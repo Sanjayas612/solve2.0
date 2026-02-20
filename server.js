@@ -155,9 +155,9 @@ app.post('/api/auth/google', async (req, res) => {
     }
 
     // Save session
-    req.session.user = { role: 'student', id: student._id, email, name: student.name };
+    req.session.user = { role: 'student', username: student.usn, id: student._id, email, name: student.name };
 
-    res.json({ success: true });
+    res.json({ success: true, role: 'student', name: student.name });
 
   } catch (err) {
     console.error(err);
