@@ -2790,25 +2790,306 @@
 
     <!-- ══════ PAGE: DRIVE FEED ══════ -->
     <div class="page" id="page-feed">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div>
-          <div style="font-size:15px;font-weight:700;">📡 Personalised Drive Feed</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:3px;">Only companies you're eligible for — no clutter
+      <style>
+        /* ── FEED TABS ── */
+        .feed-tabs {
+          display: flex;
+          gap: 4px;
+          background: var(--surface2);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 5px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .feed-tab {
+          flex: 1;
+          min-width: 100px;
+          padding: 9px 14px;
+          border-radius: 10px;
+          border: none;
+          background: transparent;
+          color: var(--text2);
+          font-family: inherit;
+          font-size: 12.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.18s;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        .feed-tab:hover {
+          color: var(--text);
+          background: rgba(255, 255, 255, 0.04);
+        }
+
+        .feed-tab.active {
+          background: var(--surface);
+          color: var(--text);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .feed-tab.active.tab-eligible {
+          color: var(--success);
+        }
+
+        .feed-tab.active.tab-all {
+          color: var(--accent);
+        }
+
+        .feed-tab.active.tab-history {
+          color: var(--warning);
+        }
+
+        /* ── DRIVE CARD STATES ── */
+        .drive-card-s.ineligible {
+          opacity: 0.62;
+          border-left: 3px solid var(--danger) !important;
+          filter: saturate(0.6);
+        }
+
+        .drive-card-s.ineligible:hover {
+          opacity: 0.78;
+        }
+
+        .ineligible-reasons {
+          background: rgba(244, 63, 94, 0.07);
+          border: 1px solid rgba(244, 63, 94, 0.18);
+          border-radius: 8px;
+          padding: 9px 12px;
+          margin-top: 10px;
+          font-size: 11.5px;
+          color: #f87171;
+        }
+
+        .ineligible-reasons strong {
+          display: block;
+          margin-bottom: 4px;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .ineligible-reasons ul {
+          margin: 0;
+          padding-left: 16px;
+        }
+
+        .ineligible-reasons li {
+          margin-bottom: 2px;
+        }
+
+        /* ── HISTORY SECTION ── */
+        .history-section-label {
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1.2px;
+          color: var(--text3);
+          padding: 4px 0 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .history-section-label::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--border);
+        }
+
+        .history-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          padding: 16px 18px;
+          margin-bottom: 12px;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 10px;
+          align-items: center;
+          border-left: 3px solid var(--border);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .history-card:hover {
+          border-left-color: var(--warning);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .history-card.hc-selected {
+          border-left-color: var(--success);
+        }
+
+        .history-card.hc-not-applied {
+          border-left-color: var(--text3);
+        }
+
+        .history-card.hc-applied {
+          border-left-color: var(--accent);
+        }
+
+        .hc-company {
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 4px;
+        }
+
+        .hc-meta {
+          font-size: 12px;
+          color: var(--text2);
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .hc-status-pill {
+          padding: 5px 14px;
+          border-radius: 20px;
+          font-size: 11.5px;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .hc-eligible-tag {
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 10px;
+          display: inline-block;
+          margin-left: 6px;
+        }
+
+        .hc-eligible-tag.yes {
+          background: rgba(34, 197, 94, 0.1);
+          color: var(--success);
+        }
+
+        .hc-eligible-tag.no {
+          background: rgba(244, 63, 94, 0.1);
+          color: var(--danger);
+        }
+
+        /* ── FEED STATS ── */
+        .feed-stats {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        .feed-stat {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 10px 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+          min-width: 100px;
+        }
+
+        .feed-stat-val {
+          font-size: 20px;
+          font-weight: 800;
+        }
+
+        .feed-stat-lbl {
+          font-size: 10.5px;
+          color: var(--text2);
+        }
+
+        .feed-search {
+          position: relative;
+          margin-bottom: 16px;
+        }
+
+        .feed-search input {
+          width: 100%;
+          padding: 10px 14px 10px 38px;
+          background: var(--surface2);
+          border: 1px solid var(--border);
+          border-radius: 11px;
+          color: var(--text);
+          font-family: inherit;
+          font-size: 13px;
+          transition: border-color 0.2s;
+        }
+
+        .feed-search input:focus {
+          outline: none;
+          border-color: var(--accent);
+        }
+
+        .feed-search .si {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 15px;
+        }
+      </style>
+
+      <div class="feed-stats" id="feed-stats-bar">
+        <div class="feed-stat">
+          <div style="font-size:18px">🏢</div>
+          <div>
+            <div class="feed-stat-val" id="fs-total">—</div>
+            <div class="feed-stat-lbl">Total Companies</div>
           </div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <select class="field" style="width:auto;padding:7px 12px;font-size:12px;" id="feed-filter"
-            onchange="renderFeed()">
-            <option value="">All Status</option>
-            <option value="active">🟢 Active</option>
-            <option value="upcoming">🔵 Upcoming</option>
-          </select>
+        <div class="feed-stat">
+          <div style="font-size:18px">✅</div>
+          <div>
+            <div class="feed-stat-val" id="fs-eligible" style="color:var(--success)">—</div>
+            <div class="feed-stat-lbl">You're Eligible</div>
+          </div>
+        </div>
+        <div class="feed-stat">
+          <div style="font-size:18px">📨</div>
+          <div>
+            <div class="feed-stat-val" id="fs-applied" style="color:var(--accent)">—</div>
+            <div class="feed-stat-lbl">Applied</div>
+          </div>
+        </div>
+        <div class="feed-stat">
+          <div style="font-size:18px">🏆</div>
+          <div>
+            <div class="feed-stat-val" id="fs-history" style="color:var(--warning)">—</div>
+            <div class="feed-stat-lbl">Past Drives</div>
+          </div>
         </div>
       </div>
+
+      <!-- Tabs -->
+      <div class="feed-tabs">
+        <button class="feed-tab tab-eligible active" onclick="setFeedTab('eligible', this)">✅ Eligible Drives</button>
+        <button class="feed-tab tab-all" onclick="setFeedTab('all', this)">🏢 All Companies</button>
+        <button class="feed-tab tab-history" onclick="setFeedTab('history', this)">📜 Campus History</button>
+      </div>
+
+      <!-- Search + filter row -->
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;">
+        <div class="feed-search" style="flex:1">
+          <span class="si">🔍</span>
+          <input type="text" id="feed-search" placeholder="Search company, location, package…" oninput="renderFeed()">
+        </div>
+        <select class="field" style="width:auto;padding:8px 12px;font-size:12px;flex-shrink:0;" id="feed-filter"
+          onchange="renderFeed()">
+          <option value="">All Status</option>
+          <option value="active">🟢 Active</option>
+          <option value="upcoming">🔵 Upcoming</option>
+        </select>
+      </div>
+
       <div class="drive-feed" id="drive-feed-list">
         <div class="empty">
           <div class="e-icon">⏳</div>
-          <p>Loading eligible drives…</p>
+          <p>Loading drives…</p>
         </div>
       </div>
     </div>
@@ -3705,7 +3986,7 @@
     // ═══════════════════════════════════════════════════════════
     const pageTitles = {
       home: ['Home', 'Your placement journey at a glance'],
-      feed: ['Drive Feed', 'Companies you\'re eligible for'],
+      feed: ['Drive Feed', 'All companies visiting campus — apply where you\'re eligible'],
       tracker: ['My Applications', 'Track your placement progress'],
       assessments: ['Assessments', 'Tests & evaluations'],
       quiz: ['Take Assessment', 'Complete your test'],
@@ -3837,66 +4118,173 @@
     // ═══════════════════════════════════════════════════════════
     // DRIVE FEED
     // ═══════════════════════════════════════════════════════════
+    let _feedTab = 'eligible';
+
+    function setFeedTab(tab, btn) {
+      _feedTab = tab;
+      document.querySelectorAll('.feed-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      // Hide status filter on history tab
+      document.getElementById('feed-filter').style.display = tab === 'history' ? 'none' : '';
+      renderFeed();
+    }
+
     async function loadFeed() {
       const el = document.getElementById('drive-feed-list');
-      el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>';
-      const drives = await api('GET', `/api/drives/student/${currentUser.username}`);
+      el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading all drives…</p></div>';
+      const drives = await api('GET', `/api/drives/student/${currentUser.username}/all`);
       allDrives = Array.isArray(drives) ? drives : [];
-      // Update badge
+
+      // Update stats
+      const apps = studentData?.driveApplications || [];
+      const activeDrives = allDrives.filter(d => d.status !== 'completed');
+      const eligibleDrives = activeDrives.filter(d => d.isEligible);
+      const historyDrives = allDrives.filter(d => d.status === 'completed');
+      const appliedCount = apps.filter(a => ['applied', 'shortlisted', 'selected'].includes(a.status)).length;
+
+      document.getElementById('fs-total').textContent = activeDrives.length;
+      document.getElementById('fs-eligible').textContent = eligibleDrives.length;
+      document.getElementById('fs-applied').textContent = appliedCount;
+      document.getElementById('fs-history').textContent = historyDrives.length;
+
+      // Badge shows eligible count
       const badge = document.getElementById('feed-badge');
-      if (allDrives.length > 0) { badge.style.display = ''; badge.textContent = allDrives.length; }
+      if (eligibleDrives.length > 0) { badge.style.display = ''; badge.textContent = eligibleDrives.length; }
       else badge.style.display = 'none';
+
       renderFeed();
     }
 
     function renderFeed() {
-      const filter = document.getElementById('feed-filter').value;
+      const statusFilter = document.getElementById('feed-filter')?.value || '';
+      const searchQ = (document.getElementById('feed-search')?.value || '').toLowerCase();
       const el = document.getElementById('drive-feed-list');
-      const drives = filter ? allDrives.filter(d => d.status === filter) : allDrives;
-      if (!drives.length) {
-        el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">🎯</div><h3>No drives found</h3><p>Check back later for new opportunities</p></div>`;
+      const apps = studentData?.driveApplications || [];
+
+      // ── HISTORY TAB ──
+      if (_feedTab === 'history') {
+        let histDrives = allDrives.filter(d => d.status === 'completed');
+        if (searchQ) histDrives = histDrives.filter(d =>
+          d.companyName?.toLowerCase().includes(searchQ) ||
+          d.location?.toLowerCase().includes(searchQ) ||
+          d.package?.toLowerCase().includes(searchQ)
+        );
+        if (!histDrives.length) {
+          el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">📜</div><h3>No Campus History Yet</h3><p>Companies that visited campus will appear here after drives close</p></div>`;
+          return;
+        }
+        // Group by year (from driveDate)
+        const byYear = {};
+        histDrives.forEach(d => {
+          const yr = d.driveDate ? new Date(d.driveDate).getFullYear() : 'Unknown';
+          if (!byYear[yr]) byYear[yr] = [];
+          byYear[yr].push(d);
+        });
+        let html = '';
+        for (const [yr, drives] of Object.entries(byYear).sort((a, b) => b[0] - a[0])) {
+          html += `<div class="history-section-label">${yr}</div>`;
+          drives.forEach(d => {
+            const app = apps.find(a => a.driveId === d._id);
+            const myStatus = app ? app.status : null;
+            const wasEligible = d.isEligible;
+            let pillColor = '#475569'; let pillBg = 'rgba(71,85,105,0.12)'; let pillText = '—';
+            if (myStatus === 'selected') { pillColor = 'var(--success)'; pillBg = 'rgba(34,197,94,0.1)'; pillText = '🏆 Selected'; }
+            else if (myStatus === 'shortlisted') { pillColor = 'var(--warning)'; pillBg = 'rgba(245,158,11,0.1)'; pillText = '⭐ Shortlisted'; }
+            else if (myStatus === 'applied') { pillColor = 'var(--accent)'; pillBg = 'rgba(79,142,247,0.1)'; pillText = '📨 Applied'; }
+            else if (myStatus === 'rejected') { pillColor = 'var(--danger)'; pillBg = 'rgba(244,63,94,0.1)'; pillText = '✗ Rejected'; }
+            else if (wasEligible) { pillText = 'Did Not Apply'; }
+            else { pillText = 'Not Eligible'; }
+            html += `<div class="history-card ${myStatus === 'selected' ? 'hc-selected' : myStatus ? 'hc-applied' : 'hc-not-applied'}">
+              <div>
+                <div class="hc-company">
+                  🏢 ${d.companyName}
+                  <span class="hc-eligible-tag ${wasEligible ? 'yes' : 'no'}">${wasEligible ? '✓ Eligible' : '✗ Not Eligible'}</span>
+                </div>
+                <div class="hc-meta">
+                  ${d.package ? `<span>💰 ${d.package}</span>` : ''}
+                  ${d.location ? `<span>📍 ${d.location}</span>` : ''}
+                  ${d.driveDate ? `<span>📅 ${fmtDate(d.driveDate)}</span>` : ''}
+                  ${d.eligibleBranches?.length ? `<span>🎓 ${d.eligibleBranches.join(', ')}</span>` : '<span>🎓 All Branches</span>'}
+                  <span>CGPA ≥ ${d.minCGPA}</span>
+                </div>
+              </div>
+              <div class="hc-status-pill" style="color:${pillColor};background:${pillBg}">${pillText}</div>
+            </div>`;
+          });
+        }
+        el.innerHTML = html;
         return;
       }
-      const apps = studentData?.driveApplications || [];
+
+      // ── ELIGIBLE or ALL TAB ──
+      let drives = allDrives.filter(d => d.status !== 'completed');
+      if (_feedTab === 'eligible') drives = drives.filter(d => d.isEligible);
+      if (statusFilter) drives = drives.filter(d => d.status === statusFilter);
+      if (searchQ) drives = drives.filter(d =>
+        d.companyName?.toLowerCase().includes(searchQ) ||
+        d.location?.toLowerCase().includes(searchQ) ||
+        d.package?.toLowerCase().includes(searchQ)
+      );
+
+      if (!drives.length) {
+        const msg = _feedTab === 'eligible'
+          ? '<h3>No eligible drives</h3><p>You\'ll be notified when new drives match your profile</p>'
+          : '<h3>No drives found</h3><p>Check back soon for new opportunities</p>';
+        el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">🎯</div>${msg}</div>`;
+        return;
+      }
+
       el.innerHTML = drives.map(d => {
         const app = apps.find(a => a.driveId === d._id);
         const status = app ? app.status : 'eligible';
         const applied = ['applied', 'shortlisted', 'selected'].includes(status);
         const deadline = d.deadline ? new Date(d.deadline) : null;
         const isExpired = deadline && deadline < new Date();
-        return `<div class="drive-card-s status-${d.status}">
-      <div class="dc-header">
-        <div class="dc-company">
-          <div class="dc-company-icon">🏢</div>
-          ${d.companyName}
-        </div>
-        <div style="display:flex;gap:7px;align-items:center;">
-          <span class="badge ${d.status === 'active' ? 'b-green' : d.status === 'upcoming' ? 'b-blue' : 'b-gray'}">${d.status === 'active' ? '🟢 Active' : d.status === 'upcoming' ? '🔵 Upcoming' : '✓ Completed'}</span>
-          ${statusBadge(status)}
-        </div>
-      </div>
-      <div class="dc-meta">
-        ${d.package ? `<span class="chip">💰 <strong>${d.package}</strong></span>` : ''}
-        ${d.location ? `<span class="chip">📍 <strong>${d.location}</strong></span>` : ''}
-        <span class="chip">📊 CGPA ≥ <strong>${d.minCGPA}</strong></span>
-        <span class="chip">🚫 Max Backlogs: <strong>${d.maxBacklogs}</strong></span>
-        ${d.driveDate ? `<span class="chip">📅 <strong>${fmtDate(d.driveDate)}</strong></span>` : ''}
-        ${d.eligibleBranches?.length ? `<span class="chip">🎓 ${d.eligibleBranches.join(', ')}</span>` : '<span class="chip">🎓 All Branches</span>'}
-      </div>
-      ${d.description ? `<div class="dc-desc">${d.description}</div>` : ''}
-      <div class="dc-footer">
-        <div class="dc-deadline">
-          Deadline: ${deadline ? `<strong ${isExpired ? 'style="color:var(--danger)"' : ''}>${fmtDate(d.deadline)}${isExpired ? ' (Expired)' : ''}</strong>` : '<strong>Open</strong>'}
-        </div>
-        <div class="dc-actions">
-          ${!applied && !isExpired && d.status !== 'completed' ?
-            `<button class="btn btn-primary btn-sm" onclick="openApply('${d._id}','${d.companyName}')">Apply Now →</button>` :
-            applied ? `<button class="btn btn-outline btn-sm" disabled>✓ ${status.charAt(0).toUpperCase() + status.slice(1)}</button>` :
-              `<button class="btn btn-outline btn-sm" disabled>Closed</button>`
-          }
-        </div>
-      </div>
-    </div>`;
+        const isEligible = d.isEligible;
+
+        const ineligibleBlock = !isEligible && d.ineligibleReasons?.length ? `
+          <div class="ineligible-reasons">
+            <strong>⚠ Why you're not eligible</strong>
+            <ul>${d.ineligibleReasons.map(r => `<li>${r}</li>`).join('')}</ul>
+          </div>` : '';
+
+        const actionBtn = isEligible
+          ? (!applied && !isExpired && d.status !== 'completed'
+            ? `<button class="btn btn-primary btn-sm" onclick="openApply('${d._id}','${d.companyName}')">Apply Now →</button>`
+            : applied
+              ? `<button class="btn btn-outline btn-sm" disabled>✓ ${status.charAt(0).toUpperCase() + status.slice(1)}</button>`
+              : `<button class="btn btn-outline btn-sm" disabled>Closed</button>`)
+          : `<button class="btn btn-outline btn-sm" disabled style="opacity:0.4;cursor:not-allowed">Not Eligible</button>`;
+
+        return `<div class="drive-card-s status-${d.status}${!isEligible ? ' ineligible' : ''}">
+          <div class="dc-header">
+            <div class="dc-company">
+              <div class="dc-company-icon">🏢</div>
+              ${d.companyName}
+              ${!isEligible ? '<span style="font-size:10px;color:var(--danger);font-weight:700;margin-left:6px;background:rgba(244,63,94,0.1);padding:2px 8px;border-radius:10px;">Not Eligible</span>' : ''}
+            </div>
+            <div style="display:flex;gap:7px;align-items:center;">
+              <span class="badge ${d.status === 'active' ? 'b-green' : d.status === 'upcoming' ? 'b-blue' : 'b-gray'}">${d.status === 'active' ? '🟢 Active' : d.status === 'upcoming' ? '🔵 Upcoming' : '✓ Completed'}</span>
+              ${isEligible ? statusBadge(status) : ''}
+            </div>
+          </div>
+          <div class="dc-meta">
+            ${d.package ? `<span class="chip">💰 <strong>${d.package}</strong></span>` : ''}
+            ${d.location ? `<span class="chip">📍 <strong>${d.location}</strong></span>` : ''}
+            <span class="chip">📊 CGPA ≥ <strong>${d.minCGPA}</strong></span>
+            <span class="chip">🚫 Max Backlogs: <strong>${d.maxBacklogs}</strong></span>
+            ${d.driveDate ? `<span class="chip">📅 <strong>${fmtDate(d.driveDate)}</strong></span>` : ''}
+            ${d.eligibleBranches?.length ? `<span class="chip">🎓 ${d.eligibleBranches.join(', ')}</span>` : '<span class="chip">🎓 All Branches</span>'}
+          </div>
+          ${d.description ? `<div class="dc-desc">${d.description}</div>` : ''}
+          ${ineligibleBlock}
+          <div class="dc-footer">
+            <div class="dc-deadline">
+              Deadline: ${deadline ? `<strong ${isExpired ? 'style="color:var(--danger)"' : ''}>${fmtDate(d.deadline)}${isExpired ? ' (Expired)' : ''}</strong>` : '<strong>Open</strong>'}
+            </div>
+            <div class="dc-actions">${actionBtn}</div>
+          </div>
+        </div>`;
       }).join('');
     }
 

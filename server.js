@@ -533,6 +533,26 @@ app.get('/api/drives/student/:usn', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// All drives (active + upcoming + completed) with eligibility flag per student
+app.get('/api/drives/student/:usn/all', async (req, res) => {
+  try {
+    const student = await Student.findOne({ usn: req.params.usn });
+    if (!student) return res.status(404).json({ error: 'Student not found' });
+    const drives = await Drive.find({}).sort({ driveDate: -1 });
+    const result = drives.map(d => {
+      const reasons = [];
+      if (student.cgpa < d.minCGPA) reasons.push(`CGPA ${student.cgpa} < required ${d.minCGPA}`);
+      if (student.backlogs > d.maxBacklogs) reasons.push(`${student.backlogs} backlog(s) exceed limit of ${d.maxBacklogs}`);
+      if (d.eligibleBranches.length > 0 && !d.eligibleBranches.includes(student.branch))
+        reasons.push(`Branch ${student.branch} not eligible (${d.eligibleBranches.join(', ')})`);
+      if (d.eligibleYear.length > 0 && !d.eligibleYear.includes(student.year))
+        reasons.push(`Year ${student.year} not in eligible years`);
+      return { ...d.toObject(), isEligible: reasons.length === 0, ineligibleReasons: reasons };
+    });
+    res.json(result);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── AI QUIZ GENERATION ───────────────────────────────────────────────────────
 app.post('/api/quiz/generate', async (req, res) => {
   try {
