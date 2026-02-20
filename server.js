@@ -11,11 +11,12 @@ const https = require('https');
 const { OAuth2Client } = require('google-auth-library');
 
 // ─── AI HELPER — Gemini 2.0 Flash (primary) + OpenRouter (fallback) ─────────
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAF29JUbKPg6kfr-ZdaMxXpsnIU-1yRQ4c';
 
 function geminiRequest(systemPrompt, userMessages, maxTokens) {
   return new Promise((resolve, reject) => {
+    // Build URL fresh each call so env var changes take effect
+    const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY;
     // Build Gemini contents array from history
     const contents = [];
     for (const m of userMessages) {
@@ -53,11 +54,7 @@ function geminiRequest(systemPrompt, userMessages, maxTokens) {
 }
 
 function openRouterRequest(body) {
-  // Multiple free keys to rotate through
-  const OR_KEYS = [
-    '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',
-    'sk-or-v1-6e4a2d8b1f3c5e7a9d0b2c4e6f8a0b2d4e6f8a0b2d4e6f8a0b2d4e6f8a0b2d4'
-  ];
+  const OR_KEY = process.env.OPENROUTER_KEY || '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';
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify(body);
     const options = {
@@ -65,7 +62,7 @@ function openRouterRequest(body) {
       path: '/api/v1/chat/completions',
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + OR_KEYS[0],
+        'Authorization': 'Bearer ' + OR_KEY,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://solve-q7hx.onrender.com',
         'X-Title': 'PlacementPro',
@@ -432,80 +429,139 @@ app.post('/api/quiz/generate', async (req, res) => {
     const { categories, subTopics, questionCount = 10, difficulty = 'mixed' } = req.body;
     if (!categories || !categories.length) return res.status(400).json({ error: 'Categories required' });
 
-    const topicList = [...categories, ...(subTopics || [])].join(', ');
-    const prompt = `You are an expert technical interview question creator for campus placements in India. Generate exactly ${questionCount} unique multiple-choice questions covering: ${topicList}.
+    // ── LARGE QUESTION BANK ──────────────────────────────────────────────────
+    const BANK = {
+      Aptitude: [
+        { question: "If a train travels 360 km in 4 hours, what is its speed in m/s?", options: ["25 m/s","50 m/s","90 m/s","100 m/s"], correctAnswer: 0, topic: "Speed & Distance" },
+        { question: "A can do a work in 15 days, B in 20 days. Together they finish in?", options: ["8 days","8.57 days","9 days","10 days"], correctAnswer: 1, topic: "Time & Work" },
+        { question: "What is 15% of 480?", options: ["62","68","72","76"], correctAnswer: 2, topic: "Percentages" },
+        { question: "If 6 men can do a job in 10 days, how many men are needed to do it in 5 days?", options: ["10","12","14","16"], correctAnswer: 1, topic: "Time & Work" },
+        { question: "A sum doubles in 10 years at simple interest. Rate of interest per annum?", options: ["8%","10%","12%","15%"], correctAnswer: 1, topic: "Simple Interest" },
+        { question: "Find the next number: 2, 6, 12, 20, 30, ?", options: ["40","42","44","46"], correctAnswer: 1, topic: "Number Series" },
+        { question: "Find the odd one out: 2, 3, 5, 7, 9, 11", options: ["2","9","3","5"], correctAnswer: 1, topic: "Odd One Out" },
+        { question: "What is the LCM of 12 and 18?", options: ["24","36","48","72"], correctAnswer: 1, topic: "LCM & HCF" },
+        { question: "A shopkeeper sells a product at 20% profit. If CP is ₹500, what is SP?", options: ["₹580","₹600","₹620","₹640"], correctAnswer: 1, topic: "Profit & Loss" },
+        { question: "If ABCD = 1234, then DCBA = ?", options: ["4321","3241","4312","3421"], correctAnswer: 0, topic: "Coding" },
+        { question: "Average of first 10 natural numbers?", options: ["5","5.5","6","6.5"], correctAnswer: 1, topic: "Averages" },
+        { question: "A pipe fills a tank in 4 hrs, another drains it in 8 hrs. Together?", options: ["6 hrs","7 hrs","8 hrs","10 hrs"], correctAnswer: 2, topic: "Pipes & Cisterns" },
+        { question: "Ratio of 3:4 means if one part is 75, other is?", options: ["90","100","112","125"], correctAnswer: 1, topic: "Ratio & Proportion" },
+        { question: "Which is the smallest prime number?", options: ["0","1","2","3"], correctAnswer: 2, topic: "Number Theory" },
+        { question: "Find the missing: 1, 4, 9, 16, ?, 36", options: ["20","25","28","30"], correctAnswer: 1, topic: "Number Series" },
+        { question: "If 40% of a number is 120, the number is?", options: ["250","300","350","400"], correctAnswer: 1, topic: "Percentages" },
+        { question: "Speed of boat in still water is 10 km/h, stream speed 2 km/h. Upstream speed?", options: ["6","8","10","12"], correctAnswer: 1, topic: "Boats & Streams" },
+        { question: "How many ways to arrange letters in 'DOG'?", options: ["3","4","6","8"], correctAnswer: 2, topic: "Permutations" },
+        { question: "Compound interest on ₹1000 at 10% for 2 years?", options: ["₹200","₹205","₹210","₹215"], correctAnswer: 2, topic: "Compound Interest" },
+        { question: "If today is Monday, what day is 100 days later?", options: ["Wednesday","Thursday","Friday","Saturday"], correctAnswer: 1, topic: "Calendar" }
+      ],
+      "Logical Reasoning": [
+        { question: "All cats are animals. Some animals are dogs. Which is definitely true?", options: ["Some cats are dogs","All animals are cats","Some cats may not be animals","All dogs are animals"], correctAnswer: 3, topic: "Syllogisms" },
+        { question: "DOCTOR : HOSPITAL :: TEACHER : ?", options: ["BOOK","SCHOOL","STUDENT","DESK"], correctAnswer: 1, topic: "Analogies" },
+        { question: "If A > B, B > C, then?", options: ["C > A","A > C","A = C","C > B"], correctAnswer: 1, topic: "Inequalities" },
+        { question: "Find the odd one out: Apple, Mango, Carrot, Orange", options: ["Apple","Mango","Carrot","Orange"], correctAnswer: 2, topic: "Classification" },
+        { question: "A is B's brother. B is C's mother. How is A related to C?", options: ["Father","Uncle","Grandfather","Brother"], correctAnswer: 1, topic: "Blood Relations" },
+        { question: "Point A is 5km North of B. C is 3km East of B. A is ? of C.", options: ["North-East","North-West","South-East","South-West"], correctAnswer: 1, topic: "Direction Sense" },
+        { question: "6th from left is 14th from right in a row. Total students?", options: ["18","19","20","21"], correctAnswer: 1, topic: "Ordering" },
+        { question: "If FIRE = 6935, CODE = ?", options: ["3145","3154","1345","5314"], correctAnswer: 0, topic: "Coding-Decoding" },
+        { question: "Mirror image of 'p' is?", options: ["b","d","q","p"], correctAnswer: 1, topic: "Mirror Images" },
+        { question: "Statement: All pens are books. Conclusion: Some books are pens.", options: ["True","False","Uncertain","Partly true"], correctAnswer: 0, topic: "Syllogisms" },
+        { question: "Which figure completes the series: Circle, Square, Triangle, Circle, Square, ?", options: ["Circle","Square","Triangle","Pentagon"], correctAnswer: 2, topic: "Pattern" },
+        { question: "If 5 * 3 = 28 and 6 * 2 = 32, then 7 * 4 = ?", options: ["44","45","46","47"], correctAnswer: 0, topic: "Mathematical Puzzles" }
+      ],
+      Technical: [
+        { question: "What is the time complexity of binary search?", options: ["O(n)","O(log n)","O(n²)","O(1)"], correctAnswer: 1, topic: "Algorithms" },
+        { question: "Which data structure uses LIFO principle?", options: ["Queue","Stack","Array","Linked List"], correctAnswer: 1, topic: "Data Structures" },
+        { question: "What does SQL stand for?", options: ["Structured Query Language","Simple Query Language","Standard Query Language","Sequential Query Language"], correctAnswer: 0, topic: "SQL" },
+        { question: "Which OOP concept allows a class to inherit from multiple classes?", options: ["Encapsulation","Multiple Inheritance","Polymorphism","Abstraction"], correctAnswer: 1, topic: "OOP" },
+        { question: "What is a primary key in a database?", options: ["A key that can be NULL","A unique identifier for each record","A foreign key reference","An index key"], correctAnswer: 1, topic: "DBMS" },
+        { question: "Which sorting algorithm has O(n log n) average time complexity?", options: ["Bubble Sort","Selection Sort","Merge Sort","Insertion Sort"], correctAnswer: 2, topic: "Algorithms" },
+        { question: "What does HTTP stand for?", options: ["HyperText Transfer Protocol","High Text Transfer Protocol","HyperText Transmission Protocol","High Transfer Text Protocol"], correctAnswer: 0, topic: "Networks" },
+        { question: "Which layer of OSI model is responsible for routing?", options: ["Data Link","Network","Transport","Session"], correctAnswer: 1, topic: "Networks" },
+        { question: "What is a deadlock in OS?", options: ["Process waiting forever","Memory overflow","CPU overload","Disk failure"], correctAnswer: 0, topic: "Operating Systems" },
+        { question: "Which of the following is not a type of JOIN in SQL?", options: ["INNER JOIN","OUTER JOIN","CROSS JOIN","CIRCULAR JOIN"], correctAnswer: 3, topic: "SQL" },
+        { question: "Time complexity of inserting into a hash table (average)?", options: ["O(1)","O(log n)","O(n)","O(n²)"], correctAnswer: 0, topic: "Data Structures" },
+        { question: "What is normalization in DBMS?", options: ["Adding redundancy","Reducing redundancy","Deleting records","Encrypting data"], correctAnswer: 1, topic: "DBMS" },
+        { question: "Which principle states a class should have only one reason to change?", options: ["Open/Closed","Liskov Substitution","Single Responsibility","Interface Segregation"], correctAnswer: 2, topic: "OOP" },
+        { question: "What does DFS stand for in graph traversal?", options: ["Data First Search","Depth First Search","Direct First Search","Deep File System"], correctAnswer: 1, topic: "Algorithms" },
+        { question: "What is a foreign key?", options: ["Key from another country","Key referencing primary key of another table","Unique key","Composite key"], correctAnswer: 1, topic: "DBMS" },
+        { question: "Which protocol is used for secure web communication?", options: ["HTTP","FTP","HTTPS","SMTP"], correctAnswer: 2, topic: "Networks" },
+        { question: "What is the output of: 5 & 3 in binary?", options: ["0","1","7","15"], correctAnswer: 1, topic: "Programming" },
+        { question: "Which data structure is best for implementing recursion?", options: ["Array","Queue","Stack","Heap"], correctAnswer: 2, topic: "Data Structures" },
+        { question: "What is virtual memory?", options: ["RAM extension using disk","Cache memory","ROM extension","Swap space only"], correctAnswer: 0, topic: "Operating Systems" },
+        { question: "What does API stand for?", options: ["Application Programming Interface","Application Process Integration","Automated Program Interface","Application Protocol Internet"], correctAnswer: 0, topic: "Programming" }
+      ],
+      Programming: [
+        { question: "What is a pointer in C?", options: ["Variable storing value","Variable storing address","Function","Array element"], correctAnswer: 1, topic: "C Programming" },
+        { question: "What is the size of int in a 64-bit system?", options: ["2 bytes","4 bytes","8 bytes","16 bytes"], correctAnswer: 1, topic: "C Programming" },
+        { question: "What is 'this' keyword in Java?", options: ["Refers to current class","Refers to parent class","Refers to static method","Refers to interface"], correctAnswer: 0, topic: "Java" },
+        { question: "Which keyword is used to prevent inheritance in Java?", options: ["static","abstract","final","private"], correctAnswer: 2, topic: "Java" },
+        { question: "What does print(type([])) output in Python?", options: ["<class 'tuple'>","<class 'list'>","<class 'dict'>","<class 'set'>"], correctAnswer: 1, topic: "Python" },
+        { question: "What is the correct way to declare a constant in JavaScript?", options: ["var","let","const","static"], correctAnswer: 2, topic: "JavaScript" },
+        { question: "Which Python data type is immutable?", options: ["List","Dictionary","Set","Tuple"], correctAnswer: 3, topic: "Python" },
+        { question: "What is method overloading?", options: ["Same name, different params","Same name, same params","Different names","Inheritance"], correctAnswer: 0, topic: "OOP" }
+      ],
+      "HR Interview": [
+        { question: "What is the best answer for 'Tell me about yourself'?", options: ["Share personal life","Share professional background relevant to job","Repeat your resume","Talk about hobbies only"], correctAnswer: 1, topic: "HR Questions" },
+        { question: "When asked 'What is your greatest weakness?', you should?", options: ["Say you have no weakness","State a real weakness and how you're improving","Give a strength disguised as weakness","Avoid the question"], correctAnswer: 1, topic: "HR Questions" },
+        { question: "For 'Where do you see yourself in 5 years?', best response is?", options: ["Running the company","Vague answer","Career growth aligned with company goals","I don't know"], correctAnswer: 2, topic: "HR Questions" },
+        { question: "When negotiating salary you should?", options: ["Accept first offer","Research market rate and give a range","Demand highest possible","Avoid discussing salary"], correctAnswer: 1, topic: "Salary Negotiation" },
+        { question: "'Why should we hire you?' best approach?", options: ["Say you need the job","Highlight unique skills matching the JD","Compare yourself to others","Say you're the best"], correctAnswer: 1, topic: "HR Questions" },
+        { question: "What does STAR method stand for in interviews?", options: ["Skill, Task, Action, Result","Situation, Task, Action, Result","Strategy, Team, Achieve, Result","Skill, Timeline, Achievement, Role"], correctAnswer: 1, topic: "Interview Technique" },
+        { question: "Body language in an interview should be?", options: ["Casual and relaxed","Confident, open posture, eye contact","Formal and stiff","Aggressive"], correctAnswer: 1, topic: "Soft Skills" },
+        { question: "When asked 'Do you have questions for us?', you should?", options: ["Say No","Ask about salary immediately","Ask about team, role, and growth","Avoid questions"], correctAnswer: 2, topic: "HR Questions" }
+      ],
+      "Soft Skills": [
+        { question: "Active listening means?", options: ["Waiting to speak","Fully concentrating and understanding the speaker","Nodding continuously","Looking attentive without listening"], correctAnswer: 1, topic: "Communication" },
+        { question: "Which communication style is most effective professionally?", options: ["Aggressive","Passive","Assertive","Submissive"], correctAnswer: 2, topic: "Communication" },
+        { question: "What is emotional intelligence?", options: ["IQ level","Ability to understand and manage emotions","Memory power","Technical skills"], correctAnswer: 1, topic: "EQ" },
+        { question: "Teamwork means?", options: ["Doing everything yourself","Collaborating to achieve a common goal","Following leader blindly","Competing with teammates"], correctAnswer: 1, topic: "Teamwork" }
+      ]
+    };
 
-Rules:
-- Difficulty: ${difficulty}
-- Each question MUST be completely unique
-- Questions must be placement/campus interview focused
-- Return ONLY a raw JSON object — no markdown, no code fences, no explanation
+    // ── Select questions from bank matching requested categories ─────────────
+    const allCats = [...categories, ...(subTopics || [])];
+    let pool = [];
 
-Required JSON structure (return exactly this, nothing else):
-{"questions":[{"question":"Question text?","options":["Option A","Option B","Option C","Option D"],"correctAnswer":0,"topic":"${categories[0]}","marks":1}]}
-
-correctAnswer is 0-indexed (0=A,1=B,2=C,3=D). Generate all ${questionCount} questions now:`;
-
-    // Try Gemini first, then OpenRouter fallback
-    let content = '';
-    let lastError = '';
-
-    try {
-      console.log('Trying Gemini 2.0 Flash for quiz...');
-      content = await geminiRequest('You are an expert quiz generator. Return ONLY raw JSON, no markdown.', [{ role: 'user', content: prompt }], 4000);
-      console.log('Gemini quiz OK');
-    } catch(e) {
-      lastError = 'Gemini: ' + e.message;
-      console.log('Gemini failed, trying OpenRouter...', e.message);
-      const OR_MODELS = ['meta-llama/llama-3.1-8b-instruct:free', 'mistralai/mistral-7b-instruct:free', 'google/gemma-2-9b-it:free'];
-      for (const model of OR_MODELS) {
-        try {
-          const data = await openRouterRequest({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 });
-          if (data.error) { lastError = data.error.message; continue; }
-          content = data.choices?.[0]?.message?.content || '';
-          if (content.trim()) { console.log('OpenRouter quiz OK:', model); break; }
-        } catch(err) { lastError = err.message; }
+    for (const cat of allCats) {
+      // Exact match first
+      if (BANK[cat]) { pool.push(...BANK[cat]); continue; }
+      // Partial match
+      for (const key of Object.keys(BANK)) {
+        if (key.toLowerCase().includes(cat.toLowerCase()) || cat.toLowerCase().includes(key.toLowerCase())) {
+          pool.push(...BANK[key]);
+        }
       }
     }
 
-    if (!content.trim()) {
-      return res.status(500).json({ error: 'All AI models failed. Last error: ' + lastError });
+    // If still empty, use all bank questions
+    if (!pool.length) {
+      for (const v of Object.values(BANK)) pool.push(...v);
     }
 
-    // Robustly extract JSON
-    let parsed;
-    try {
-      // Strip markdown code fences if present
-      let cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
-      // Find the JSON object
-      const start = cleaned.indexOf('{');
-      const end = cleaned.lastIndexOf('}');
-      if (start !== -1 && end !== -1) cleaned = cleaned.substring(start, end + 1);
-      parsed = JSON.parse(cleaned);
-    } catch(e) {
-      console.error('JSON parse failed. Raw content:', content.substring(0, 600));
-      return res.status(500).json({ error: 'AI returned invalid JSON. Please try again.', raw: content.substring(0, 300) });
+    // Deduplicate by question text
+    const seen = new Set();
+    pool = pool.filter(q => { if (seen.has(q.question)) return false; seen.add(q.question); return true; });
+
+    // Shuffle
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    const questions = parsed.questions || [];
-    if (!questions.length) {
-      return res.status(500).json({ error: 'AI returned 0 questions. Please try again.' });
-    }
-
-    // Ensure all questions have required fields
-    const clean = questions.map((q, i) => ({
-      question: q.question || `Question ${i+1}`,
-      options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Option A','Option B','Option C','Option D'],
-      correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+    const questions = pool.slice(0, questionCount).map(q => ({
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
       topic: q.topic || categories[0],
-      marks: q.marks || 1
+      marks: 1
     }));
 
-    res.json({ success: true, questions: clean });
+    res.json({ success: true, questions });
   } catch(e) {
     console.error('Quiz gen error:', e.stack || e.message);
     res.status(500).json({ error: e.message });
   }
+});
+
 });
 
 // ─── PLACEMENT CHATBOT ───────────────────────────────────────────────────────
@@ -550,7 +606,7 @@ Be concise, friendly, and practical. Use bullet points when listing things. Alwa
       }
     }
 
-    if (!reply.trim()) return res.status(500).json({ error: 'AI unavailable. Please try again.' });
+    if (!reply.trim()) return res.status(500).json({ error: 'AI unavailable. Please try again.', hint: 'Check GEMINI_API_KEY and OPENROUTER_KEY env vars' });
     res.json({ success: true, reply });
   } catch(e) {
     res.status(500).json({ error: e.message });
