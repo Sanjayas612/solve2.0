@@ -827,7 +827,7 @@ function showGoogleFormWaiting(usn, name) {
       Since this is your <strong>first login</strong>, you need to complete a one-time registration form.
       Please fill in all your details accurately — this information will be used for placement records.
     </p>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScBZINZkwDg9jx2hz5TX8X49NrSaTHF5MRB6Q2VECsVz4mJXA/viewform?usp=publish-editor"
+    <a href="https://forms.gle/grnW99SeeG476viF9"
        target="_blank"
        style="background:var(--accent);color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;">
       📝 Open Registration Form
@@ -846,7 +846,7 @@ function showGoogleFormWaiting(usn, name) {
   `;
 
   // Open form immediately in new tab
-  window.open('https://docs.google.com/forms/d/e/1FAIpQLScBZINZkwDg9jx2hz5TX8X49NrSaTHF5MRB6Q2VECsVz4mJXA/viewform?usp=publish-editor', '_blank');
+  window.open('https://forms.gle/grnW99SeeG476viF9', '_blank');
 
   // Poll every 5 seconds to check if form has been submitted
   let _formPollInterval = setInterval(async () => {
@@ -904,8 +904,16 @@ let _googleNameFromToken = '';
 
 async function handleGoogleLogin(response) {
   try {
-    // Decode the JWT to get the name Google already knows
+    // Decode the JWT to get email + name
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const email = payload.email || '';
+
+    // 🔒 Block non-vvce.ac.in accounts right here on the frontend
+    if (!email.endsWith('@vvce.ac.in')) {
+      alert('❌ Access denied. Only @vvce.ac.in college accounts are allowed.');
+      return;
+    }
+
     _googleCredential = response.credential;
     _googleNameFromToken = payload.name || '';
 
@@ -920,17 +928,23 @@ async function handleGoogleLogin(response) {
 }
 
 async function handleFormBtnClick(e) {
-  // Validate name first
+  // Always block the default <a> navigation — we handle everything manually
+  if (e) e.preventDefault();
+
   const nameInput = document.getElementById('google-name-input');
   const name = nameInput.value.trim();
   if (!name) {
-    if (e) e.preventDefault();
     nameInput.style.borderColor = '#f43f5e';
     nameInput.focus();
     return;
   }
 
-  // Register/update user in DB via Google auth
+  // Show loading state on button
+  const btn = document.getElementById('google-form-btn');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '⏳ Signing in…';
+  btn.style.pointerEvents = 'none';
+
   try {
     const res = await fetch('/api/auth/google', {
       method: 'POST',
@@ -940,32 +954,33 @@ async function handleFormBtnClick(e) {
     const data = await res.json();
 
     if (!data.success) {
-      if (e) e.preventDefault();
+      btn.innerHTML = origText;
+      btn.style.pointerEvents = '';
       alert(data.error || 'Google login failed');
       return;
     }
 
+    // Close modal
     document.getElementById('google-name-modal').style.display = 'none';
 
-    // Returning student (profile already filled) — skip form, go to dashboard
+    // Returning student — go straight to dashboard
     if (!data.needsProfile) {
-      if (e) e.preventDefault();
       window.location.href = '/student';
       return;
     }
 
-    // First-time student: let the link open the form, then show waiting screen
+    // First-time student — show waiting screen AND open form in new tab
     showGoogleFormWaiting(data.usn, data.name);
-    // Don't preventDefault — let the <a href> open the form in a new tab
 
   } catch (err) {
     console.error(err);
-    if (e) e.preventDefault();
-    alert('Google login failed');
+    btn.innerHTML = origText;
+    btn.style.pointerEvents = '';
+    alert('Google login failed. Please try again.');
   }
 }
 
-// Keep confirmGoogleName as alias (used by Enter key on input)
+// Alias for Enter key on input
 async function confirmGoogleName() { handleFormBtnClick(null); }
 
 // ===== NAVIGATION =====
