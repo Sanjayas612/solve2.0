@@ -1,37 +1,167 @@
-# PlacementPro – Integrated Campus Career Suite
+# 🚀 PlacementPro – Integrated Campus Career Suite
 
-Full-stack placement management dashboard for engineering colleges.
+> Bridging Students, Alumni, and Opportunities — Intelligently.
 
-## Files
-```
-index.html   ← entire frontend (SPA)
-server.js    ← entire backend (Express + all routes + all models)
-package.json
-.env         ← add your MONGO_URI here
-render.yaml  ← Render deploy config
-```
+---
 
-## Login
-| Role    | Username | Password    |
-|---------|----------|-------------|
-| Admin   | `a`      | `a`         |
-| Student | USN      | `student123`|
+## 📌 Overview
 
-## Run Locally
-```bash
-npm install
-node server.js
-# Open http://localhost:3000
-```
+PlacementPro is an AI-powered campus placement management system designed to centralize student placements, alumni interaction, and assessment preparation into one unified ecosystem.
 
-## CSV Import Format
-```
-Name,USN,Branch,Year,CGPA,Backlogs,Email,Phone
-Rahul Sharma,1MS21CS001,CSE,4,8.5,0,rahul@example.com,9876543210
-```
+Built for Solve-a-thon 1.0, this platform solves the problem of fragmented, manual placement systems used in colleges.
 
-## Deploy on Render
-1. Push to GitHub
-2. New Web Service → connect repo
-3. Build: `npm install` · Start: `node server.js`
-4. Env var: `MONGO_URI` = your MongoDB connection string
+---
+
+## 🎯 Problem Statement
+
+Most college placement systems:
+
+- Depend on Excel sheets and manual records
+- Use WhatsApp/email for notifications
+- Lack structured alumni mentorship
+- Do not provide AI-based preparation tools
+- Have no centralized analytics dashboard
+
+There is no integrated platform connecting Students, Alumni, and Placement Cells intelligently.
+
+---
+
+## 💡 Solution
+
+PlacementPro provides:
+
+- 🤖 AI-powered PlacementBot
+- 🎓 Student Dashboard
+- 👨‍💼 Alumni Dashboard
+- 💬 Alumni Connect (Chat + Resource Sharing)
+- 🧠 Aptitude & Technical Assessment System
+- 📊 Placement Analytics
+- 📂 CSV Upload for student data
+- 🔐 Google Authentication
+- 📱 Progressive Web App (PWA) support
+
+---
+
+## 🏗 Tech Stack
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+- Responsive UI
+- PWA Enabled
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- REST APIs
+
+### AI Integration
+- Gemini API
+- OpenRouter fallback
+- Dynamic question generation
+- Company insights & interview guidance
+
+---
+
+## ⚙️ Features
+
+### 🎓 For Students
+- View placement drives
+- Practice aptitude & technical tests
+- Chat with PlacementBot
+- Connect with alumni
+- Track preparation progress
+
+### 👨‍💼 For Alumni
+- Mentor students
+- Share placement resources
+- Participate in discussion groups
+- Provide career guidance
+
+### 🏫 For Placement Cell
+- Upload student data via CSV
+- Track placement statistics
+- Manage placement drives
+- Monitor student engagement
+
+---
+
+## 🖥 Installation & Setup
+
+### 1. Clone the Repository
+
+git clone https://github.com/Majenayu/solve2.0.git
+  
+---
+
+### 2. Install Dependencies
+
+npm install  
+
+---
+
+### 3. Run the Application
+
+npm start  
+
+or (for development)
+
+npm run dev  
+
+---
+
+Server runs at:
+
+https://solve2-0.onrender.com
+
+---
+
+## 📈 Future Enhancements
+
+- AI Resume Analysis
+- Interview Simulation Module
+- Recruiter Portal
+- Multi-college SaaS deployment
+- Predictive placement analytics
+- Mobile App version
+
+---
+
+## 🌍 Impact
+
+- Improves placement readiness
+- Strengthens alumni-student network
+- Reduces manual workload for placement cells
+- Provides AI-driven career support
+- Enhances institutional placement performance
+
+---
+
+## 🏆 Hackathon Submission
+
+Event: Solve-a-thon 1.0  
+Team Name: Team Code Breakers  
+Team Leader: P G Ayush Rai
+
+---
+
+## 📜 License
+
+All Rights Reserved.
+
+Copyright (c) 2026 Code Breakers.
+Unauthorized copying, modification, distribution, or use of this software, 
+via any medium, is strictly prohibited without prior written permission.
+
+---
+
+## 🙌 Acknowledgements
+
+- MongoDB
+- Express.js
+- Node.js
+- Gemini API
+- OpenAI APIs
