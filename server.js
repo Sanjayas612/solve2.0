@@ -226,6 +226,24 @@ const Notification = mongoose.model('Notification', new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 }));
 
+// ─── INTERVIEW SLOT MODEL ─────────────────────────────────────────────────────
+const InterviewSlot = mongoose.model('InterviewSlot', new mongoose.Schema({
+  driveId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  driveName: { type: String, default: '' },
+  studentId: mongoose.Schema.Types.ObjectId,
+  studentName: { type: String, required: true },
+  usn: { type: String, required: true },
+  studentEmail: { type: String, default: '' },
+  date: { type: Date, required: true },
+  startTime: { type: String, required: true },   // "09:00"
+  endTime: { type: String, required: true },   // "09:30"
+  mode: { type: String, enum: ['online', 'offline', 'hybrid'], default: 'online' },
+  location: { type: String, default: '' },
+  notes: { type: String, default: '' },
+  status: { type: String, enum: ['scheduled', 'completed', 'cancelled'], default: 'scheduled' },
+  createdAt: { type: Date, default: Date.now }
+}));
+
 // ─── ALUMNI MODELS ───────────────────────────────────────────────────────────
 const Alumni = mongoose.model('Alumni', new mongoose.Schema({
   name: { type: String, required: true },
@@ -1135,6 +1153,144 @@ Generate a realistic benchmark comparison. Respond ONLY with valid JSON (no mark
   } catch (e) {
     res.status(500).json({ success: false, error: 'AI comparison failed: ' + e.message });
   }
+});
+
+// ─── INTERVIEW SCHEDULER ──────────────────────────────────────────────────────
+
+// GET shortlisted (or eligible fallback) students for a drive
+app.get('/api/interview/shortlisted/:driveId', async (req, res) => {
+  try {
+    const drive = await Drive.findById(req.params.driveId);
+    if (!drive) return res.status(404).json({ error: 'Drive not found' });
+    // First try formally shortlisted
+    let students = await Student.find({
+      'driveApplications': { $elemMatch: { driveId: drive._id, status: 'shortlisted' } }
+    }).select('name usn branch year cgpa email phone');
+    // Fallback: eligible students if shortlist hasn't been confirmed yet
+    if (!students.length) {
+      const q = { cgpa: { $gte: drive.minCGPA }, backlogs: { $lte: drive.maxBacklogs || 0 } };
+      if (drive.eligibleBranches?.length) q.branch = { $in: drive.eligibleBranches };
+      if (drive.eligibleYear?.length) q.year = { $in: drive.eligibleYear };
+      students = await Student.find(q).select('name usn branch year cgpa email phone');
+    }
+    res.json({ students });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET slots (filter by driveId query param)
+app.get('/api/interview/slots', async (req, res) => {
+  try {
+    const q = {};
+    if (req.query.driveId) q.driveId = req.query.driveId;
+    const slots = await InterviewSlot.find(q).sort({ date: 1, startTime: 1 });
+    res.json({ slots });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST create slot with overlap prevention
+app.post('/api/interview/slots', async (req, res) => {
+  try {
+    const { driveId, studentId, studentName, usn, studentEmail, date, startTime, endTime, mode, location, notes, driveName } = req.body;
+    if (!driveId || !studentName || !usn || !date || !startTime || !endTime)
+      return res.status(400).json({ error: 'Missing required fields' });
+    const slotDate = new Date(date);
+    const dayStart = new Date(slotDate); dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(slotDate); dayEnd.setHours(23, 59, 59, 999);
+    // Overlap check: same drive, same day, same start time
+    const overlap = await InterviewSlot.findOne({ driveId, date: { $gte: dayStart, $lte: dayEnd }, startTime });
+    if (overlap) return res.status(409).json({ error: `${overlap.studentName} already has a slot at ${startTime}` });
+    const slot = await new InterviewSlot({ driveId, driveName: driveName || '', studentId, studentName, usn, studentEmail: studentEmail || '', date: slotDate, startTime, endTime, mode: mode || 'online', location: location || '', notes: notes || '' }).save();
+    res.json({ success: true, slot });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// PUT update a slot (date/time/mode/location/notes)
+app.put('/api/interview/slots/:id', async (req, res) => {
+  try {
+    const { date, startTime, endTime, mode, location, notes } = req.body;
+    const existing = await InterviewSlot.findById(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Slot not found' });
+    if (date && startTime) {
+      const slotDate = new Date(date);
+      const dayStart = new Date(slotDate); dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(slotDate); dayEnd.setHours(23, 59, 59, 999);
+      const overlap = await InterviewSlot.findOne({ _id: { $ne: req.params.id }, driveId: existing.driveId, date: { $gte: dayStart, $lte: dayEnd }, startTime });
+      if (overlap) return res.status(409).json({ error: `${overlap.studentName} already has a slot at this time` });
+    }
+    const upd = {};
+    if (date) upd.date = new Date(date);
+    if (startTime) upd.startTime = startTime;
+    if (endTime) upd.endTime = endTime;
+    if (mode) upd.mode = mode;
+    if (location !== undefined) upd.location = location;
+    if (notes !== undefined) upd.notes = notes;
+    const slot = await InterviewSlot.findByIdAndUpdate(req.params.id, { $set: upd }, { new: true });
+    res.json({ success: true, slot });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// DELETE a slot
+app.delete('/api/interview/slots/:id', async (req, res) => {
+  try {
+    await InterviewSlot.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST notify one student about their interview slot
+app.post('/api/interview/notify/:slotId', async (req, res) => {
+  try {
+    const slot = await InterviewSlot.findById(req.params.slotId);
+    if (!slot) return res.status(404).json({ error: 'Slot not found' });
+    const fmtT = t => { const [h, m] = t.split(':'); const hr = parseInt(h); return `${hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)}:${m} ${hr >= 12 ? 'PM' : 'AM'}`; };
+    const p = n => String(n).padStart(2, '0');
+    const d = new Date(slot.date);
+    const [sh, sm] = slot.startTime.split(':'); const [eh, em] = slot.endTime.split(':');
+    const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE`
+      + `&text=${encodeURIComponent('Interview – ' + (slot.driveName || 'Campus Placement'))}`
+      + `&dates=${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(sh)}${p(sm)}00`
+      + `%2F${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(eh)}${p(em)}00`
+      + `&details=${encodeURIComponent('Interview via PlacementPro\nDrive: ' + (slot.driveName || '') + (slot.location ? '\nVenue: ' + slot.location : '') + (slot.notes ? '\nNotes: ' + slot.notes : ''))}`
+      + `&location=${encodeURIComponent(slot.location || 'Campus')}&ctz=Asia%2FKolkata`;
+    const slotDateStr = new Date(slot.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const msg = `Your interview for ${slot.driveName} is scheduled on ${slotDateStr} from ${fmtT(slot.startTime)} to ${fmtT(slot.endTime)}. Mode: ${slot.mode}${slot.location ? ' | Venue: ' + slot.location : ''}${slot.notes ? ' | Note: ' + slot.notes : ''}. 📅 Add to Google Calendar: ${gcal}`;
+    await Notification.findOneAndUpdate(
+      { usn: slot.usn.toUpperCase(), type: 'general', title: { $regex: slot.driveName, $options: 'i' } },
+      { studentId: slot.studentId, usn: slot.usn.toUpperCase(), title: `📅 Interview Scheduled: ${slot.driveName}`, message: msg, type: 'general', isRead: false, createdAt: new Date() },
+      { upsert: true }
+    );
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST bulk notify all scheduled students for a drive
+app.post('/api/interview/notify-bulk/:driveId', async (req, res) => {
+  try {
+    const slots = await InterviewSlot.find({ driveId: req.params.driveId, status: 'scheduled' });
+    if (!slots.length) return res.json({ success: true, notified: 0 });
+    const fmtT = t => { const [h, m] = t.split(':'); const hr = parseInt(h); return `${hr > 12 ? hr - 12 : (hr === 0 ? 12 : hr)}:${m} ${hr >= 12 ? 'PM' : 'AM'}`; };
+    const p = n => String(n).padStart(2, '0');
+    let notified = 0;
+    for (const slot of slots) {
+      const d = new Date(slot.date);
+      const [sh, sm] = slot.startTime.split(':'); const [eh, em] = slot.endTime.split(':');
+      const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE`
+        + `&text=${encodeURIComponent('Interview – ' + (slot.driveName || 'Campus Placement'))}`
+        + `&dates=${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(sh)}${p(sm)}00`
+        + `%2F${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(eh)}${p(em)}00`
+        + `&details=${encodeURIComponent('Interview via PlacementPro\nDrive: ' + (slot.driveName || '') + (slot.location ? '\nVenue: ' + slot.location : '') + (slot.notes ? '\nNotes: ' + slot.notes : ''))}`
+        + `&location=${encodeURIComponent(slot.location || 'Campus')}&ctz=Asia%2FKolkata`;
+      const slotDateStr = new Date(slot.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+      const msg = `Interview for ${slot.driveName}: ${slotDateStr}, ${fmtT(slot.startTime)}–${fmtT(slot.endTime)}. Mode: ${slot.mode}${slot.location ? ' | Venue: ' + slot.location : ''}${slot.notes ? ' | Note: ' + slot.notes : ''}. 📅 Add to Calendar: ${gcal}`;
+      await Notification.findOneAndUpdate(
+        { usn: slot.usn.toUpperCase(), type: 'general', title: { $regex: slot.driveName, $options: 'i' } },
+        { studentId: slot.studentId, usn: slot.usn.toUpperCase(), title: `📅 Interview Scheduled: ${slot.driveName}`, message: msg, type: 'general', isRead: false, createdAt: new Date() },
+        { upsert: true }
+      );
+      notified++;
+    }
+    res.json({ success: true, notified });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ─── SERVE FRONTEND ───────────────────────────────────────────────────────────

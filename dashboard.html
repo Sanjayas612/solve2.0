@@ -1076,6 +1076,459 @@
       color: var(--danger);
     }
 
+    /* ═══════════════════════════════════════
+       INTERVIEW SCHEDULER
+    ═══════════════════════════════════════ */
+    .is-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .is-toolbar select,
+    .is-toolbar input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 9px 14px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .is-toolbar select:focus,
+    .is-toolbar input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .is-week-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+    }
+
+    .is-week-btn {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: 0.15s;
+    }
+
+    .is-week-btn:hover {
+      background: var(--surface3);
+      color: var(--text);
+    }
+
+    .is-week-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .is-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    /* ── Student Panel ── */
+    .is-student-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .is-panel-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .is-panel-body {
+      overflow-y: auto;
+      flex: 1;
+      padding: 10px;
+    }
+
+    .is-panel-stats {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .is-stat {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--text2);
+    }
+
+    .is-stat-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .is-stat-done .is-stat-num {
+      color: var(--success);
+    }
+
+    .is-stat-pending .is-stat-num {
+      color: var(--warning);
+    }
+
+    .is-panel-section {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text3);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin: 8px 0 6px;
+      padding: 0 2px;
+    }
+
+    .is-student-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: grab;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+    .is-student-card:hover {
+      border-color: var(--accent);
+      transform: translateX(2px);
+      box-shadow: 0 4px 16px rgba(79, 142, 247, 0.15);
+    }
+
+    .is-student-card.is-dragging {
+      opacity: 0.5;
+      transform: scale(0.97);
+    }
+
+    .is-card-done {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .is-card-done:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    .is-card-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .is-avatar-done {
+      background: var(--success) !important;
+    }
+
+    .is-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .is-card-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .is-card-meta {
+      font-size: 10.5px;
+      color: var(--text2);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .is-drag-handle {
+      font-size: 16px;
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    .is-empty-state {
+      padding: 24px 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    /* ── Calendar ── */
+    .is-calendar-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+    }
+
+    .is-grid-inner {
+      min-width: 700px;
+    }
+
+    .is-grid-header {
+      display: grid;
+      grid-template-columns: 64px repeat(6, 1fr);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--surface2);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .is-time-col-header {
+      padding: 10px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .is-day-header {
+      padding: 10px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      text-align: center;
+      border-left: 1px solid var(--border);
+      line-height: 1.4;
+    }
+
+    .is-day-header span {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text3);
+    }
+
+    .is-today-header {
+      color: var(--accent) !important;
+    }
+
+    .is-today-header span {
+      color: var(--accent) !important;
+    }
+
+    .is-grid-row {
+      display: grid;
+      grid-template-columns: 64px repeat(6, 1fr);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .is-grid-row:last-child {
+      border-bottom: none;
+    }
+
+    .is-time-label {
+      padding: 8px 6px;
+      font-size: 10px;
+      color: var(--text3);
+      text-align: right;
+      padding-right: 10px;
+      align-self: start;
+      padding-top: 10px;
+    }
+
+    .is-cell {
+      border-left: 1px solid var(--border);
+      min-height: 52px;
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    .is-cell-empty {
+      cursor: pointer;
+    }
+
+    .is-cell-empty:hover {
+      background: rgba(79, 142, 247, 0.06);
+    }
+
+    .is-cell-past {
+      opacity: 0.35;
+    }
+
+    .is-cell-past .is-drop-hint {
+      display: none !important;
+    }
+
+    .is-drop-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--text3);
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+    }
+
+    .is-cell-empty:hover .is-drop-hint {
+      opacity: 1;
+    }
+
+    .is-drop-over {
+      background: rgba(79, 142, 247, 0.12) !important;
+      border: 2px dashed var(--accent) !important;
+    }
+
+    .is-drop-over .is-drop-hint {
+      opacity: 1;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    .is-cell-filled {
+      cursor: pointer;
+    }
+
+    .is-slot-card {
+      margin: 4px;
+      padding: 6px 8px;
+      background: linear-gradient(135deg, rgba(79, 142, 247, 0.2), rgba(0, 212, 170, 0.15));
+      border: 1px solid rgba(79, 142, 247, 0.35);
+      border-radius: 8px;
+      font-size: 11px;
+      position: relative;
+      transition: box-shadow 0.15s;
+    }
+
+    .is-slot-card:hover {
+      box-shadow: 0 4px 14px rgba(79, 142, 247, 0.25);
+    }
+
+    .is-slot-name {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .is-slot-meta {
+      font-size: 9.5px;
+      color: var(--text2);
+      margin-top: 1px;
+    }
+
+    .is-slot-actions {
+      display: flex;
+      gap: 3px;
+      margin-top: 5px;
+    }
+
+    .is-slot-btn {
+      background: var(--surface3);
+      border: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text2);
+      text-decoration: none;
+      transition: 0.15s;
+    }
+
+    .is-slot-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .is-slot-del:hover {
+      background: rgba(244, 63, 94, 0.2);
+      color: var(--danger);
+    }
+
+    .is-slot-gcal:hover {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+    }
+
+    .is-no-drive {
+      padding: 60px 40px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.8;
+    }
+
+    /* Edit overlay fields */
+    .is-edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .is-edit-full {
+      grid-column: 1/-1;
+    }
+
+    @media (max-width: 900px) {
+      .is-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .is-student-panel {
+        max-height: 260px;
+      }
+    }
+
     @media (max-width: 900px) {
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1140,6 +1593,9 @@
       </div>
       <div class="nav-item" onclick="go('shortlist')">
         <span class="nav-icon">⭐</span><span>Shortlisting</span>
+      </div>
+      <div class="nav-item" onclick="go('interview')">
+        <span class="nav-icon">📅</span><span>Interview Scheduler</span>
       </div>
       <div class="nav-item" onclick="go('alumni-groups')">
         <span class="nav-icon">🤝</span><span>Alumni Groups</span>
@@ -1424,7 +1880,106 @@
       <div id="shortlist-table"></div>
     </div>
 
-    <!-- ══════ PAGE: ALUMNI GROUPS ══════ -->
+    <!-- ══════ PAGE: INTERVIEW SCHEDULER ══════ -->
+    <div class="page" id="page-interview">
+
+      <!-- TOOLBAR -->
+      <div class="is-toolbar">
+        <select id="is-drive-select" onchange="onDriveChange()" style="min-width:220px;">
+          <option value="">— Select a Drive —</option>
+        </select>
+        <div class="is-week-ctrl">
+          <button class="is-week-btn" onclick="isWeekPrev()">‹</button>
+          <span class="is-week-label" id="is-week-label">Loading...</span>
+          <button class="is-week-btn" onclick="isWeekNext()">›</button>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="goToday()">Today</button>
+        <button class="btn btn-primary btn-sm" onclick="notifyAllScheduled()" style="margin-left:auto;">🔔 Notify All
+          Scheduled</button>
+      </div>
+
+      <!-- LAYOUT: student panel + calendar -->
+      <div class="is-layout">
+
+        <!-- LEFT: STUDENT LIST -->
+        <div class="is-student-panel">
+          <div class="is-panel-head">
+            <span>Shortlisted Students</span>
+            <span id="is-legend" style="font-size:10px;color:var(--text3);font-weight:400;">Drag → calendar</span>
+          </div>
+          <div class="is-panel-body" id="is-student-list">
+            <div class="is-empty-state">Select a drive above to see shortlisted students</div>
+          </div>
+        </div>
+
+        <!-- RIGHT: CALENDAR GRID -->
+        <div class="is-calendar-wrap">
+          <div id="is-calendar-grid">
+            <div class="is-no-drive">Select a drive from the dropdown above to start scheduling interviews</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── INTERVIEW EDIT OVERLAY ── -->
+    <div class="overlay" id="is-edit-overlay">
+      <div class="modal" style="max-width:480px;">
+        <div class="modal-header">
+          <div class="modal-title">✏ Edit Interview Slot</div>
+          <button class="modal-close" onclick="closeOverlay('is-edit-overlay')">✕</button>
+        </div>
+        <div style="padding:20px;">
+          <input type="hidden" id="is-edit-slot-id">
+          <div
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;">
+            <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px;">STUDENT</div>
+            <div style="font-size:14px;font-weight:700;" id="is-edit-name">—</div>
+          </div>
+          <div class="is-edit-grid">
+            <div class="field is-edit-full">
+              <label>Interview Date *</label>
+              <input type="date" id="is-edit-date" class="form-input">
+            </div>
+            <div class="field">
+              <label>Start Time *</label>
+              <input type="time" id="is-edit-start" class="form-input" step="1800">
+            </div>
+            <div class="field">
+              <label>End Time *</label>
+              <input type="time" id="is-edit-end" class="form-input" step="1800">
+            </div>
+            <div class="field">
+              <label>Mode</label>
+              <select id="is-edit-mode" class="form-input">
+                <option value="online">Online</option>
+                <option value="offline">Offline</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Location / Link</label>
+              <input type="text" id="is-edit-location" placeholder="Room 101 / meet.google.com/..." class="form-input">
+            </div>
+            <div class="field is-edit-full">
+              <label>Notes for Student</label>
+              <textarea id="is-edit-notes" rows="2" placeholder="Bring ID card, formal dress code..."
+                class="form-input"></textarea>
+            </div>
+          </div>
+          <div id="is-edit-gcal" style="margin-top:12px;display:none;">
+            <a id="is-edit-gcal-link" href="#" target="_blank"
+              style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--success);text-decoration:none;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);padding:6px 14px;border-radius:8px;">
+              📅 Preview Google Calendar Link
+            </a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeOverlay('is-edit-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSlotEdit()">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
     <div class="page" id="page-alumni-groups">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <div>
@@ -1725,7 +2280,8 @@
       assessments: { title: 'Assessments', sub: 'Create and manage online tests with AI' },
       'assignment-monitor': { title: 'Assignment Monitor', sub: 'Live student assignment status & malpractice detection' },
       shortlist: { title: 'Ranking & Shortlisting', sub: 'Rank and classify students per drive' },
-      'alumni-groups': { title: 'Alumni Groups', sub: 'Manage alumni connect groups' }
+      'alumni-groups': { title: 'Alumni Groups', sub: 'Manage alumni connect groups' },
+      interview: { title: 'Interview Scheduler', sub: 'Drag-and-drop calendar to assign interview slots to shortlisted students' }
     };
 
     let currentPage = 'overview';
@@ -1752,6 +2308,7 @@
       if (id === 'assignment-monitor') loadMonitor();
       if (id === 'shortlist') loadShortlistPage();
       if (id === 'alumni-groups') loadAlumniGroups();
+      if (id === 'interview') loadInterviewScheduler();
     }
 
     // ═══════════ OVERLAY ═══════════
@@ -2686,6 +3243,363 @@ correctAnswer is 0-indexed (0=A,1=B,2=C,3=D). Make all ${qcount} questions uniqu
 
     // Auto-refresh monitor every 15 seconds when on that page
     setInterval(() => { if (currentPage === 'assignment-monitor') loadMonitor(); }, 15000);
+
+    // ═══════════════════════════════════════════════════════════
+    // INTERVIEW SCHEDULER
+    // ═══════════════════════════════════════════════════════════
+    let isCurrentDriveId = null;
+    let isCurrentWeekStart = null;
+    let isSlots = [];
+    let isShortlisted = [];
+    let isDragData = null;
+
+    const IS_HOURS = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+      '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'];
+    const IS_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    function isGetWeekStart(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      d.setDate(diff); d.setHours(0, 0, 0, 0);
+      return d;
+    }
+    function isFmtDate(d) { return d.toISOString().split('T')[0]; }
+    function isFmtDisplay(d) { return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); }
+    function isFmtTime(t) {
+      if (!t) return '';
+      const [h, m] = t.split(':');
+      const hour = parseInt(h);
+      return `${hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour)}:${m} ${hour >= 12 ? 'PM' : 'AM'}`;
+    }
+    function isEndTime(startTime) {
+      const [h, m] = startTime.split(':').map(Number);
+      if (m === 30) return `${String(h + 1).padStart(2, '0')}:00`;
+      return `${String(h).padStart(2, '0')}:30`;
+    }
+
+    async function loadInterviewScheduler() {
+      if (!isCurrentWeekStart) isCurrentWeekStart = isGetWeekStart(new Date());
+      const drives = await api('GET', '/api/drives');
+      const sel = document.getElementById('is-drive-select');
+      if (sel) {
+        sel.innerHTML = '<option value="">— Select a Drive —</option>' +
+          (Array.isArray(drives) ? drives.map(d => `<option value="${d._id}">${d.companyName} (CGPA≥${d.minCGPA})</option>`).join('') : '');
+        // Restore selection if previously set
+        if (isCurrentDriveId) sel.value = isCurrentDriveId;
+      }
+      isRenderWeekLabel();
+      if (isCurrentDriveId) await isRefresh();
+      else isRenderEmpty();
+    }
+
+    async function onDriveChange() {
+      const sel = document.getElementById('is-drive-select');
+      isCurrentDriveId = sel?.value || null;
+      if (!isCurrentDriveId) {
+        document.getElementById('is-student-list').innerHTML = '<div class="is-empty-state">Select a drive above to see shortlisted students</div>';
+        isRenderEmpty();
+        return;
+      }
+      await isRefresh();
+    }
+
+    async function isRefresh() {
+      if (!isCurrentDriveId) return;
+      const [sRes, slotRes] = await Promise.all([
+        api('GET', `/api/interview/shortlisted/${isCurrentDriveId}`),
+        api('GET', `/api/interview/slots?driveId=${isCurrentDriveId}`)
+      ]);
+      isShortlisted = sRes.students || [];
+      isSlots = slotRes.slots || [];
+      isRenderStudentPanel();
+      isRenderCalendar();
+    }
+
+    function isRenderWeekLabel() {
+      const ws = isCurrentWeekStart;
+      const we = new Date(ws); we.setDate(we.getDate() + 5);
+      const el = document.getElementById('is-week-label');
+      if (el) el.textContent = `${isFmtDisplay(ws)} – ${isFmtDisplay(we)}`;
+    }
+
+    function isWeekPrev() {
+      const d = new Date(isCurrentWeekStart); d.setDate(d.getDate() - 7);
+      isCurrentWeekStart = d; isRenderWeekLabel(); isRenderCalendar();
+    }
+    function isWeekNext() {
+      const d = new Date(isCurrentWeekStart); d.setDate(d.getDate() + 7);
+      isCurrentWeekStart = d; isRenderWeekLabel(); isRenderCalendar();
+    }
+    function goToday() {
+      isCurrentWeekStart = isGetWeekStart(new Date());
+      isRenderWeekLabel(); isRenderCalendar();
+    }
+
+    function isRenderEmpty() {
+      const grid = document.getElementById('is-calendar-grid');
+      if (grid) grid.innerHTML = '<div class="is-no-drive">Select a drive from the dropdown above to start scheduling interviews</div>';
+    }
+
+    function isRenderStudentPanel() {
+      const container = document.getElementById('is-student-list');
+      if (!container) return;
+      if (!isShortlisted.length) {
+        container.innerHTML = '<div class="is-empty-state">No shortlisted students for this drive yet.<br><br>Go to <strong>Shortlisting</strong> page and confirm shortlist first.</div>';
+        return;
+      }
+      const scheduledUsns = new Set(isSlots.map(s => s.usn));
+      const unscheduled = isShortlisted.filter(s => !scheduledUsns.has(s.usn));
+      const scheduled = isShortlisted.filter(s => scheduledUsns.has(s.usn));
+
+      let html = `<div class="is-panel-stats">
+        <div class="is-stat"><div class="is-stat-num">${isShortlisted.length}</div><div>Total</div></div>
+        <div class="is-stat is-stat-done"><div class="is-stat-num">${scheduled.length}</div><div>Scheduled</div></div>
+        <div class="is-stat is-stat-pending"><div class="is-stat-num">${unscheduled.length}</div><div>Pending</div></div>
+      </div>`;
+
+      if (unscheduled.length) {
+        html += `<div class="is-panel-section">Drag to assign slot</div>`;
+        html += unscheduled.map(s => {
+          const safeName = (s.name || '').replace(/'/g, "&apos;").replace(/"/g, '&quot;');
+          const safeEmail = (s.email || '').replace(/'/g, "&apos;");
+          return `<div class="is-student-card" draggable="true"
+            ondragstart="isOnDragStart(event,'${s._id}','${s.usn}','${safeName}','${safeEmail}')"
+            ondragend="isOnDragEnd(event)">
+            <div class="is-card-avatar">${(s.name || '?').charAt(0).toUpperCase()}</div>
+            <div class="is-card-info">
+              <div class="is-card-name">${s.name}</div>
+              <div class="is-card-meta">${s.usn} · ${s.branch} · CGPA ${s.cgpa}</div>
+            </div>
+            <div class="is-drag-handle">⠿</div>
+          </div>`;
+        }).join('');
+      }
+
+      if (scheduled.length) {
+        html += `<div class="is-panel-section" style="margin-top:12px;">Scheduled ✓</div>`;
+        html += scheduled.map(s => {
+          const slot = isSlots.find(sl => sl.usn === s.usn);
+          const slotDate = slot ? new Date(slot.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
+          const slotTime = slot ? isFmtTime(slot.startTime) : '';
+          return `<div class="is-student-card is-card-done">
+            <div class="is-card-avatar is-avatar-done">✓</div>
+            <div class="is-card-info">
+              <div class="is-card-name">${s.name}</div>
+              <div class="is-card-meta">${slotDate} · ${slotTime}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+      container.innerHTML = html;
+    }
+
+    function isRenderCalendar() {
+      const grid = document.getElementById('is-calendar-grid');
+      if (!grid) return;
+
+      const ws = isCurrentWeekStart;
+      const weekDates = IS_DAYS.map((_, i) => {
+        const d = new Date(ws); d.setDate(ws.getDate() + i); return d;
+      });
+
+      // Build slot map: "YYYY-MM-DD HH:MM" → slot
+      const slotMap = {};
+      isSlots.forEach(s => {
+        const dk = new Date(s.date).toISOString().split('T')[0];
+        slotMap[`${dk} ${s.startTime}`] = s;
+      });
+
+      let html = '<div class="is-grid-inner">';
+
+      // Header row
+      html += '<div class="is-grid-header"><div class="is-time-col-header">Time</div>';
+      weekDates.forEach((d, i) => {
+        const isToday = d.toDateString() === new Date().toDateString();
+        html += `<div class="is-day-header ${isToday ? 'is-today-header' : ''}">${IS_DAYS[i]}<br><span>${isFmtDisplay(d)}</span></div>`;
+      });
+      html += '</div>';
+
+      // Time rows
+      IS_HOURS.forEach(time => {
+        html += `<div class="is-grid-row"><div class="is-time-label">${isFmtTime(time)}</div>`;
+        weekDates.forEach(d => {
+          const dk = isFmtDate(d);
+          const key = `${dk} ${time}`;
+          const slot = slotMap[key];
+          const cellDt = new Date(`${dk}T${time}:00`);
+          const isPast = cellDt < new Date();
+
+          if (slot) {
+            const gcalLink = isGenerateCalLink(slot);
+            html += `<div class="is-cell is-cell-filled" data-date="${dk}" data-time="${time}">
+              <div class="is-slot-card" onclick="isEditSlot('${slot._id}')">
+                <div class="is-slot-name">${slot.studentName}</div>
+                <div class="is-slot-meta">${slot.usn} · ${slot.mode}</div>
+                <div class="is-slot-actions">
+                  <button class="is-slot-btn" onclick="event.stopPropagation();isEditSlot('${slot._id}')" title="Edit">✏</button>
+                  <button class="is-slot-btn is-slot-del" onclick="event.stopPropagation();isDeleteSlot('${slot._id}')" title="Remove">✕</button>
+                  <a class="is-slot-btn is-slot-gcal" href="${gcalLink}" target="_blank" onclick="event.stopPropagation()" title="Add to Google Calendar">📅</a>
+                </div>
+              </div>
+            </div>`;
+          } else {
+            const pastCls = isPast ? 'is-cell-past' : 'is-cell-empty';
+            const dropAttrs = isPast ? '' :
+              `ondragover="isOnDragOver(event)" ondragleave="isOnDragLeave(event)" ondrop="isOnDrop(event,'${dk}','${time}')"`;
+            html += `<div class="is-cell ${pastCls}" data-date="${dk}" data-time="${time}" ${dropAttrs}>
+              <span class="is-drop-hint">Drop here</span>
+            </div>`;
+          }
+        });
+        html += '</div>';
+      });
+
+      html += '</div>';
+      grid.innerHTML = html;
+    }
+
+    // ── Drag handlers ──
+    function isOnDragStart(event, studentId, usn, name, email) {
+      isDragData = { studentId, usn, name, email };
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', JSON.stringify(isDragData));
+      event.currentTarget.classList.add('is-dragging');
+    }
+    function isOnDragEnd(event) {
+      event.currentTarget.classList.remove('is-dragging');
+    }
+    function isOnDragOver(event) {
+      if (!isDragData) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      event.currentTarget.classList.add('is-drop-over');
+    }
+    function isOnDragLeave(event) {
+      event.currentTarget.classList.remove('is-drop-over');
+    }
+    async function isOnDrop(event, date, time) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('is-drop-over');
+      const data = isDragData || JSON.parse(event.dataTransfer.getData('text/plain') || '{}');
+      isDragData = null;
+      if (!data.studentId || !isCurrentDriveId) return;
+
+      // Check if student already scheduled — offer to move
+      const existing = isSlots.find(s => s.usn === data.usn);
+      if (existing) {
+        const existingDate = new Date(existing.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        if (!confirm(`${data.name} already has a slot on ${existingDate} at ${isFmtTime(existing.startTime)}.\nMove to ${date} at ${isFmtTime(time)}?`)) return;
+        await api('DELETE', `/api/interview/slots/${existing._id}`);
+        isSlots = isSlots.filter(s => s._id !== existing._id);
+      }
+
+      // Overlap check on target cell
+      const overlap = isSlots.find(s => isFmtDate(new Date(s.date)) === date && s.startTime === time);
+      if (overlap) {
+        toast('Slot Taken', `${overlap.studentName} already has this slot. Choose another time.`, 'e');
+        return;
+      }
+
+      const endTime = isEndTime(time);
+      const driveName = document.getElementById('is-drive-select')?.selectedOptions?.[0]?.text || '';
+
+      const res = await api('POST', '/api/interview/slots', {
+        driveId: isCurrentDriveId, driveName: driveName.split(' (')[0],
+        studentId: data.studentId, studentName: data.name,
+        usn: data.usn, studentEmail: data.email,
+        date, startTime: time, endTime,
+        mode: 'online', location: '', notes: ''
+      });
+
+      if (res.success) {
+        toast('Slot Assigned ✓', `${data.name} → ${date} at ${isFmtTime(time)}`, 's');
+        // Auto-notify student
+        api('POST', `/api/interview/notify/${res.slot._id}`);
+        await isRefresh();
+      } else {
+        toast('Error', res.error || 'Could not assign slot', 'e');
+      }
+    }
+
+    // ── Google Calendar link ──
+    function isGenerateCalLink(slot) {
+      const d = new Date(slot.date);
+      const [sh, sm] = slot.startTime.split(':');
+      const [eh, em] = slot.endTime.split(':');
+      const p = n => String(n).padStart(2, '0');
+      const yr = d.getFullYear(), mo = p(d.getMonth() + 1), dy = p(d.getDate());
+      const start = `${yr}${mo}${dy}T${p(sh)}${p(sm)}00`;
+      const end = `${yr}${mo}${dy}T${p(eh)}${p(em)}00`;
+      const title = encodeURIComponent(`Interview – ${slot.driveName || 'Campus Placement'}`);
+      const details = encodeURIComponent(
+        `Interview scheduled via PlacementPro\n` +
+        `Drive: ${slot.driveName}\nStudent: ${slot.studentName} (${slot.usn})\n` +
+        `Mode: ${slot.mode}${slot.location ? '\nVenue/Link: ' + slot.location : ''}` +
+        `${slot.notes ? '\nNotes: ' + slot.notes : ''}`
+      );
+      const loc = encodeURIComponent(slot.location || (slot.mode === 'online' ? 'Online' : 'College Campus'));
+      return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}%2F${end}&details=${details}&location=${loc}&ctz=Asia%2FKolkata`;
+    }
+
+    // ── Edit slot ──
+    async function isEditSlot(slotId) {
+      const slot = isSlots.find(s => s._id === slotId);
+      if (!slot) return;
+      document.getElementById('is-edit-slot-id').value = slotId;
+      document.getElementById('is-edit-name').textContent = `${slot.studentName} (${slot.usn})`;
+      document.getElementById('is-edit-date').value = isFmtDate(new Date(slot.date));
+      document.getElementById('is-edit-start').value = slot.startTime;
+      document.getElementById('is-edit-end').value = slot.endTime;
+      document.getElementById('is-edit-mode').value = slot.mode;
+      document.getElementById('is-edit-location').value = slot.location || '';
+      document.getElementById('is-edit-notes').value = slot.notes || '';
+      // Update Google Cal preview link
+      const gcalEl = document.getElementById('is-edit-gcal');
+      const gcalLink = document.getElementById('is-edit-gcal-link');
+      gcalEl.style.display = 'block';
+      gcalLink.href = isGenerateCalLink(slot);
+      showOverlay('is-edit-overlay');
+    }
+
+    async function saveSlotEdit() {
+      const slotId = document.getElementById('is-edit-slot-id').value;
+      const date = document.getElementById('is-edit-date').value;
+      const startTime = document.getElementById('is-edit-start').value;
+      const endTime = document.getElementById('is-edit-end').value;
+      const mode = document.getElementById('is-edit-mode').value;
+      const location = document.getElementById('is-edit-location').value;
+      const notes = document.getElementById('is-edit-notes').value;
+      if (!date || !startTime || !endTime) { toast('Required', 'Date, start and end time are required', 'e'); return; }
+
+      // Check overlap for OTHER students on same slot
+      const overlap = isSlots.find(s => s._id !== slotId && isFmtDate(new Date(s.date)) === date && s.startTime === startTime);
+      if (overlap) { toast('Overlap', `${overlap.studentName} already has a slot at this time`, 'e'); return; }
+
+      const res = await api('PUT', `/api/interview/slots/${slotId}`, { date, startTime, endTime, mode, location, notes });
+      if (res.success) {
+        toast('Updated ✓', 'Interview slot saved', 's');
+        closeOverlay('is-edit-overlay');
+        api('POST', `/api/interview/notify/${slotId}`);
+        await isRefresh();
+      } else toast('Error', res.error || 'Update failed', 'e');
+    }
+
+    async function isDeleteSlot(slotId) {
+      if (!confirm('Remove this interview slot? The student will not be automatically notified.')) return;
+      const res = await api('DELETE', `/api/interview/slots/${slotId}`);
+      if (res.success) { toast('Removed', 'Interview slot deleted', 's'); await isRefresh(); }
+      else toast('Error', res.error, 'e');
+    }
+
+    async function notifyAllScheduled() {
+      if (!isCurrentDriveId) { toast('Select Drive', 'Please select a drive first', 'e'); return; }
+      if (!isSlots.length) { toast('No Slots', 'No interview slots scheduled yet', 'e'); return; }
+      const res = await api('POST', `/api/interview/notify-bulk/${isCurrentDriveId}`);
+      if (res.success) toast('Notifications Sent ✓', `${res.notified} students notified about their interview slots`, 's');
+      else toast('Error', res.error, 'e');
+    }
 
 
     (async () => {
