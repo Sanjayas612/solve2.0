@@ -1409,6 +1409,174 @@ document.addEventListener('change', e => {
   }
 });
 
+// ── Built-in question bank (fallback when API unavailable) ─────────────────
+const QUESTION_BANK = {
+  'Aptitude': [
+    {question:"If a train travels 360 km in 4 hours, what is its speed in m/s?",options:["25 m/s","30 m/s","20 m/s","15 m/s"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"A shopkeeper sells an item for ₹480 at 20% profit. What is the cost price?",options:["₹400","₹380","₹420","₹360"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"What is 15% of 240?",options:["36","34","38","32"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"If 6 men complete a work in 12 days, how many days do 9 men take?",options:["8 days","6 days","10 days","9 days"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"A and B together can do a work in 6 days. A alone in 10 days. How many days for B alone?",options:["15 days","12 days","18 days","20 days"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"The ratio of ages of A and B is 3:5. After 6 years ratio becomes 2:3. Find A's current age.",options:["18","15","12","24"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"Simple interest on ₹5000 at 8% per year for 3 years?",options:["₹1200","₹1000","₹1400","₹1600"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"Two pipes fill a tank in 12 and 18 minutes. Both open together — time to fill?",options:["7.2 min","8 min","6 min","9 min"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"Profit percentage when CP=₹250, SP=₹300?",options:["20%","25%","15%","10%"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"Find the next number: 1, 4, 9, 16, 25, ?",options:["36","30","49","40"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"A man walks 3 km north then 4 km east. Distance from start?",options:["5 km","7 km","6 km","4 km"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"If 20% of x is 80, then x is?",options:["400","320","160","500"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"A number is increased by 25% then decreased by 25%. Net change?",options:["-6.25%","0%","+6.25%","-25%"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"HCF of 36 and 48?",options:["12","6","18","24"],correctAnswer:0,topic:"Aptitude",marks:1},
+    {question:"LCM of 4, 6, 8?",options:["24","12","48","36"],correctAnswer:0,topic:"Aptitude",marks:1},
+  ],
+  'Logical Reasoning': [
+    {question:"If all Bloops are Razzies and all Razzies are Lazzies, then all Bloops are definitely:",options:["Lazzies","Not Lazzies","Sometimes Lazzies","None"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"A is B's sister. C is B's mother. D is C's father. How is A related to D?",options:["Granddaughter","Daughter","Sister","Niece"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"In a row of 40 students, Ravi is 11th from left. Position from right?",options:["30","29","31","28"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Find next: 3, 6, 11, 18, 27, ?",options:["38","36","40","42"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"A walks 5km north, turns right 3km, turns right 5km. Distance from start?",options:["3 km","5 km","8 km","0 km"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Statements: All cats are dogs. All dogs are birds. Conclusion: All cats are birds?",options:["True","False","Uncertain","Partially True"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Find the odd one out: 121, 144, 169, 196, 225, 250",options:["250","225","196","169"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"If MANGO is coded as NBOHP, then APPLE is coded as?",options:["BQQMF","BQPMF","BQPME","CQQMF"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Find next: ACE, BDF, CEG, ?",options:["DFH","EGI","CFH","DGI"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"If south-east becomes north, north-east becomes west, what does south become?",options:["North-East","North-West","South-East","East"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Rearrange to form a word: TEADMI",options:["MATED","ADTIME","MIDEAT","DAMITE"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+    {question:"Which number replaces ?: 2,4,8,16,32,?",options:["64","48","60","56"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
+  ],
+  'Verbal Ability': [
+    {question:"Synonym of BENEVOLENT:",options:["Kind","Cruel","Strict","Ignorant"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Antonym of VERBOSE:",options:["Concise","Talkative","Lengthy","Wordy"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Fill in: She has been working here ___ 2010.",options:["since","for","from","by"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Correct sentence?",options:["He doesn't know anything","He don't know nothing","He doesn't knows anything","He doesn't know nothing"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Correctly spelled word?",options:["Accommodation","Accomodation","Acommodation","Acomodation"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Meaning of 'Bite the bullet':",options:["Endure pain stoically","Shoot someone","Eat fast","Argue fiercely"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Active to passive: 'The manager signed the letter.'",options:["The letter was signed by the manager","The letter is signed by manager","The manager has signed the letter","Letter was sign by manager"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Synonym of ELOQUENT:",options:["Fluent","Silent","Confused","Harsh"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Antonym of DILIGENT:",options:["Lazy","Hardworking","Careful","Sincere"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+    {question:"Meaning of idiom 'Break the ice':",options:["Start a conversation","Damage property","Be cold","Stop fighting"],correctAnswer:0,topic:"Verbal Ability",marks:1},
+  ],
+  'Technical': [
+    {question:"Time complexity of binary search?",options:["O(log n)","O(n)","O(n²)","O(1)"],correctAnswer:0,topic:"C Programming",marks:1},
+    {question:"Which data structure uses LIFO?",options:["Stack","Queue","Linked List","Tree"],correctAnswer:0,topic:"Data Structures",marks:1},
+    {question:"What does SQL SELECT DISTINCT do?",options:["Returns unique rows","Returns all rows","Deletes duplicates","Counts rows"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
+    {question:"In Python, which is immutable?",options:["Tuple","List","Dictionary","Set"],correctAnswer:0,topic:"Python",marks:1},
+    {question:"In C, function to allocate memory dynamically?",options:["malloc()","alloc()","new()","create()"],correctAnswer:0,topic:"C Programming",marks:1},
+    {question:"HTTP status 404 means?",options:["Not Found","Server Error","Unauthorized","Forbidden"],correctAnswer:0,topic:"Web Development",marks:1},
+    {question:"Sorting with worst-case O(n log n)?",options:["Merge Sort","Bubble Sort","Insertion Sort","Selection Sort"],correctAnswer:0,topic:"Algorithms",marks:1},
+    {question:"Foreign key in a database?",options:["References primary key of another table","Duplicate primary key","Indexed column","Unique constraint"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
+    {question:"'virtual' keyword in C++ enables?",options:["Runtime polymorphism","Abstract class","Dynamic memory","None"],correctAnswer:0,topic:"C++ OOP",marks:1},
+    {question:"Deadlock in OS means?",options:["Two processes wait for each other indefinitely","CPU overload","Memory overflow","Network failure"],correctAnswer:0,topic:"Operating Systems",marks:1},
+    {question:"Java keyword to prevent method overriding?",options:["final","static","private","abstract"],correctAnswer:0,topic:"Java",marks:1},
+    {question:"Purpose of index in a database?",options:["Speed up retrieval","Delete duplicates","Enforce constraints","Join tables"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
+    {question:"Which Python keyword is used to handle exceptions?",options:["try","catch","error","handle"],correctAnswer:0,topic:"Python",marks:1},
+    {question:"In Java, which method is the entry point?",options:["public static void main(String[] args)","static main()","void main()","public main()"],correctAnswer:0,topic:"Java",marks:1},
+    {question:"OSI model has how many layers?",options:["7","5","4","6"],correctAnswer:0,topic:"Computer Networks",marks:1},
+    {question:"What is a pointer in C?",options:["Variable storing memory address","Variable storing value","Function type","Loop variable"],correctAnswer:0,topic:"C Programming",marks:1},
+    {question:"Which HTTP method is used to send data to a server?",options:["POST","GET","PUT","DELETE"],correctAnswer:0,topic:"Web Development",marks:1},
+    {question:"Time complexity of inserting in a hash table (average)?",options:["O(1)","O(n)","O(log n)","O(n²)"],correctAnswer:0,topic:"Data Structures",marks:1},
+    {question:"What does OOP stand for?",options:["Object Oriented Programming","Open Operational Process","Object Overriding Protocol","None"],correctAnswer:0,topic:"C++ OOP",marks:1},
+    {question:"Which SQL command removes all rows from a table without logging?",options:["TRUNCATE","DELETE","DROP","REMOVE"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
+  ],
+  'Managerial': [
+    {question:"Which leadership style involves team in decision-making?",options:["Democratic","Autocratic","Laissez-faire","Transactional"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"SMART goal stands for?",options:["Specific, Measurable, Achievable, Relevant, Time-bound","Simple, Manageable, Accurate, Realistic, Timely","Strategic, Meaningful, Attainable, Resourceful, Trackable","None"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"Maslow's Hierarchy theory is about?",options:["Employee motivation through needs","Financial planning","Production efficiency","Quality control"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"Primary purpose of a Gantt chart?",options:["Project scheduling","Financial reporting","Team evaluation","Risk assessment"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"KPI stands for?",options:["Key Performance Indicator","Key Productivity Index","Knowledge Process Integration","None"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"360-degree feedback involves evaluation by?",options:["Peers, subordinates, superiors and self","Only superiors","Only peers","Only subordinates"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"Win-win conflict resolution style?",options:["Collaboration","Competition","Avoidance","Accommodation"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"CPM stands for?",options:["Critical Path Method","Cost Planning Management","Centralized Project Monitor","None"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"Which management style gives complete freedom to employees?",options:["Laissez-faire","Autocratic","Democratic","Bureaucratic"],correctAnswer:0,topic:"Managerial",marks:1},
+    {question:"SWOT analysis evaluates?",options:["Strengths, Weaknesses, Opportunities, Threats","Strategy, Work, Operations, Targets","None of above","Skills, Work, Outcomes, Tactics"],correctAnswer:0,topic:"Managerial",marks:1},
+  ],
+  'HR Interview': [
+    {question:"Best way to answer 'Greatest weakness'?",options:["Mention real weakness + how improving","Say no weaknesses","Strength disguised as weakness","Refuse to answer"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"'Tell me about yourself' should focus on?",options:["Professional background relevant to role","Personal life","Academic history only","Future personal goals"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"Best answer to 'Where do you see yourself in 5 years'?",options:["Align goals with company growth","Want the interviewer's job","Unsure","Mention salary expectations"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"'Why should we hire you?' should focus on?",options:["Specific skills matching the JD","General qualities","Only your degree","Salary needs"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"Salary expectations — best approach?",options:["Give researched market range","Demand highest possible","Say any amount is fine","Refuse to discuss"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"STAR method stands for?",options:["Situation, Task, Action, Result","Strategy, Target, Achievement, Review","Skill, Time, Ability, Result","None"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"'Do you have any questions for us?' — best response?",options:["Ask about growth or team culture","No questions","Ask about leaves","Ask salary immediately"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"How to answer 'Why do you want to join our company'?",options:["Show company knowledge aligned to your goals","Salary is good","It's close to home","Had no other offers"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"If asked about a gap in employment, you should?",options:["Be honest and explain how you used time productively","Lie about it","Refuse to answer","Blame previous employer"],correctAnswer:0,topic:"HR Interview",marks:1},
+    {question:"Body language tip for interviews?",options:["Maintain eye contact and sit upright","Look at the floor","Cross arms","Check phone"],correctAnswer:0,topic:"HR Interview",marks:1},
+  ]
+};
+
+async function callGeminiDirect(prompt) {
+  const GEMINI_KEY = 'AIzaSyAF29JUbKPg6kfr-ZdaMxXpsnIU-1yRQ4c';
+  try {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
+      })
+    });
+    if (!resp.ok) { console.warn('Gemini HTTP error:', resp.status); return null; }
+    const data = await resp.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!content.trim()) return null;
+    let cleaned = content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
+    if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e+1);
+    const parsed = JSON.parse(cleaned);
+    if (parsed.questions?.length) return parsed.questions;
+  } catch(err) { console.warn('Gemini failed:', err.message); }
+  return null;
+}
+
+async function callOpenRouterDirect(prompt) {
+  const MODELS = [
+    'meta-llama/llama-3.1-8b-instruct:free',
+    'mistralai/mistral-7b-instruct:free',
+    'google/gemma-2-9b-it:free',
+    'qwen/qwen-2-7b-instruct:free'
+  ];
+  const API_KEY = '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';
+  for (const model of MODELS) {
+    try {
+      const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'PlacementPro'
+        },
+        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 })
+      });
+      if (!resp.ok) continue;
+      const data = await resp.json();
+      if (data.error) { console.warn('OR model error', model, data.error); continue; }
+      const content = data.choices?.[0]?.message?.content || '';
+      if (!content.trim()) continue;
+      let cleaned = content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
+      if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e+1);
+      const parsed = JSON.parse(cleaned);
+      if (parsed.questions?.length) { console.log('OpenRouter success:', model); return parsed.questions; }
+    } catch(err) { console.warn('OR model failed:', model, err.message); }
+  }
+  return null;
+}
+
+function getFallbackQuestions(cats, subs, qcount) {
+  let pool = [];
+  cats.forEach(cat => { pool.push(...(QUESTION_BANK[cat] || [])); });
+  if (subs.length) {
+    const subPool = pool.filter(q => subs.some(s => q.topic === s || q.question.toLowerCase().includes(s.toLowerCase())));
+    if (subPool.length >= Math.min(qcount, 5)) pool = subPool;
+  }
+  pool = pool.sort(() => Math.random() - 0.5);
+  while (pool.length < qcount) pool = [...pool, ...pool];
+  return pool.slice(0, qcount).map(q => {
+    const correct = q.options[q.correctAnswer];
+    const opts = [...q.options].sort(() => Math.random() - 0.5);
+    return { ...q, options: opts, correctAnswer: opts.indexOf(correct) };
+  });
+}
+
 async function generateAIQuiz() {
   const cats = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
   if (!cats.length) { toast('Select Categories', 'Choose at least one category', 'e'); return; }
@@ -1420,15 +1588,35 @@ async function generateAIQuiz() {
   btn.innerHTML = '<div class="loader"></div> Generating…';
   btn.disabled = true;
 
-  const res = await api('POST', '/api/quiz/generate', { categories: cats, subTopics: subs, questionCount: qcount, difficulty: diff });
+  const topicList = [...cats, ...subs].join(', ');
+  const prompt = `You are a placement exam expert for Indian engineering colleges. Generate exactly ${qcount} unique multiple-choice questions on: ${topicList}. Difficulty: ${diff}.
+Return ONLY valid JSON — no markdown, no explanation, no code fences:
+{"questions":[{"question":"Question text?","options":["Option A","Option B","Option C","Option D"],"correctAnswer":0,"topic":"${cats[0]}","marks":1}]}
+correctAnswer is 0-indexed (0=A,1=B,2=C,3=D). Make all ${qcount} questions unique and placement-focused.`;
+
+  let questions = null;
+
+  // 1. Try Gemini first (most reliable)
+  questions = await callGeminiDirect(prompt);
+
+  // 2. Try OpenRouter as fallback
+  if (!questions || !questions.length) {
+    console.log('Gemini failed, trying OpenRouter...');
+    questions = await callOpenRouterDirect(prompt);
+  }
+
+  // 3. Use built-in question bank as last resort
+  if (!questions || !questions.length) {
+    console.log('All AI failed, using question bank...');
+    questions = getFallbackQuestions(cats, subs, qcount);
+    toast('Using Question Bank', 'AI unavailable — loaded from built-in bank', 'w');
+  } else {
+    toast('AI Generated ✓', `${questions.length} questions ready`, 's');
+  }
 
   btn.innerHTML = '🤖 Generate Questions';
   btn.disabled = false;
-
-  if (!res.success || !res.questions?.length) {
-    toast('Error', res.error || 'Failed to generate', 'e'); return;
-  }
-  generatedQuestions = res.questions;
+  generatedQuestions = questions;
   renderGeneratedPreview();
 }
 
