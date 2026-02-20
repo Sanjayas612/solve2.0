@@ -1191,165 +1191,17 @@ async function loadAssessments() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// QUIZ ENGINE WITH ANTI-MALPRACTICE
+// QUIZ ENGINE
 // ═══════════════════════════════════════════════════════════
-let currentAttemptId = null;
-let warningCount = 0;
-let isMalpractice = false;
-let quizActive = false;
-let visibilityHandler = null;
-let beforeUnloadHandler = null;
-let focusHandler = null;
-let fullscreenWarned = false;
-
 async function startQuiz(id) {
   const el = document.getElementById('quiz-wrap');
   el.innerHTML = '<div class="empty"><div class="e-icon"><div class="loader"></div></div><p>Loading assessment…</p></div>';
   go('quiz');
   const data = await api('GET', `/api/assessments/${id}/take`);
   if (!data || data.error) { el.innerHTML = `<div class="empty"><div class="e-icon">❌</div><p>${data?.error || 'Failed to load'}</p></div>`; return; }
-  
-  // Start attempt on server
-  const attemptRes = await api('POST', '/api/attempts/start', { assessmentId: id, usn: currentUser.username });
-  if (attemptRes.attempt && (attemptRes.attempt.status === 'submitted' || attemptRes.attempt.status === 'malpractice')) {
-    el.innerHTML = `<div class="empty"><div class="e-icon">⛔</div><p>You have already ${attemptRes.attempt.status === 'malpractice' ? 'been flagged for malpractice' : 'submitted this assessment'}</p></div>`;
-    return;
-  }
-  currentAttemptId = attemptRes.attempt?._id || null;
-  warningCount = 0;
-  isMalpractice = false;
-  quizActive = true;
-  
   currentQuiz = { ...data, id, started: Date.now() };
   quizAnswers = {};
   renderQuiz();
-  attachMalpracticeListeners();
-  
-  // Request fullscreen for better proctoring
-  try { document.documentElement.requestFullscreen().catch(()=>{}); } catch(e) {}
-}
-
-function attachMalpracticeListeners() {
-  // Tab/window visibility change
-  visibilityHandler = async () => {
-    if (!quizActive) return;
-    if (document.hidden) {
-      await handleViolation('Tab switch / window hidden detected');
-    }
-  };
-  
-  // Window blur (switched to another app)
-  focusHandler = async () => {
-    if (!quizActive) return;
-    await handleViolation('Window lost focus detected');
-  };
-  
-  // Prevent copying
-  document.addEventListener('visibilitychange', visibilityHandler);
-  window.addEventListener('blur', focusHandler);
-  
-  // Disable right-click during quiz
-  document.addEventListener('contextmenu', blockContext);
-  // Disable keyboard shortcuts
-  document.addEventListener('keydown', blockShortcuts);
-}
-
-function blockContext(e) { if (quizActive) e.preventDefault(); }
-function blockShortcuts(e) {
-  if (!quizActive) return;
-  if ((e.ctrlKey||e.metaKey) && ['c','v','a','u','s'].includes(e.key.toLowerCase())) e.preventDefault();
-  if (e.key === 'F12' || e.key === 'F5') e.preventDefault();
-  if (e.altKey && e.key === 'Tab') e.preventDefault();
-}
-
-function detachMalpracticeListeners() {
-  if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler);
-  if (focusHandler) window.removeEventListener('blur', focusHandler);
-  document.removeEventListener('contextmenu', blockContext);
-  document.removeEventListener('keydown', blockShortcuts);
-  quizActive = false;
-  // Exit fullscreen
-  try { if (document.fullscreenElement) document.exitFullscreen().catch(()=>{}); } catch(e) {}
-}
-
-async function handleViolation(eventName) {
-  if (!quizActive || isMalpractice) return;
-  warningCount++;
-  
-  // Report to server
-  if (currentAttemptId) {
-    const res = await api('POST', `/api/attempts/${currentAttemptId}/warning`, { event: eventName });
-    if (res.isMalpractice) {
-      isMalpractice = true;
-      await forcedSubmitMalpractice();
-      return;
-    }
-  }
-  
-  const remaining = 3 - warningCount;
-  showWarningBanner(warningCount, remaining, eventName);
-  
-  if (warningCount >= 3) {
-    isMalpractice = true;
-    await forcedSubmitMalpractice();
-  }
-}
-
-function showWarningBanner(count, remaining, reason) {
-  const existing = document.getElementById('malpractice-warning-banner');
-  if (existing) existing.remove();
-  
-  const banner = document.createElement('div');
-  banner.id = 'malpractice-warning-banner';
-  banner.style.cssText = `
-    position:fixed;top:0;left:0;right:0;z-index:99999;
-    background:${count>=3?'#f43f5e':count===2?'#f59e0b':'#f59e0b'};
-    color:white;padding:16px 24px;
-    display:flex;align-items:center;justify-content:space-between;
-    font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.5);
-    animation: slideDown 0.3s ease;
-  `;
-  
-  if (count >= 3) {
-    banner.innerHTML = `
-      <div>🚨 MALPRACTICE DETECTED — Auto-submitting your assessment!</div>
-      <div style="font-size:12px;font-weight:400;margin-top:2px;">You have been marked for malpractice and the officer has been notified.</div>`;
-  } else {
-    banner.innerHTML = `
-      <div>
-        <div>⚠️ WARNING ${count}/3 — ${reason}</div>
-        <div style="font-size:11px;font-weight:400;margin-top:2px;">Do NOT switch tabs or leave this window. ${remaining} warning${remaining!==1?'s':''} remaining before auto-submit!</div>
-      </div>
-      <button onclick="this.closest('#malpractice-warning-banner').remove()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;">Dismiss</button>`;
-  }
-  document.body.appendChild(banner);
-  if (count < 3) setTimeout(() => banner.remove(), 6000);
-}
-
-async function forcedSubmitMalpractice() {
-  quizActive = false;
-  detachMalpracticeListeners();
-  clearInterval(quizTimerInterval);
-  quizTimerInterval = null;
-  
-  // Submit with current answers
-  if (currentAttemptId) {
-    await api('POST', `/api/attempts/${currentAttemptId}/submit`, { answers: quizAnswers, forced: true });
-  }
-  
-  const el = document.getElementById('quiz-wrap');
-  el.innerHTML = `
-    <div style="text-align:center;padding:60px 20px;">
-      <div style="font-size:60px;margin-bottom:16px;">🚨</div>
-      <div style="font-size:24px;font-weight:800;color:var(--danger);margin-bottom:12px;">Assessment Auto-Submitted</div>
-      <div style="font-size:15px;color:var(--text2);margin-bottom:8px;">You were detected switching tabs/windows 3 times.</div>
-      <div style="font-size:13px;color:var(--text3);margin-bottom:24px;">Your session has been flagged as <strong style="color:var(--danger);">MALPRACTICE</strong> and the TPO officer has been notified.</div>
-      <div style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:12px;padding:16px;max-width:380px;margin:0 auto 24px;font-size:13px;color:var(--text2);">
-        Your answers at the time of auto-submission have been recorded. You may not re-attempt this assessment.
-      </div>
-      <button class="btn btn-outline" onclick="go('assessments')">← Back to Assessments</button>
-    </div>`;
 }
 
 function renderQuiz() {
@@ -1358,19 +1210,10 @@ function renderQuiz() {
   const LETTERS = ['A','B','C','D'];
   el.innerHTML = `
     <div class="quiz-header">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="quiz-timer" id="quiz-timer">⏱ ${String(Math.floor(q.timeLimit)).padStart(2,'0')}:00</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div id="warning-indicator" style="display:none;background:rgba(244,63,94,0.15);border:1px solid rgba(244,63,94,0.3);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--danger);font-weight:700;">⚠️ Warnings: <span id="w-count">0</span>/3</div>
-          <div style="font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 8px;">🔒 Proctored</div>
-        </div>
-      </div>
+      <div class="quiz-timer" id="quiz-timer">⏱ ${String(Math.floor(q.timeLimit)).padStart(2,'0')}:00</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:4px;">${q.title}</div>
       <div style="font-size:12px;color:var(--text2);">${q.type} · ${q.questions.length} questions · ${q.totalMarks} marks</div>
-      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 12px;margin-top:10px;font-size:11.5px;color:var(--warning);">
-        ⚠️ <strong>Proctored Assessment:</strong> Do not switch tabs, close this window, or use keyboard shortcuts. 3 violations = auto-submit + malpractice flag.
-      </div>
-      <div class="quiz-progress" style="margin-top:12px;">
+      <div class="quiz-progress" style="margin-top:14px;">
         <div class="quiz-progress-fill" id="quiz-prog" style="width:0%"></div>
       </div>
     </div>
@@ -1389,6 +1232,7 @@ function renderQuiz() {
         </div>`).join('')}
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;padding-bottom:32px;">
+      <button class="btn btn-outline" onclick="go('assessments')">← Back</button>
       <button class="btn btn-primary" onclick="submitQuiz()">Submit Assessment ✓</button>
     </div>`;
 
@@ -1409,10 +1253,12 @@ function renderQuiz() {
 }
 
 function selectOpt(qi, oi) {
+  // Clear previous selection for this question
   const prev = quizAnswers[qi];
   if (prev !== undefined) document.getElementById(`qo-${qi}-${prev}`)?.classList.remove('selected');
   quizAnswers[qi] = oi;
   document.getElementById(`qo-${qi}-${oi}`)?.classList.add('selected');
+  // Update progress
   const answered = Object.keys(quizAnswers).length;
   const pct = Math.round((answered / currentQuiz.questions.length) * 100);
   const prog = document.getElementById('quiz-prog');
@@ -1420,27 +1266,16 @@ function selectOpt(qi, oi) {
 }
 
 async function submitQuiz() {
-  if (isMalpractice) return;
   if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
-  detachMalpracticeListeners();
-  
   const unanswered = currentQuiz.questions.length - Object.keys(quizAnswers).length;
-  if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) {
-    // Re-attach if they cancel
-    quizActive = true;
-    attachMalpracticeListeners();
-    return;
-  }
-  
-  let res;
-  if (currentAttemptId) {
-    res = await api('POST', `/api/attempts/${currentAttemptId}/submit`, { answers: quizAnswers });
-  } else {
-    res = await api('POST', `/api/assessments/${currentQuiz.id}/submit`, { usn: currentUser.username, answers: quizAnswers });
-  }
-  
+  if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  const res = await api('POST', `/api/assessments/${currentQuiz.id}/submit`, {
+    usn: currentUser.username,
+    answers: quizAnswers
+  });
   if (res.error) { toast('Error', res.error, 'e'); return; }
   showQuizResult(res);
+  // Refresh student data
   const fresh = await api('GET', `/api/students/me/${currentUser.username}`);
   if (fresh && fresh._id) studentData = fresh;
 }
@@ -1610,5 +1445,495 @@ document.addEventListener('click', e => {
   setInterval(loadNotifications, 30000);
 })();
 </script>
+
+
+<script>
+  const bot = document.getElementById("botDraggable");
+  const frame = document.getElementById("botFrame");
+
+  // Load saved position
+  const savedX = localStorage.getItem("botX");
+  const savedY = localStorage.getItem("botY");
+  if (savedX && savedY) {
+    bot.style.left = savedX + "px";
+    bot.style.top = savedY + "px";
+    bot.style.right = "auto";
+    bot.style.bottom = "auto";
+  }
+
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  bot.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - bot.getBoundingClientRect().left;
+    offsetY = e.clientY - bot.getBoundingClientRect().top;
+    bot.style.cursor = "grabbing";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    const x = e.clientX - offsetX;
+    const y = e.clientY - offsetY;
+
+    bot.style.left = x + "px";
+    bot.style.top = y + "px";
+    bot.style.right = "auto";
+    bot.style.bottom = "auto";
+
+    // Save position
+    localStorage.setItem("botX", x);
+    localStorage.setItem("botY", y);
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    bot.style.cursor = "grab";
+  });
+
+  // Click to toggle bot
+  bot.addEventListener("click", () => {
+    frame.style.display = frame.style.display === "none" ? "block" : "none";
+  });
+</script>
+
+<!-- ═══════════ PLACEMENT COACH CHATBOT WIDGET ═══════════ -->
+<style>
+#pc-toggle {
+  position:fixed; bottom:24px; right:24px;
+  width:62px; height:62px; border-radius:50%;
+  background:linear-gradient(135deg,#4f8ef7,#8b5cf6);
+  color:#fff; font-size:26px; border:none; cursor:pointer;
+  box-shadow:0 8px 28px rgba(79,142,247,0.45);
+  z-index:9998; display:flex; align-items:center; justify-content:center;
+  transition:transform 0.2s;
+}
+#pc-toggle:hover { transform:scale(1.08); }
+
+#pc-panel {
+  position:fixed; bottom:100px; right:24px;
+  width:420px; max-width:calc(100vw - 48px);
+  height:580px; max-height:calc(100vh - 120px);
+  background:#0d1424; border:1px solid #1e2d48;
+  border-radius:18px; box-shadow:0 24px 64px rgba(0,0,0,0.6);
+  z-index:9997; display:none; flex-direction:column;
+  overflow:hidden; animation:fadeUp 0.25s ease;
+}
+
+/* Header */
+#pc-header {
+  background:linear-gradient(135deg,#4f8ef7,#8b5cf6);
+  padding:14px 16px; display:flex; align-items:center;
+  justify-content:space-between; flex-shrink:0;
+}
+#pc-header .pc-title { color:#fff; font-weight:700; font-size:15px; }
+#pc-header .pc-sub { color:rgba(255,255,255,0.75); font-size:11px; }
+#pc-close { background:none; border:none; color:#fff; font-size:18px; cursor:pointer; padding:4px; border-radius:6px; }
+#pc-close:hover { background:rgba(255,255,255,0.15); }
+
+/* Mode Tabs */
+#pc-tabs {
+  display:flex; gap:6px; padding:10px 12px;
+  background:#070b14; border-bottom:1px solid #1e2d48; flex-shrink:0;
+}
+.pc-tab {
+  flex:1; padding:7px 4px; border-radius:8px; border:1px solid #1e2d48;
+  background:#0d1424; color:#8da4c8; font-size:12px; font-weight:600;
+  cursor:pointer; text-align:center; transition:all 0.18s;
+}
+.pc-tab:hover { background:#1e2d48; color:#e8f0fe; }
+.pc-tab.active { background:linear-gradient(135deg,#4f8ef7,#8b5cf6); color:#fff; border-color:transparent; }
+
+/* Chat messages */
+#pc-messages {
+  flex:1; overflow-y:auto; padding:12px; display:flex;
+  flex-direction:column; gap:10px; background:#070b14;
+}
+#pc-messages::-webkit-scrollbar { width:4px; }
+#pc-messages::-webkit-scrollbar-thumb { background:#1e2d48; border-radius:4px; }
+
+.pc-msg { max-width:85%; padding:10px 14px; border-radius:14px; font-size:13.5px; line-height:1.55; word-wrap:break-word; }
+.pc-msg.user { background:linear-gradient(135deg,#4f8ef7,#6366f1); color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+.pc-msg.bot { background:#1a2540; color:#e8f0fe; align-self:flex-start; border-bottom-left-radius:4px; }
+.pc-msg.bot b { color:#4f8ef7; }
+
+.pc-typing { align-self:flex-start; background:#1a2540; border-radius:14px; padding:10px 16px; }
+.pc-typing span { display:inline-block; width:7px; height:7px; border-radius:50%; background:#8da4c8; margin:0 2px; animation:pcBounce 1.2s infinite; }
+.pc-typing span:nth-child(2) { animation-delay:0.2s; }
+.pc-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes pcBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* Suggestions */
+#pc-chips { display:flex; flex-wrap:wrap; gap:6px; padding:8px 12px; background:#070b14; flex-shrink:0; }
+.pc-chip {
+  padding:5px 12px; border-radius:20px; background:#1a2540;
+  color:#8da4c8; font-size:12px; cursor:pointer; border:1px solid #1e2d48;
+  transition:all 0.15s; white-space:nowrap;
+}
+.pc-chip:hover { background:#4f8ef7; color:#fff; border-color:#4f8ef7; }
+
+/* Input */
+#pc-input-row {
+  display:flex; gap:8px; padding:10px 12px;
+  background:#0d1424; border-top:1px solid #1e2d48; flex-shrink:0;
+}
+#pc-input {
+  flex:1; padding:9px 14px; background:#070b14; border:1px solid #1e2d48;
+  border-radius:10px; color:#e8f0fe; font-size:13px; outline:none;
+  font-family:inherit;
+}
+#pc-input:focus { border-color:#4f8ef7; }
+#pc-send {
+  padding:9px 16px; background:linear-gradient(135deg,#4f8ef7,#8b5cf6);
+  color:#fff; border:none; border-radius:10px; cursor:pointer;
+  font-size:14px; font-weight:700; transition:opacity 0.2s;
+}
+#pc-send:hover { opacity:0.88; }
+#pc-send:disabled { opacity:0.4; cursor:not-allowed; }
+
+/* Quiz */
+#pc-quiz { flex:1; overflow-y:auto; padding:14px; background:#070b14; display:none; flex-direction:column; gap:14px; }
+#pc-quiz::-webkit-scrollbar { width:4px; }
+#pc-quiz::-webkit-scrollbar-thumb { background:#1e2d48; border-radius:4px; }
+
+.pq-question { background:#1a2540; border-radius:12px; padding:14px; }
+.pq-q-text { font-size:14px; font-weight:600; color:#e8f0fe; margin-bottom:12px; line-height:1.5; }
+.pq-q-num { font-size:11px; color:#4f8ef7; font-weight:700; margin-bottom:6px; }
+.pq-opts { display:flex; flex-direction:column; gap:8px; }
+.pq-opt {
+  padding:9px 14px; border-radius:9px; border:1px solid #1e2d48;
+  background:#0d1424; color:#e8f0fe; cursor:pointer; font-size:13px;
+  transition:all 0.15s; text-align:left;
+}
+.pq-opt:hover:not(:disabled) { border-color:#4f8ef7; background:#1a2540; }
+.pq-opt.correct { background:rgba(34,197,94,0.15); border-color:#22c55e; color:#22c55e; }
+.pq-opt.wrong   { background:rgba(244,63,94,0.15);  border-color:#f43f5e; color:#f43f5e; }
+.pq-opt.reveal  { border-color:#22c55e; color:#22c55e; background:rgba(34,197,94,0.08); }
+
+.pq-score-bar {
+  background:#1a2540; border-radius:12px; padding:14px; text-align:center;
+  border:1px solid #1e2d48;
+}
+.pq-score-num { font-size:32px; font-weight:800; background:linear-gradient(135deg,#4f8ef7,#22c55e); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+#pc-quiz-header { display:none; background:#0d1424; border-bottom:1px solid #1e2d48; padding:8px 14px; flex-shrink:0; }
+#pc-quiz-header .qh-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8da4c8; }
+.qh-score { color:#22c55e; font-weight:700; }
+
+/* Loading spinner for quiz */
+.pc-loading { text-align:center; padding:30px; color:#8da4c8; font-size:14px; }
+.pc-loader { width:32px; height:32px; border:3px solid #1e2d48; border-top-color:#4f8ef7; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
+</style>
+
+<!-- Toggle Button -->
+<button id="pc-toggle" onclick="pcToggle()" title="Placement Coach AI">🤖</button>
+
+<!-- Chat Panel -->
+<div id="pc-panel">
+  <!-- Header -->
+  <div id="pc-header">
+    <div>
+      <div class="pc-title">🎓 Placement Coach</div>
+      <div class="pc-sub">AI-powered career assistant</div>
+    </div>
+    <button id="pc-close" onclick="pcToggle()">✕</button>
+  </div>
+
+  <!-- Mode Tabs -->
+  <div id="pc-tabs">
+    <div class="pc-tab active" onclick="pcSetMode('chat')" id="pctab-chat">💬 Chat</div>
+    <div class="pc-tab" onclick="pcSetMode('aptitude')" id="pctab-aptitude">🧠 Aptitude</div>
+    <div class="pc-tab" onclick="pcSetMode('technical')" id="pctab-technical">💻 Technical</div>
+    <div class="pc-tab" onclick="pcSetMode('hr')" id="pctab-hr">🎤 HR</div>
+  </div>
+
+  <!-- Quiz Score Header (shown during quiz) -->
+  <div id="pc-quiz-header">
+    <div class="qh-row">
+      <span id="pc-q-num">Q 1/10</span>
+      <span class="qh-score">Score: <span id="pc-q-score">0</span> / <span id="pc-q-total">0</span></span>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <div id="pc-messages"></div>
+
+  <!-- Suggestion Chips -->
+  <div id="pc-chips"></div>
+
+  <!-- Quiz Area -->
+  <div id="pc-quiz"></div>
+
+  <!-- Input -->
+  <div id="pc-input-row">
+    <input id="pc-input" type="text" placeholder="Ask anything about placements…"
+      onkeydown="if(event.key==='Enter')pcSend()">
+    <button id="pc-send" onclick="pcSend()">➤</button>
+  </div>
+</div>
+
+<script>
+// ═══════════ PLACEMENT COACH BOT ═══════════
+(function() {
+  const FORM_LINK = 'https://forms.gle/grnW99SeeG476viF9';
+  let pcOpen = false;
+  let pcMode = 'chat';
+  let pcHistory = [];
+  let pcQuizData = [];
+  let pcQIndex = 0;
+  let pcScore = 0;
+  let pcAnswered = false;
+
+  const CHIPS = {
+    chat: ['Top hiring companies','How to crack TCS NQT','Resume tips','DSA roadmap','Salary packages 2024','Mock interview tips'],
+    aptitude: ['Start Aptitude Quiz','Number Series','Time & Work','Percentage Problems','Logical Reasoning','Data Interpretation'],
+    technical: ['Start Technical Quiz','Arrays & Strings','DBMS Concepts','OS Interview Qs','OOP Principles','SQL Queries'],
+    hr: ['Start HR Quiz','Tell me about yourself','Strengths & Weaknesses','Why should we hire you','Where do you see yourself','Salary negotiation']
+  };
+
+  window.pcToggle = function() {
+    pcOpen = !pcOpen;
+    const panel = document.getElementById('pc-panel');
+    panel.style.display = pcOpen ? 'flex' : 'none';
+    if (pcOpen && document.getElementById('pc-messages').children.length === 0) {
+      pcBotMsg("👋 Hi! I'm your **Placement Coach**. I can help you with:
+
+• Company info & interview prep
+• Aptitude & Technical quizzes
+• Resume tips & HR questions
+• Salary trends
+
+What would you like to explore?");
+      pcShowChips(CHIPS.chat);
+    }
+    if (pcOpen) setTimeout(() => document.getElementById('pc-input').focus(), 200);
+  };
+
+  window.pcSetMode = function(mode) {
+    pcMode = mode;
+    // Update tabs
+    ['chat','aptitude','technical','hr'].forEach(m => {
+      document.getElementById('pctab-'+m).classList.toggle('active', m === mode);
+    });
+    // Show/hide areas
+    document.getElementById('pc-messages').style.display = mode === 'chat' ? 'flex' : 'none';
+    document.getElementById('pc-chips').style.display = mode === 'chat' ? 'flex' : 'none';
+    document.getElementById('pc-quiz').style.display = mode !== 'chat' ? 'flex' : 'none';
+    document.getElementById('pc-input-row').style.display = mode === 'chat' ? 'flex' : 'none';
+    document.getElementById('pc-quiz-header').style.display = 'none';
+
+    if (mode !== 'chat') {
+      pcStartQuiz(mode);
+    } else {
+      pcShowChips(CHIPS.chat);
+    }
+  };
+
+  window.pcSend = async function() {
+    const input = document.getElementById('pc-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    document.getElementById('pc-send').disabled = true;
+
+    pcUserMsg(msg);
+    pcShowChips([]);
+    pcHistory.push({ role: 'user', content: msg });
+
+    // Check for quiz triggers in chat
+    const lower = msg.toLowerCase();
+    if (lower.includes('aptitude quiz') || lower.includes('start aptitude')) { pcSetMode('aptitude'); document.getElementById('pc-send').disabled = false; return; }
+    if (lower.includes('technical quiz') || lower.includes('start technical')) { pcSetMode('technical'); document.getElementById('pc-send').disabled = false; return; }
+    if (lower.includes('hr quiz') || lower.includes('start hr')) { pcSetMode('hr'); document.getElementById('pc-send').disabled = false; return; }
+
+    // Show typing
+    const typingId = pcShowTyping();
+
+    try {
+      const r = await fetch('/api/chat', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message: msg, history: pcHistory.slice(-12) })
+      });
+      const data = await r.json();
+      pcRemoveTyping(typingId);
+      const reply = data.reply || data.error || 'Sorry, something went wrong.';
+      pcBotMsg(reply);
+      pcHistory.push({ role: 'assistant', content: reply });
+      // Show context chips
+      pcShowChips(CHIPS[pcMode] || CHIPS.chat);
+    } catch(e) {
+      pcRemoveTyping(typingId);
+      pcBotMsg('⚠️ Connection error. Please check your internet and try again.');
+    }
+    document.getElementById('pc-send').disabled = false;
+  };
+
+  // ── Quiz Logic ──────────────────────────────────────────────────────────────
+  async function pcStartQuiz(mode) {
+    const quizEl = document.getElementById('pc-quiz');
+    quizEl.innerHTML = `<div class="pc-loading"><div class="pc-loader"></div>Generating ${mode} questions with AI…</div>`;
+    document.getElementById('pc-quiz-header').style.display = 'none';
+
+    pcQuizData = []; pcQIndex = 0; pcScore = 0;
+
+    const configs = {
+      aptitude:  { categories:['Aptitude','Logical Reasoning'], subTopics:['Number Series','Time and Work','Percentages','Data Interpretation','Verbal Ability'] },
+      technical: { categories:['Technical','Programming'], subTopics:['Data Structures','Algorithms','DBMS','Operating Systems','OOP Concepts','SQL','Computer Networks'] },
+      hr:        { categories:['HR Interview','Soft Skills'], subTopics:['Communication','Behavioral Questions','Situational Questions','Leadership','Teamwork'] }
+    };
+
+    try {
+      const cfg = configs[mode] || configs.aptitude;
+      const r = await fetch('/api/quiz/generate', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ ...cfg, questionCount: 10, difficulty: 'mixed' })
+      });
+      const data = await r.json();
+      if (!data.success || !data.questions?.length) throw new Error(data.error || 'No questions returned');
+      pcQuizData = data.questions;
+      pcRenderQuestion();
+    } catch(e) {
+      quizEl.innerHTML = `<div class="pc-loading">
+        <div style="font-size:32px;margin-bottom:10px;">⚠️</div>
+        <div style="color:#f43f5e;margin-bottom:12px;">Failed to load questions: ${e.message}</div>
+        <button onclick="pcSetMode('${mode}')" style="padding:8px 20px;background:#4f8ef7;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">🔄 Retry</button>
+      </div>`;
+    }
+  }
+
+  function pcRenderQuestion() {
+    const q = pcQuizData[pcQIndex];
+    if (!q) { pcShowResult(); return; }
+
+    pcAnswered = false;
+    const quizEl = document.getElementById('pc-quiz');
+    const hdr = document.getElementById('pc-quiz-header');
+    hdr.style.display = 'block';
+    document.getElementById('pc-q-num').textContent = `Q ${pcQIndex+1} / ${pcQuizData.length}`;
+    document.getElementById('pc-q-score').textContent = pcScore;
+    document.getElementById('pc-q-total').textContent = pcQIndex;
+
+    quizEl.innerHTML = `
+      <div class="pq-question">
+        <div class="pq-q-num">Question ${pcQIndex+1} of ${pcQuizData.length} • ${q.topic || ''}</div>
+        <div class="pq-q-text">${q.question}</div>
+        <div class="pq-opts" id="pq-opts">
+          ${q.options.map((o,i) => `<button class="pq-opt" onclick="pcAnswer(${i})" id="pqo-${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+        </div>
+      </div>
+    `;
+    quizEl.scrollTop = 0;
+  }
+
+  window.pcAnswer = function(idx) {
+    if (pcAnswered) return;
+    pcAnswered = true;
+    const q = pcQuizData[pcQIndex];
+    const correct = q.correctAnswer;
+    const isRight = idx === correct;
+    if (isRight) pcScore++;
+
+    // Color the options
+    for (let i = 0; i < q.options.length; i++) {
+      const btn = document.getElementById('pqo-'+i);
+      if (!btn) continue;
+      btn.disabled = true;
+      if (i === correct) btn.classList.add('reveal');
+      if (i === idx && !isRight) btn.classList.add('wrong');
+      if (i === idx && isRight) btn.classList.remove('reveal'), btn.classList.add('correct');
+    }
+
+    // Update score header
+    document.getElementById('pc-q-score').textContent = pcScore;
+    document.getElementById('pc-q-total').textContent = pcQIndex + 1;
+
+    // Next button
+    const quizEl = document.getElementById('pc-quiz');
+    const nextBtn = document.createElement('div');
+    nextBtn.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;';
+    const feedback = isRight ? '<span style="color:#22c55e;font-size:13px;font-weight:700;">✅ Correct!</span>' : `<span style="color:#f43f5e;font-size:13px;font-weight:700;">❌ Wrong</span>`;
+    nextBtn.innerHTML = `${feedback}<button onclick="pcNextQ()" style="padding:8px 20px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;">${pcQIndex + 1 < pcQuizData.length ? 'Next →' : 'See Results'}</button>`;
+    quizEl.querySelector('.pq-question').appendChild(nextBtn);
+  };
+
+  window.pcNextQ = function() {
+    pcQIndex++;
+    if (pcQIndex >= pcQuizData.length) { pcShowResult(); return; }
+    pcRenderQuestion();
+  };
+
+  function pcShowResult() {
+    const quizEl = document.getElementById('pc-quiz');
+    const pct = Math.round((pcScore / pcQuizData.length) * 100);
+    const grade = pct >= 80 ? ['🏆','Excellent!','#22c55e'] : pct >= 60 ? ['👍','Good Job!','#4f8ef7'] : pct >= 40 ? ['📚','Keep Practicing','#f59e0b'] : ['💪','Need More Practice','#f43f5e'];
+    document.getElementById('pc-quiz-header').style.display = 'none';
+    quizEl.innerHTML = `
+      <div class="pq-score-bar">
+        <div style="font-size:40px;margin-bottom:8px;">${grade[0]}</div>
+        <div class="pq-score-num">${pcScore} / ${pcQuizData.length}</div>
+        <div style="font-size:14px;color:${grade[2]};font-weight:700;margin:6px 0;">${grade[1]} — ${pct}%</div>
+        <div style="font-size:12px;color:#8da4c8;margin-top:4px;">${pct>=80?'Outstanding performance!':pct>=60?'Great effort, keep it up!':pct>=40?'Review the topics and try again.':'Focus on fundamentals and practice daily.'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="pcSetMode('${pcMode}')" style="padding:10px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">🔄 Retry Quiz</button>
+        <button onclick="pcSetMode('chat')" style="padding:10px;background:#1a2540;color:#e8f0fe;border:1px solid #1e2d48;border-radius:10px;cursor:pointer;font-size:14px;">💬 Back to Chat</button>
+      </div>
+    `;
+  }
+
+  // ── Chip click ──────────────────────────────────────────────────────────────
+  window.pcChipClick = function(text) {
+    document.getElementById('pc-input').value = text;
+    pcSend();
+  };
+
+  function pcShowChips(chips) {
+    const el = document.getElementById('pc-chips');
+    el.innerHTML = chips.map(c => `<div class="pc-chip" onclick="pcChipClick('${c}')">${c}</div>`).join('');
+  }
+
+  // ── Message helpers ─────────────────────────────────────────────────────────
+  function pcUserMsg(text) {
+    const el = document.getElementById('pc-messages');
+    const d = document.createElement('div');
+    d.className = 'pc-msg user';
+    d.textContent = text;
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function pcBotMsg(text) {
+    const el = document.getElementById('pc-messages');
+    const d = document.createElement('div');
+    d.className = 'pc-msg bot';
+    // Basic markdown: **bold**, bullet points
+    d.innerHTML = text
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+      .replace(/^• /gm, '&bull; ')
+      .replace(/
+/g, '<br>');
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function pcShowTyping() {
+    const el = document.getElementById('pc-messages');
+    const id = 'pct-' + Date.now();
+    const d = document.createElement('div');
+    d.className = 'pc-typing'; d.id = id;
+    d.innerHTML = '<span></span><span></span><span></span>';
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+    return id;
+  }
+
+  function pcRemoveTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+})();
+</script>
+
 </body>
 </html>

@@ -475,6 +475,56 @@ correctAnswer is 0-indexed (0=A,1=B,2=C,3=D). Generate all ${questionCount} ques
   }
 });
 
+// ─── PLACEMENT CHATBOT ───────────────────────────────────────────────────────
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, history = [] } = req.body;
+    if (!message) return res.status(400).json({ error: 'Message required' });
+
+    const systemPrompt = `You are PlacementCoach, an expert AI assistant for engineering college students preparing for campus placements in India. You help with:
+- Company information (TCS, Infosys, Wipro, Accenture, Google, Amazon, etc.)
+- Interview preparation tips and common questions
+- Aptitude & reasoning strategies
+- Technical topics: DSA, DBMS, OS, Networks, OOP, SQL
+- Resume building and soft skills
+- Salary expectations and placement trends
+- Mock interview advice
+
+Be concise, friendly, and practical. Use bullet points when listing things. Always motivate students.`;
+
+    const messages = [
+      ...history.slice(-10).map(h => ({ role: h.role, content: h.content })),
+      { role: 'user', content: message }
+    ];
+
+    const MODELS = [
+      'meta-llama/llama-3.1-8b-instruct:free',
+      'mistralai/mistral-7b-instruct:free',
+      'google/gemma-2-9b-it:free'
+    ];
+
+    let reply = '';
+    for (const model of MODELS) {
+      try {
+        const data = await openRouterRequest({
+          model,
+          messages: [{ role: 'system', content: systemPrompt }, ...messages],
+          temperature: 0.7,
+          max_tokens: 800
+        });
+        if (data.error) continue;
+        reply = data.choices?.[0]?.message?.content || '';
+        if (reply.trim()) break;
+      } catch(e) { continue; }
+    }
+
+    if (!reply.trim()) return res.status(500).json({ error: 'AI unavailable. Please try again.' });
+    res.json({ success: true, reply });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── AI CONNECTION TEST ───────────────────────────────────────────────────────
 app.get('/api/quiz/test', async (req, res) => {
   try {
