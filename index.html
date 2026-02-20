@@ -331,6 +331,7 @@ tbody td:first-child { color: var(--text); font-weight: 500; }
 .empty-state p { font-size: 15px; }
 </style>
 </head>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <body>
 
 <!-- LOGIN PAGE -->
@@ -353,7 +354,22 @@ tbody td:first-child { color: var(--text); font-weight: 500; }
       <label>Password</label>
       <input type="password" id="login-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    <button class="btn-primary" onclick="DoLogin()">Sign In →</button>
+    <!-- Google Login for Student -->
+<div id="google-login" style="display:none; margin-top:16px; text-align:center;">
+  <div id="g_id_onload"
+       data-client_id="672992454401-bh0cqp66c4lgmptfgqh07nuh5f64verq.apps.googleusercontent.com"
+       data-callback="handleGoogleLogin">
+  </div>
+  <div class="g_id_signin"
+       data-type="standard"
+       data-size="large"
+       data-theme="outline"
+       data-text="sign_in_with"
+       data-shape="rectangular"
+       data-logo_alignment="left">
+  </div>
+</div>
     <p class="login-hint">Admin: user = <code>a</code> / pass = <code>a</code></p>
   </div>
 </div>
@@ -728,8 +744,16 @@ function showToast(title, msg, type = 'info') {
 let loginRole = 'admin';
 function setRole(role) {
   loginRole = role;
-  document.querySelectorAll('.role-tab').forEach((t, i) => t.classList.toggle('active', (role === 'admin' && i === 0) || (role === 'student' && i === 1)));
-  document.getElementById('uname-label').textContent = role === 'admin' ? 'Username' : 'USN (e.g. 1MS21CS001)';
+  document.querySelectorAll('.role-tab').forEach((t, i) =>
+    t.classList.toggle('active', (role === 'admin' && i === 0) || (role === 'student' && i === 1))
+  );
+
+  // Show Google login only for student
+  if (role === 'student') {
+    document.getElementById('google-login').style.display = 'block';
+  } else {
+    document.getElementById('google-login').style.display = 'none';
+  }
 }
 
 async function doLogin() {
@@ -742,10 +766,8 @@ async function doLogin() {
       window.location.href = '/dashboard';
       return;
     }
-    if (res.role === 'student') {
-      window.location.href = '/student';
-      return;
-    }
+    window.location.href = '/student';
+    return;
   } else {
     showToast('Login Failed', res.error, 'error');
   }
@@ -778,6 +800,31 @@ async function doLogout() {
   currentUser = null;
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
+}
+
+async function handleGoogleLogin(response) {
+  try {
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert(data.error || 'Google login failed');
+      return;
+    }
+
+    // ✅ Success (for now just reload / or go to dashboard later)
+    alert('Student login successful!');
+    location.reload();
+
+  } catch (err) {
+    console.error(err);
+    alert('Google login failed');
+  }
 }
 
 // ===== NAVIGATION =====
