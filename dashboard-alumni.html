@@ -752,28 +752,40 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                 <div>
                     <div style="font-size:15px;font-weight:700;">My Groups</div>
-                    <div style="font-size:12px;color:var(--text2);margin-top:2px;">Alumni groups you've joined</div>
+                    <div style="font-size:12px;color:var(--text2);margin-top:2px;">Alumni groups you've joined or can
+                        join</div>
                 </div>
             </div>
-            <div class="group-list" id="groups-list"></div>
+            <!-- Tab toggle: My Groups / Discover -->
+            <div style="display:flex;gap:8px;margin-bottom:20px;">
+                <button class="btn btn-sm btn-primary" id="gtab-mine" onclick="showGroupTab('mine')">👥 My
+                    Groups</button>
+                <button class="btn btn-sm btn-outline" id="gtab-all" onclick="showGroupTab('all')">🔍 Browse All
+                    Groups</button>
+            </div>
+            <div id="groups-list"></div>
+            <div id="groups-all" style="display:none;"></div>
         </div>
 
         <!-- MESSAGES (group chat view) -->
         <div class="page" id="page-messages">
-            <div style="margin-bottom:16px;">
+            <div style="margin-bottom:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;">
                 <select id="msg-group-select"
                     style="padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;"
                     onchange="loadGroupChat()">
                     <option value="">— Select a group —</option>
                 </select>
-                <div style="display:inline-flex;gap:6px;margin-left:12px;">
+                <div style="display:inline-flex;gap:6px;">
                     <button class="btn btn-sm btn-outline" id="tab-general" onclick="switchTab('general')"
                         style="background:rgba(139,92,246,0.12);color:var(--purple);border-color:var(--purple);">💬
                         General</button>
+                    <button class="btn btn-sm btn-outline" id="tab-resources" onclick="switchTab('resources')">📁
+                        Resources</button>
                     <button class="btn btn-sm btn-outline" id="tab-private" onclick="switchTab('private')">🔒
                         Private</button>
                 </div>
             </div>
+            <!-- General / Private chat -->
             <div class="chat-container" id="chat-area">
                 <div class="chat-messages" id="chat-messages">
                     <div class="empty">
@@ -782,10 +794,21 @@
                     </div>
                 </div>
                 <div class="chat-input">
+                    <input type="file" id="res-file-alumni" style="display:none" onchange="uploadResourceAlumni()">
                     <input type="text" id="chat-input" placeholder="Type a message..."
                         onkeydown="if(event.key==='Enter')sendMsg()">
                     <button class="btn btn-primary btn-sm" onclick="sendMsg()">Send</button>
                 </div>
+            </div>
+            <!-- Resources panel (alumni only upload) -->
+            <div id="resources-panel" style="display:none;">
+                <div style="padding:12px 0 16px;display:flex;align-items:center;gap:10px;">
+                    <button class="btn btn-outline btn-sm"
+                        onclick="document.getElementById('res-file-alumni').click()">📎 Upload Resource</button>
+                    <span style="font-size:12px;color:var(--text3);">Share study materials, interview prep, or any
+                        useful resources with students</span>
+                </div>
+                <div id="alumni-resources-list"></div>
             </div>
         </div>
 
@@ -873,17 +896,66 @@
   `).join('');
         }
 
+        let currentGroupTab = 'mine';
+
+        function showGroupTab(tab) {
+            currentGroupTab = tab;
+            document.getElementById('gtab-mine').className = tab === 'mine' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+            document.getElementById('gtab-all').className = tab === 'all' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+            document.getElementById('groups-list').style.display = tab === 'mine' ? 'block' : 'none';
+            document.getElementById('groups-all').style.display = tab === 'all' ? 'block' : 'none';
+            if (tab === 'all') loadAllGroups();
+        }
+
         async function loadGroups() {
             allGroups = await api('GET', '/api/alumni/groups');
             const myGroups = allGroups.filter(g => g.members.some(m => m.userId === alumniData._id));
             const el = document.getElementById('groups-list');
-            if (!myGroups.length) { el.innerHTML = '<div class="empty"><div class="e-icon">👥</div><p>You haven\'t joined any groups yet</p></div>'; return; }
+            if (!myGroups.length) {
+                el.innerHTML = `<div class="empty"><div class="e-icon">👥</div><p>You haven't joined any groups yet</p><p style="font-size:12px;color:var(--text3);margin-top:8px;">Click <strong>Browse All Groups</strong> to discover and join groups</p></div>`;
+                return;
+            }
             el.innerHTML = myGroups.map(g => `
-    <div class="group-card">
+    <div class="group-card" onclick="go('messages');loadGroupChat('${g._id}')">
       <div class="gc-name">🏢 ${g.name} <span class="badge b-purple">${g.companyTag}</span></div>
       <div class="gc-meta"><span>👥 ${g.members.length} members</span><span>📅 ${new Date(g.createdAt).toLocaleDateString()}</span></div>
+      <div style="margin-top:8px;"><span style="font-size:11px;padding:3px 10px;background:rgba(34,197,94,0.1);border-radius:20px;color:var(--success);">✅ Joined · Click to open chat</span></div>
     </div>
   `).join('');
+        }
+
+        async function loadAllGroups() {
+            allGroups = await api('GET', '/api/alumni/groups');
+            const el = document.getElementById('groups-all');
+            if (!allGroups.length) { el.innerHTML = '<div class="empty"><div class="e-icon">🔍</div><p>No groups exist yet</p></div>'; return; }
+            el.innerHTML = allGroups.map(g => {
+                const isMember = g.members.some(m => m.userId === alumniData._id);
+                return `<div class="group-card">
+      <div class="gc-name">🏢 ${g.name} <span class="badge b-purple">${g.companyTag}</span></div>
+      <div class="gc-meta"><span>👥 ${g.members.length} members</span><span>📅 ${new Date(g.createdAt).toLocaleDateString()}</span></div>
+      <div style="margin-top:10px;">
+        ${isMember
+                        ? `<span style="font-size:11px;padding:4px 12px;background:rgba(34,197,94,0.1);border-radius:20px;color:var(--success);">✅ Already a member</span>
+             <button class="btn btn-sm btn-outline" style="margin-left:8px;" onclick="go('messages');loadGroupChat('${g._id}')">💬 Open Chat</button>`
+                        : `<button class="btn btn-sm btn-primary" onclick="joinGroupAsAlumni('${g._id}')">➕ Join Group</button>`
+                    }
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        async function joinGroupAsAlumni(groupId) {
+            const res = await api('POST', `/api/alumni/groups/${groupId}/join`, {
+                userId: alumniData._id, name: alumniData.name, role: 'alumni'
+            });
+            if (res.success) {
+                toast('Joined!', 'You are now a member of this group', 's');
+                allGroups = await api('GET', '/api/alumni/groups');
+                loadAllGroups();
+                loadGroups();
+                const myGroups = allGroups.filter(g => g.members.some(m => m.userId === alumniData._id));
+                document.getElementById('stat-groups').textContent = myGroups.length;
+            } else toast('Error', res.error || 'Failed to join group', 'e');
         }
 
         async function loadMessageGroupSelect() {
@@ -895,13 +967,67 @@
 
         function switchTab(tab) {
             currentTab = tab;
-            document.getElementById('tab-general').style.background = tab === 'general' ? 'rgba(139,92,246,0.12)' : 'transparent';
-            document.getElementById('tab-general').style.color = tab === 'general' ? 'var(--purple)' : 'var(--text2)';
-            document.getElementById('tab-general').style.borderColor = tab === 'general' ? 'var(--purple)' : 'var(--border)';
-            document.getElementById('tab-private').style.background = tab === 'private' ? 'rgba(139,92,246,0.12)' : 'transparent';
-            document.getElementById('tab-private').style.color = tab === 'private' ? 'var(--purple)' : 'var(--text2)';
-            document.getElementById('tab-private').style.borderColor = tab === 'private' ? 'var(--purple)' : 'var(--border)';
-            loadGroupChat();
+            ['general', 'resources', 'private'].forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                if (!btn) return;
+                const active = t === tab;
+                btn.style.background = active ? 'rgba(139,92,246,0.12)' : 'transparent';
+                btn.style.color = active ? 'var(--purple)' : 'var(--text2)';
+                btn.style.borderColor = active ? 'var(--purple)' : 'var(--border)';
+            });
+            const isResources = tab === 'resources';
+            document.getElementById('chat-area').style.display = isResources ? 'none' : 'flex';
+            document.getElementById('resources-panel').style.display = isResources ? 'block' : 'none';
+            if (isResources) loadAlumniResources();
+            else loadGroupChat();
+        }
+
+        async function loadAlumniResources() {
+            const groupId = document.getElementById('msg-group-select').value;
+            const el = document.getElementById('alumni-resources-list');
+            if (!groupId) { el.innerHTML = '<div class="empty"><div class="e-icon">📁</div><p>Select a group first</p></div>'; return; }
+            const msgs = await api('GET', `/api/alumni/groups/${groupId}/messages/resource`);
+            if (!msgs.length) { el.innerHTML = '<div class="empty"><div class="e-icon">📁</div><p>No resources shared yet. Be the first to upload!</p></div>'; return; }
+            const byUser = {};
+            msgs.forEach(m => { if (!byUser[m.senderName]) byUser[m.senderName] = []; byUser[m.senderName].push(m); });
+            let html = '';
+            Object.entries(byUser).forEach(([name, items]) => {
+                html += `<div class="card" style="margin-bottom:14px;"><div class="card-header"><div class="card-title" style="font-size:13px;">📂 ${name}'s Resources</div></div>`;
+                items.forEach(m => {
+                    const ext = (m.fileName || 'file').split('.').pop().toUpperCase();
+                    const icon = { PDF: '📄', DOC: '📝', DOCX: '📝', PPT: '📊', PPTX: '📊', XLS: '📊', XLSX: '📊', JPG: '🖼️', PNG: '🖼️', ZIP: '📦' }[ext] || '📄';
+                    html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+                        <span style="font-size:22px;">${icon}</span>
+                        <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${m.fileName || 'Untitled'}</div>
+                        <div style="font-size:11px;color:var(--text3);">${new Date(m.createdAt).toLocaleDateString()}</div></div>
+                        <a href="${m.fileUrl}" target="_blank" download class="btn btn-sm btn-outline">↓ Download</a>
+                    </div>`;
+                });
+                html += '</div>';
+            });
+            el.innerHTML = html;
+        }
+
+        async function uploadResourceAlumni() {
+            const groupId = document.getElementById('msg-group-select').value;
+            if (!groupId) { toast('Error', 'Select a group first', 'e'); return; }
+            const fileInput = document.getElementById('res-file-alumni');
+            const file = fileInput.files[0];
+            if (!file) return;
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('section', 'resource');
+            fd.append('senderId', alumniData._id);
+            fd.append('senderName', alumniData.name);
+            fd.append('senderRole', 'alumni');
+            fd.append('content', file.name);
+            try {
+                const res = await fetch(`/api/alumni/groups/${groupId}/messages`, { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) { toast('Uploaded!', 'Resource shared with the group', 's'); loadAlumniResources(); }
+                else toast('Error', 'Upload failed', 'e');
+            } catch (e) { toast('Error', 'Upload failed', 'e'); }
+            fileInput.value = '';
         }
 
         async function loadGroupChat(gid) {

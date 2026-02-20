@@ -893,10 +893,16 @@
         <!-- RESOURCES -->
         <div class="content-area" id="section-resources" style="display:none;">
             <div
-                style="padding:14px 28px;border-bottom:1px solid var(--border);display:flex;gap:10px;background:var(--surface)">
+                style="padding:14px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface)">
                 <input type="file" id="res-file" style="display:none" onchange="uploadResource()">
-                <button class="btn btn-outline btn-sm" onclick="document.getElementById('res-file').click()">📎 Upload
-                    Resource</button>
+                <div id="upload-area"></div>
+                <div id="alumni-only-note"
+                    style="display:none;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px;">
+                    <span
+                        style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);color:var(--purple);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">🔒
+                        Alumni Only</span>
+                    Only alumni can upload resources to this group
+                </div>
             </div>
             <div class="resources-area" id="resources-list"></div>
         </div>
@@ -954,19 +960,30 @@
         function toast(t, m, type = '') { const c = document.getElementById('toasts'); const el = document.createElement('div'); el.className = 'toast ' + type; el.innerHTML = `<div class="toast-t">${t}</div><div class="toast-m">${m}</div>`; c.appendChild(el); setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(100%)'; el.style.transition = '0.3s'; setTimeout(() => el.remove(), 300) }, 4000) }
         const api = async (m, p, b) => { const o = { method: m, headers: { 'Content-Type': 'application/json' } }; if (b) o.body = JSON.stringify(b); return (await fetch(p, o)).json() };
 
-        // Figure out who we are (student session)
+        // Figure out who we are (student or alumni session)
         async function init() {
             try {
-                // Try to get session info from student login
                 const res = await fetch('/api/auth/me');
                 if (res.ok) {
                     currentUser = await res.json();
                 }
             } catch (e) { }
-            if (!currentUser || !currentUser.username) {
-                // Fallback: use localStorage or a default
+            if (!currentUser || (!currentUser.username && !currentUser.id)) {
                 currentUser = { username: 'student', name: localStorage.getItem('studentName') || 'Student', role: 'student' };
             }
+
+            // Render upload area based on role
+            const isAlumni = currentUser.role === 'alumni';
+            const uploadArea = document.getElementById('upload-area');
+            const alumniNote = document.getElementById('alumni-only-note');
+            if (isAlumni) {
+                uploadArea.innerHTML = '<button class="btn btn-outline btn-sm" onclick="document.getElementById('res - file').click()">📎 Upload Resource</button>';
+                alumniNote.style.display = 'none';
+            } else {
+                uploadArea.innerHTML = '';
+                alumniNote.style.display = 'flex';
+            }
+
             loadGroups();
         }
 
@@ -991,9 +1008,10 @@
             if (!currentGroup) return;
 
             // Auto-join if not member
-            const userId = currentUser.username || currentUser.id;
+            const userId = currentUser.id || currentUser.username;
+            const joinRole = currentUser.role === 'alumni' ? 'alumni' : 'student';
             if (!currentGroup.members.find(m => m.userId === userId)) {
-                await api('POST', `/api/alumni/groups/${id}/join`, { userId, name: currentUser.name, role: 'student' });
+                await api('POST', `/api/alumni/groups/${id}/join`, { userId, name: currentUser.name, role: joinRole });
                 allGroups = await api('GET', '/api/alumni/groups');
                 currentGroup = allGroups.find(g => g._id === id);
             }
@@ -1043,8 +1061,9 @@
             const content = input.value.trim();
             if (!content) return;
             input.value = '';
+            const senderRole = currentUser.role === 'alumni' ? 'alumni' : 'student';
             await api('POST', `/api/alumni/groups/${currentGroup._id}/messages`, {
-                section: 'general', senderId: currentUser.username || currentUser.id, senderName: currentUser.name, senderRole: 'student', content
+                section: 'general', senderId: currentUser.username || currentUser.id, senderName: currentUser.name, senderRole, content
             });
             loadChatMessages();
         }
@@ -1080,15 +1099,20 @@
 
         async function uploadResource() {
             if (!currentGroup) return;
+            // Only alumni can upload resources
+            if (currentUser.role !== 'alumni') {
+                toast('Access Denied', 'Only alumni can upload resources', 'e');
+                return;
+            }
             const fileInput = document.getElementById('res-file');
             const file = fileInput.files[0];
             if (!file) return;
             const fd = new FormData();
             fd.append('file', file);
             fd.append('section', 'resource');
-            fd.append('senderId', currentUser.username || currentUser.id);
+            fd.append('senderId', currentUser.id || currentUser.username);
             fd.append('senderName', currentUser.name);
-            fd.append('senderRole', 'student');
+            fd.append('senderRole', 'alumni');
             fd.append('content', file.name);
             try {
                 const res = await fetch(`/api/alumni/groups/${currentGroup._id}/messages`, { method: 'POST', body: fd });

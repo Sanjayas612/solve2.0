@@ -1057,6 +1057,10 @@ app.get('/api/alumni/groups/:id/messages/:section', async (req, res) => {
 app.post('/api/alumni/groups/:id/messages', upload.single('file'), async (req, res) => {
   try {
     const { section, senderId, senderName, senderRole, content } = req.body;
+    // Only alumni can post to the resource section
+    if (section === 'resource' && senderRole !== 'alumni') {
+      return res.status(403).json({ error: 'Only alumni can upload resources' });
+    }
     const msg = { groupId: req.params.id, section: section || 'general', senderId, senderName, senderRole: senderRole || 'student', content: content || '' };
     if (req.file) {
       msg.fileName = req.file.originalname;
