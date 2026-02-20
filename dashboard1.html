@@ -5642,12 +5642,6 @@
         hr: ['Start HR Quiz', 'Tell me about yourself', 'Strengths & Weaknesses', 'Why hire you', 'Salary negotiation']
       };
 
-      // Wire up send button and enter key AFTER DOM ready
-      document.getElementById('pc-send').addEventListener('click', pcSend);
-      document.getElementById('pc-input').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') pcSend();
-      });
-
       window.pcToggle = function () {
         pcOpen = !pcOpen;
         var panel = document.getElementById('pc-panel');
@@ -5836,3 +5830,25 @@
         d.className = 'pc-typing'; d.id = id;
         d.innerHTML = '<span></span><span></span><span></span>';
         el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
+        return id;
+      }
+
+      function pcRemoveTyping(id) {
+        var el = document.getElementById(id);
+        if (el) el.remove();
+      }
+
+      // Wire up event listeners AFTER all functions are defined
+      var pcSendBtn = document.getElementById('pc-send');
+      var pcInputEl = document.getElementById('pc-input');
+      if (pcSendBtn) pcSendBtn.addEventListener('click', pcSend);
+      if (pcInputEl) pcInputEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') pcSend();
+      });
+
+    })();
+  </script>
+</body>
+
+</html>
