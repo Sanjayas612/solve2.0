@@ -83,6 +83,45 @@ function openRouterRequest(body) {
     req.end();
   });
 }
+
+async function askAI(systemPrompt, messages) {
+  // 1️⃣ Try Gemini first
+  try {
+    console.log("🤖 Trying Gemini...");
+    const geminiReply = await geminiRequest(systemPrompt, messages, 1024);
+    if (geminiReply && geminiReply.trim()) {
+      console.log("✅ Gemini success");
+      return geminiReply;
+    }
+    throw new Error("Empty Gemini response");
+  } catch (err) {
+    console.error("❌ Gemini failed:", err.message);
+  }
+
+  // 2️⃣ Fallback to OpenRouter
+  try {
+    console.log("🔁 Falling back to OpenRouter...");
+    const orResp = await openRouterRequest({
+      model: "openai/gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages
+      ],
+      max_tokens: 800,
+      temperature: 0.7
+    });
+
+    const text = orResp?.choices?.[0]?.message?.content;
+    if (!text) throw new Error("Empty OpenRouter response");
+
+    console.log("✅ OpenRouter success");
+    return text;
+  } catch (err) {
+    console.error("❌ OpenRouter failed:", err.message);
+    throw new Error("Both Gemini and OpenRouter failed");
+  }
+}
+
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
@@ -616,51 +655,27 @@ app.post('/api/quiz/generate', async (req, res) => {
 });
 
 // ─── PLACEMENT CHATBOT ───────────────────────────────────────────────────────
+// ─── CHAT ROUTE ──────────────────────────────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
   try {
     const { message, history = [] } = req.body;
-    if (!message) return res.status(400).json({ error: 'Message required' });
+    if (!message) {
+      return res.status(400).json({ error: 'Message required' });
+    }
 
-    const systemPrompt = `You are PlacementCoach, an expert AI assistant for engineering college students preparing for campus placements in India. You help with:
-- Company information (TCS, Infosys, Wipro, Accenture, Google, Amazon, etc.)
-- Interview preparation tips and common questions
-- Aptitude & reasoning strategies
-- Technical topics: DSA, DBMS, OS, Networks, OOP, SQL
-- Resume building and soft skills
-- Salary expectations and placement trends
-- Mock interview advice
-
-Be concise, friendly, and practical. Use bullet points when listing things. Always motivate students.`;
+    const systemPrompt = `You are PlacementCoach, an expert AI assistant for engineering students preparing for placements. Be concise, friendly, and practical.`;
 
     const messages = [
       ...history.slice(-10).map(h => ({ role: h.role, content: h.content })),
       { role: 'user', content: message }
     ];
 
-    let reply = '';
+    const reply = await askAI(systemPrompt, messages);
 
-    // Try Gemini 2.0 Flash first
-    try {
-      console.log('Trying Gemini for chat...');
-      reply = await geminiRequest(systemPrompt, messages, 800);
-      console.log('Gemini chat OK');
-    } catch (e) {
-      console.log('Gemini chat failed, trying OpenRouter...', e.message);
-      const OR_MODELS = ['meta-llama/llama-3.1-8b-instruct:free', 'mistralai/mistral-7b-instruct:free', 'google/gemma-2-9b-it:free'];
-      for (const model of OR_MODELS) {
-        try {
-          const data = await openRouterRequest({ model, messages: [{ role: 'system', content: systemPrompt }, ...messages], temperature: 0.7, max_tokens: 800 });
-          if (data.error) continue;
-          reply = data.choices?.[0]?.message?.content || '';
-          if (reply.trim()) break;
-        } catch (err) { continue; }
-      }
-    }
-
-    if (!reply.trim()) return res.status(500).json({ error: 'AI unavailable. Please try again.', hint: 'Check GEMINI_API_KEY and OPENROUTER_KEY env vars' });
     res.json({ success: true, reply });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error("🔥 AI ERROR:", e.message);
+    res.status(500).json({ error: "AI unavailable. Please try again." });
   }
 });
 
