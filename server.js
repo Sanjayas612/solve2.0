@@ -7,6 +7,8 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -109,11 +111,6 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
   if (role === 'student') {
-    // ── Dev shortcut: username=a  password=aa ──
-    if (username === 'a' && password === 'aa') {
-      req.session.user = { role: 'student', username: 'A', name: 'Test Student', id: null };
-      return res.json({ success: true, role: 'student', name: 'Test Student' });
-    }
     const student = await Student.findOne({ usn: username.toUpperCase() });
     if (!student) return res.status(401).json({ error: 'Student not found' });
     if (student.password !== password) return res.status(401).json({ error: 'Invalid password' });
@@ -121,6 +118,51 @@ app.post('/api/auth/login', async (req, res) => {
     return res.json({ success: true, role: 'student', name: student.name });
   }
   res.status(400).json({ error: 'Invalid role' });
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name;
+
+    // 🔒 Allow only vvce.ac.in
+    if (!email.endsWith('@vvce.ac.in')) {
+      return res.json({ success: false, error: 'Only @vvce.ac.in emails are allowed' });
+    }
+
+    // Find or create student
+    let student = await Student.findOne({ email });
+
+    if (!student) {
+      student = await Student.create({
+        name,
+        email,
+        usn: email.split('@')[0].toUpperCase(),
+        branch: 'CSE',
+        year: 4,
+        cgpa: 0,
+        backlogs: 0,
+        password: 'google-auth'
+      });
+    }
+
+    // Save session
+    req.session.user = { role: 'student', id: student._id, email, name: student.name };
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, error: 'Google login failed' });
+  }
 });
 
 app.post('/api/auth/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
@@ -450,6 +492,8 @@ app.get('/api/form-submit', (req, res) => {
 
 // ─── SERVE FRONTEND ───────────────────────────────────────────────────────────
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
+app.get('/student', (req, res) => res.sendFile(path.join(__dirname, 'dashboard1.html')));
+app.get('/dashboard1', (req, res) => res.sendFile(path.join(__dirname, 'dashboard1.html')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.listen(PORT, () => console.log(`🚀 PlacementPro running on http://localhost:${PORT}`));
