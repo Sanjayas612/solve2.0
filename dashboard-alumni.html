@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlacementPro – Alumni Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #070b14;
+            --surface: #0d1424;
+            --surface2: #131d33;
+            --border: #1e2d48;
+            --accent: #4f8ef7;
+            --accent2: #00d4aa;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #f43f5e;
+            --purple: #8b5cf6;
+            --text: #e8f0fe;
+            --text2: #8da4c8;
+            --text3: #3d5a80;
+            --grad: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            --grad2: linear-gradient(135deg, #4f8ef7, #00d4aa);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        /* ═══ SIDEBAR ═══ */
+        .sidebar {
+            width: 256px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 200;
+        }
+
+        .sidebar-header {
+            padding: 22px 18px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header .logo-text h2 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .sidebar-header .logo-text span {
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .nav-group {
+            padding: 14px 10px 4px;
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text3);
+            padding: 0 10px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text2);
+            transition: all 0.18s;
+            margin-bottom: 1px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--purple);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: var(--purple);
+        }
+
+        .nav-icon {
+            font-size: 15px;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .user-info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-info .role {
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .logout-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text3);
+            cursor: pointer;
+            font-size: 17px;
+            padding: 5px;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--danger);
+        }
+
+        /* ═══ MAIN ═══ */
+        .main {
+            margin-left: 256px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 11, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .topbar p {
+            font-size: 12px;
+            color: var(--text3);
+            margin-top: 1px;
+        }
+
+        .page {
+            display: none;
+            padding: 28px 32px;
+            animation: fadeUp 0.35s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ═══ CARDS ═══ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .accent-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .stat-card .sc-icon {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .sc-value {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-card .sc-label {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 6px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .card-sub {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 3px;
+        }
+
+        /* ═══ BTNS ═══ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s;
+        }
+
+        .btn-primary {
+            background: var(--grad);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: .88;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text2);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .btn-sm {
+            padding: 5px 11px;
+            font-size: 12px;
+        }
+
+        /* ═══ GROUP LIST ═══ */
+        .group-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 14px;
+        }
+
+        .group-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .group-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .group-card .gc-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-card .gc-meta {
+            font-size: 12px;
+            color: var(--text2);
+            display: flex;
+            gap: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .b-purple {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--purple);
+        }
+
+        /* ═══ CHAT ═══ */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .msg {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .msg-other {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+        }
+
+        .msg-self {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            align-self: flex-end;
+        }
+
+        .msg .msg-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--purple);
+            margin-bottom: 3px;
+        }
+
+        .msg .msg-time {
+            font-size: 10px;
+            color: var(--text3);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 11px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        /* ═══ PROFILE ═══ */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .profile-field label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--text2);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .profile-field input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .profile-field input:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        .profile-full {
+            grid-column: 1/-1;
+        }
+
+        /* ═══ EMPTY ═══ */
+        .empty {
+            text-align: center;
+            padding: 52px 24px;
+            color: var(--text3);
+        }
+
+        .empty .e-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .empty p {
+            font-size: 14px;
+        }
+
+        /* ═══ TOAST ═══ */
+        .toast-wrap {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--purple);
+            border-radius: 12px;
+            padding: 13px 16px;
+            min-width: 270px;
+            max-width: 340px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+            pointer-events: all;
+        }
+
+        .toast.s {
+            border-left-color: var(--success);
+        }
+
+        .toast.e {
+            border-left-color: var(--danger);
+        }
+
+        .toast-t {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .toast-m {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        /* ═══ RESOURCE ═══ */
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .resource-item:hover {
+            border-color: var(--purple);
+        }
+
+        .resource-item .ri-icon {
+            font-size: 20px;
+        }
+
+        .resource-item .ri-name {
+            font-size: 13px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .resource-item .ri-by {
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .resource-item a {
+            color: var(--accent2);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        @media(max-width:900px) {
+            .sidebar {
+                width: 64px;
+            }
+
+            .sidebar .logo-text,
+            .sidebar .nav-item span:not(.nav-icon),
+            .sidebar-footer .user-info {
+                display: none;
+            }
+
+            .main {
+                margin-left: 64px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toast-wrap" id="toasts"></div>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">
+                <h2>PlacementPro</h2><span>Alumni Dashboard</span>
+            </div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Overview</div>
+            <div class="nav-item active" onclick="go('dashboard')"><span
+                    class="nav-icon">📊</span><span>Dashboard</span></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Connect</div>
+            <div class="nav-item" onclick="go('groups')"><span class="nav-icon">👥</span><span>My Groups</span></div>
+            <div class="nav-item" onclick="go('messages')"><span class="nav-icon">💬</span><span>Messages</span></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Account</div>
+            <div class="nav-item" onclick="go('profile')"><span class="nav-icon">👤</span><span>My Profile</span></div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="avatar" id="user-avatar">A</div>
+            <div class="user-info">
+                <div class="name" id="user-name">Alumni</div>
+                <div class="role" id="user-company">—</div>
+            </div>
+            <button class="logout-btn" onclick="logout()" title="Logout">⇤</button>
+        </div>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <div>
+                <h1 id="page-title">Dashboard</h1>
+                <p id="page-sub">Welcome back, Alumni</p>
+            </div>
+            <div><button class="btn btn-outline btn-sm" onclick="loadPage()">↻ Refresh</button></div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="accent-line" style="background:var(--grad)"></div>
+                    <div class="sc-icon">👥</div>
+                    <div class="sc-value" id="stat-groups">0</div>
+                    <div class="sc-label">Groups Joined</div>
+                </div>
+                <div class="stat-card">
+                    <div class="accent-line" style="background:var(--grad2)"></div>
+                    <div class="sc-icon">💬</div>
+                    <div class="sc-value" id="stat-messages">0</div>
+                    <div class="sc-label">Messages Sent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
+                    <div class="sc-icon">📁</div>
+                    <div class="sc-value" id="stat-resources">0</div>
+                    <div class="sc-label">Resources Shared</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Recent Groups</div>
+                        <div class="card-sub">Groups you're a part of</div>
+                    </div>
+                </div>
+                <div id="dash-groups"></div>
+            </div>
+        </div>
+
+        <!-- GROUPS -->
+        <div class="page" id="page-groups">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <div>
+                    <div style="font-size:15px;font-weight:700;">My Groups</div>
+                    <div style="font-size:12px;color:var(--text2);margin-top:2px;">Alumni groups you've joined</div>
+                </div>
+            </div>
+            <div class="group-list" id="groups-list"></div>
+        </div>
+
+        <!-- MESSAGES (group chat view) -->
+        <div class="page" id="page-messages">
+            <div style="margin-bottom:16px;">
+                <select id="msg-group-select"
+                    style="padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;"
+                    onchange="loadGroupChat()">
+                    <option value="">— Select a group —</option>
+                </select>
+                <div style="display:inline-flex;gap:6px;margin-left:12px;">
+                    <button class="btn btn-sm btn-outline" id="tab-general" onclick="switchTab('general')"
+                        style="background:rgba(139,92,246,0.12);color:var(--purple);border-color:var(--purple);">💬
+                        General</button>
+                    <button class="btn btn-sm btn-outline" id="tab-private" onclick="switchTab('private')">🔒
+                        Private</button>
+                </div>
+            </div>
+            <div class="chat-container" id="chat-area">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="empty">
+                        <div class="e-icon">💬</div>
+                        <p>Select a group to view messages</p>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Type a message..."
+                        onkeydown="if(event.key==='Enter')sendMsg()">
+                    <button class="btn btn-primary btn-sm" onclick="sendMsg()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="page" id="page-profile">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">My Profile</div>
+                        <div class="card-sub">Update your alumni details</div>
+                    </div>
+                </div>
+                <div class="profile-grid">
+                    <div class="profile-field"><label>Full Name</label><input type="text" id="p-name"></div>
+                    <div class="profile-field"><label>Email</label><input type="email" id="p-email" readonly
+                            style="opacity:0.6;cursor:not-allowed;"></div>
+                    <div class="profile-field"><label>Company</label><input type="text" id="p-company"></div>
+                    <div class="profile-field"><label>Designation</label><input type="text" id="p-designation"></div>
+                    <div class="profile-field"><label>LinkedIn URL</label><input type="url" id="p-linkedin"
+                            placeholder="https://linkedin.com/in/..."></div>
+                    <div class="profile-field"><label>GitHub URL</label><input type="url" id="p-github"
+                            placeholder="https://github.com/..."></div>
+                    <div class="profile-field"><label>Personal Gmail</label><input type="email" id="p-gmail"></div>
+                    <div class="profile-field"><label>Branch</label><input type="text" id="p-branch"></div>
+                    <div class="profile-field profile-full"><label>Graduation Year</label><input type="number"
+                            id="p-gradyear"></div>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                    <button class="btn btn-primary" onclick="saveProfile()">💾 Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let alumniData = null;
+        let allGroups = [];
+        let currentChatGroup = null;
+        let currentTab = 'general';
+
+        function toast(t, m, type = '') { const c = document.getElementById('toasts'); const el = document.createElement('div'); el.className = 'toast ' + type; el.innerHTML = `<div class="toast-t">${t}</div><div class="toast-m">${m}</div>`; c.appendChild(el); setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(100%)'; el.style.transition = '0.3s'; setTimeout(() => el.remove(), 300) }, 4000) }
+        const api = async (m, p, b) => { const o = { method: m, headers: { 'Content-Type': 'application/json' } }; if (b) o.body = JSON.stringify(b); return (await fetch(p, o)).json() };
+
+        function go(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            const titles = { dashboard: 'Dashboard', groups: 'My Groups', messages: 'Messages', profile: 'My Profile' };
+            document.getElementById('page-title').textContent = titles[page] || page;
+            loadPage(page);
+        }
+
+        async function loadPage(p) {
+            const page = p || document.querySelector('.page.active')?.id?.replace('page-', '');
+            if (page === 'dashboard') loadDashboard();
+            else if (page === 'groups') loadGroups();
+            else if (page === 'messages') loadMessageGroupSelect();
+            else if (page === 'profile') loadProfile();
+        }
+
+        async function init() {
+            try {
+                alumniData = await api('GET', '/api/alumni/me');
+                if (alumniData.error) { window.location.href = '/alumni-login'; return; }
+                document.getElementById('user-name').textContent = alumniData.name || 'Alumni';
+                document.getElementById('user-avatar').textContent = (alumniData.name || 'A')[0].toUpperCase();
+                document.getElementById('user-company').textContent = alumniData.company || '—';
+                document.getElementById('page-sub').textContent = `Welcome back, ${alumniData.name}`;
+                loadDashboard();
+            } catch (e) { window.location.href = '/alumni-login'; }
+        }
+
+        async function loadDashboard() {
+            allGroups = await api('GET', '/api/alumni/groups');
+            const myGroups = allGroups.filter(g => g.members.some(m => m.userId === alumniData._id));
+            document.getElementById('stat-groups').textContent = myGroups.length;
+            const dg = document.getElementById('dash-groups');
+            if (!myGroups.length) { dg.innerHTML = '<div class="empty"><div class="e-icon">👥</div><p>No groups yet. Join one from the student connect page!</p></div>'; return; }
+            dg.innerHTML = myGroups.slice(0, 5).map(g => `
+    <div class="group-card" onclick="go('groups');loadGroupChat('${g._id}')">
+      <div class="gc-name">🏢 ${g.name}</div>
+      <div class="gc-meta"><span>👥 ${g.members.length} members</span><span>📅 ${new Date(g.createdAt).toLocaleDateString()}</span></div>
+    </div>
+  `).join('');
+        }
+
+        async function loadGroups() {
+            allGroups = await api('GET', '/api/alumni/groups');
+            const myGroups = allGroups.filter(g => g.members.some(m => m.userId === alumniData._id));
+            const el = document.getElementById('groups-list');
+            if (!myGroups.length) { el.innerHTML = '<div class="empty"><div class="e-icon">👥</div><p>You haven\'t joined any groups yet</p></div>'; return; }
+            el.innerHTML = myGroups.map(g => `
+    <div class="group-card">
+      <div class="gc-name">🏢 ${g.name} <span class="badge b-purple">${g.companyTag}</span></div>
+      <div class="gc-meta"><span>👥 ${g.members.length} members</span><span>📅 ${new Date(g.createdAt).toLocaleDateString()}</span></div>
+    </div>
+  `).join('');
+        }
+
+        async function loadMessageGroupSelect() {
+            allGroups = await api('GET', '/api/alumni/groups');
+            const myGroups = allGroups.filter(g => g.members.some(m => m.userId === alumniData._id));
+            const sel = document.getElementById('msg-group-select');
+            sel.innerHTML = '<option value="">— Select a group —</option>' + myGroups.map(g => `<option value="${g._id}">${g.name}</option>`).join('');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-general').style.background = tab === 'general' ? 'rgba(139,92,246,0.12)' : 'transparent';
+            document.getElementById('tab-general').style.color = tab === 'general' ? 'var(--purple)' : 'var(--text2)';
+            document.getElementById('tab-general').style.borderColor = tab === 'general' ? 'var(--purple)' : 'var(--border)';
+            document.getElementById('tab-private').style.background = tab === 'private' ? 'rgba(139,92,246,0.12)' : 'transparent';
+            document.getElementById('tab-private').style.color = tab === 'private' ? 'var(--purple)' : 'var(--text2)';
+            document.getElementById('tab-private').style.borderColor = tab === 'private' ? 'var(--purple)' : 'var(--border)';
+            loadGroupChat();
+        }
+
+        async function loadGroupChat(gid) {
+            const groupId = gid || document.getElementById('msg-group-select').value;
+            if (!groupId) return;
+            currentChatGroup = groupId;
+            if (gid) document.getElementById('msg-group-select').value = gid;
+
+            const container = document.getElementById('chat-messages');
+            if (currentTab === 'private') {
+                // Load private messages for this alumni
+                const msgs = await api('GET', `/api/alumni/private/${groupId}/${alumniData._id}`);
+                if (!msgs.length) { container.innerHTML = '<div class="empty"><div class="e-icon">🔒</div><p>No private messages yet</p></div>'; return; }
+                container.innerHTML = msgs.map(m => `
+      <div class="msg ${m.senderId === alumniData._id ? 'msg-self' : 'msg-other'}">
+        <div class="msg-name">${m.senderName}</div>
+        <div>${m.content}</div>
+        <div class="msg-time">${new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      </div>
+    `).join('');
+            } else {
+                const msgs = await api('GET', `/api/alumni/groups/${groupId}/messages/general`);
+                if (!msgs.length) { container.innerHTML = '<div class="empty"><div class="e-icon">💬</div><p>No messages yet. Start the conversation!</p></div>'; return; }
+                container.innerHTML = msgs.map(m => `
+      <div class="msg ${m.senderId === alumniData._id ? 'msg-self' : 'msg-other'}">
+        <div class="msg-name">${m.senderName} <span style="font-size:10px;color:var(--text3);font-weight:400;">${m.senderRole}</span></div>
+        <div>${m.content}</div>
+        <div class="msg-time">${new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      </div>
+    `).join('');
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMsg() {
+            if (!currentChatGroup) { toast('Error', 'Select a group first', 'e'); return; }
+            const input = document.getElementById('chat-input');
+            const content = input.value.trim();
+            if (!content) return;
+            input.value = '';
+
+            if (currentTab === 'private') {
+                // For alumni, send private message (we need to know which student — for now, broadcast to general)
+                await api('POST', `/api/alumni/groups/${currentChatGroup}/messages`, {
+                    section: 'general', senderId: alumniData._id, senderName: alumniData.name, senderRole: 'alumni', content
+                });
+            } else {
+                await api('POST', `/api/alumni/groups/${currentChatGroup}/messages`, {
+                    section: 'general', senderId: alumniData._id, senderName: alumniData.name, senderRole: 'alumni', content
+                });
+            }
+            loadGroupChat();
+        }
+
+        async function loadProfile() {
+            if (!alumniData) return;
+            document.getElementById('p-name').value = alumniData.name || '';
+            document.getElementById('p-email').value = alumniData.email || '';
+            document.getElementById('p-company').value = alumniData.company || '';
+            document.getElementById('p-designation').value = alumniData.designation || '';
+            document.getElementById('p-linkedin').value = alumniData.linkedin || '';
+            document.getElementById('p-github').value = alumniData.github || '';
+            document.getElementById('p-gmail').value = alumniData.gmail || '';
+            document.getElementById('p-branch').value = alumniData.branch || '';
+            document.getElementById('p-gradyear').value = alumniData.gradYear || '';
+        }
+
+        async function saveProfile() {
+            const data = {
+                name: document.getElementById('p-name').value.trim(),
+                company: document.getElementById('p-company').value.trim(),
+                designation: document.getElementById('p-designation').value.trim(),
+                linkedin: document.getElementById('p-linkedin').value.trim(),
+                github: document.getElementById('p-github').value.trim(),
+                gmail: document.getElementById('p-gmail').value.trim(),
+                branch: document.getElementById('p-branch').value.trim(),
+                gradYear: parseInt(document.getElementById('p-gradyear').value) || 0
+            };
+            const res = await api('PUT', '/api/alumni/me', data);
+            if (res.success) {
+                alumniData = res.alumni;
+                document.getElementById('user-name').textContent = alumniData.name;
+                document.getElementById('user-company').textContent = alumniData.company;
+                toast('Saved', 'Profile updated successfully', 's');
+            } else toast('Error', res.error || 'Failed to save', 'e');
+        }
+
+        function logout() {
+            window.location.href = '/alumni-login';
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

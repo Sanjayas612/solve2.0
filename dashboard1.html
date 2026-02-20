@@ -1,948 +1,2074 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PlacementPro – Student Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:       #070b14;
-  --surface:  #0d1424;
-  --surface2: #121c30;
-  --surface3: #182236;
-  --border:   #1e2d48;
-  --accent:   #4f8ef7;
-  --accent2:  #00d4aa;
-  --purple:   #8b5cf6;
-  --success:  #22c55e;
-  --warning:  #f59e0b;
-  --danger:   #f43f5e;
-  --text:     #e8f0fe;
-  --text2:    #8da4c8;
-  --text3:    #3d5a80;
-  --grad:     linear-gradient(135deg, #4f8ef7 0%, #00d4aa 100%);
-  --grad2:    linear-gradient(135deg, #8b5cf6 0%, #4f8ef7 100%);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlacementPro – Student Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b14;
+      --surface: #0d1424;
+      --surface2: #121c30;
+      --surface3: #182236;
+      --border: #1e2d48;
+      --accent: #4f8ef7;
+      --accent2: #00d4aa;
+      --purple: #8b5cf6;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --text: #e8f0fe;
+      --text2: #8da4c8;
+      --text3: #3d5a80;
+      --grad: linear-gradient(135deg, #4f8ef7 0%, #00d4aa 100%);
+      --grad2: linear-gradient(135deg, #8b5cf6 0%, #4f8ef7 100%);
+    }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
-code { font-family: 'JetBrains Mono', monospace; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
 
-@keyframes fadeUp   { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes spin     { to { transform: rotate(360deg); } }
-@keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:.4; } }
-@keyframes shimmer  { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
-@keyframes glow     { 0%,100% { box-shadow: 0 0 8px rgba(79,142,247,0.3); } 50% { box-shadow: 0 0 20px rgba(79,142,247,0.6); } }
-@keyframes countUp  { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-/* ═══════════ SIDEBAR ═══════════ */
-.sidebar {
-  width: 256px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  position: fixed; top: 0; left: 0; height: 100vh;
-  display: flex; flex-direction: column;
-  overflow-y: auto; z-index: 200;
-  transition: width 0.3s;
-}
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
 
-.sidebar-header {
-  padding: 22px 18px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-}
-.sidebar-header .logo-icon {
-  width: 42px; height: 42px; border-radius: 12px;
-  background: var(--grad);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-  animation: glow 3s ease-in-out infinite;
-}
-.sidebar-header .logo-text h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-.sidebar-header .logo-text span { font-size: 11px; color: var(--text3); }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-.nav-group { padding: 14px 10px 4px; }
-.nav-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); padding: 0 10px; margin-bottom: 4px; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
 
-.nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: 10px;
-  cursor: pointer; font-size: 13.5px; font-weight: 500;
-  color: var(--text2); transition: all 0.18s; margin-bottom: 1px;
-  position: relative;
-}
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); }
-.nav-item.active::before {
-  content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
-  width: 3px; border-radius: 0 3px 3px 0;
-  background: var(--accent);
-}
-.nav-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
-.nav-badge {
-  margin-left: auto; background: var(--danger);
-  color: white; font-size: 10px; font-weight: 700;
-  padding: 2px 6px; border-radius: 20px;
-}
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-.sidebar-footer {
-  margin-top: auto; padding: 14px 16px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.avatar {
-  width: 34px; height: 34px; border-radius: 10px;
-  background: var(--grad2);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px; flex-shrink: 0;
-}
-.user-info .name  { font-size: 13px; font-weight: 600; }
-.user-info .role  { font-size: 11px; color: var(--text3); }
-.logout-btn {
-  margin-left: auto; background: none; border: none;
-  color: var(--text3); cursor: pointer; font-size: 17px;
-  padding: 5px; border-radius: 7px; transition: all 0.2s;
-}
-.logout-btn:hover { background: rgba(244,63,94,0.1); color: var(--danger); }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-/* ═══════════ MAIN ═══════════ */
-.main { margin-left: 256px; min-height: 100vh; flex: 1; background: var(--bg); }
+    @keyframes slideIn {
+      from {
+        transform: translateX(120%);
+        opacity: 0;
+      }
 
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(7,11,20,0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 62px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.topbar-left h1  { font-size: 17px; font-weight: 700; }
-.topbar-left p   { font-size: 12px; color: var(--text3); margin-top: 1px; }
-.topbar-right    { display: flex; align-items: center; gap: 10px; }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
 
-/* Notification bell */
-.notif-btn {
-  position: relative; background: none; border: none;
-  color: var(--text2); font-size: 18px; cursor: pointer;
-  padding: 6px; border-radius: 9px; transition: all 0.2s;
-}
-.notif-btn:hover { background: var(--surface2); color: var(--text); }
-.notif-dot {
-  position: absolute; top: 4px; right: 4px;
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--danger); border: 2px solid var(--bg);
-  animation: pulse 2s infinite;
-}
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-/* ═══════════ PAGE ═══════════ */
-.page { display: none; padding: 28px 32px; animation: fadeUp 0.35s ease; }
-.page.active { display: block; }
+    @keyframes pulse {
 
-/* ═══════════ BUTTONS ═══════════ */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 18px; border-radius: 9px;
-  font-family: inherit; font-size: 13px; font-weight: 600;
-  cursor: pointer; border: none; transition: all 0.18s; white-space: nowrap;
-}
-.btn-primary { background: var(--grad); color: white; }
-.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-.btn-danger  { background: rgba(244,63,94,0.1); color: var(--danger); border: 1px solid rgba(244,63,94,0.2); }
-.btn-success { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
-.btn-purple  { background: rgba(139,92,246,0.12); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
-.btn-cyan    { background: rgba(0,212,170,0.1); color: var(--accent2); border: 1px solid rgba(0,212,170,0.2); }
-.btn-sm      { padding: 5px 11px; font-size: 12px; border-radius: 7px; }
-.btn-icon    { padding: 7px; width: 32px; height: 32px; justify-content: center; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-/* ═══════════ CARDS ═══════════ */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
-  margin-bottom: 20px;
-}
-.card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 10px; }
-.card-title  { font-size: 15px; font-weight: 700; }
-.card-sub    { font-size: 12px; color: var(--text2); margin-top: 3px; }
-.card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+      50% {
+        opacity: .4;
+      }
+    }
 
-/* ═══════════ STAT CARDS ═══════════ */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px; margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
-  position: relative; overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
-  cursor: default;
-}
-.stat-card:hover { border-color: rgba(79,142,247,0.35); transform: translateY(-2px); }
-.stat-card .accent-line {
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 16px 16px 0 0;
-}
-.stat-card .sc-icon  { font-size: 22px; margin-bottom: 12px; }
-.stat-card .sc-value { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; animation: countUp 0.5s ease; }
-.stat-card .sc-label { font-size: 12px; color: var(--text2); margin-top: 6px; }
-.stat-card .sc-sub   { font-size: 11px; color: var(--text3); margin-top: 5px; }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
 
-/* ═══════════ BADGES ═══════════ */
-.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.b-blue   { background: rgba(79,142,247,0.12); color: var(--accent); }
-.b-green  { background: rgba(34,197,94,0.12);  color: var(--success); }
-.b-yellow { background: rgba(245,158,11,0.12); color: var(--warning); }
-.b-red    { background: rgba(244,63,94,0.12);  color: var(--danger); }
-.b-purple { background: rgba(139,92,246,0.12); color: var(--purple); }
-.b-cyan   { background: rgba(0,212,170,0.12);  color: var(--accent2); }
-.b-gray   { background: rgba(141,164,200,0.1); color: var(--text3); }
+      100% {
+        background-position: 200% 0;
+      }
+    }
 
-/* ═══════════ APPLICATION STATUS PIPELINE ═══════════ */
-.status-pipeline {
-  display: flex; align-items: center; gap: 0;
-  padding: 14px 0; overflow-x: auto;
-}
-.pipe-step {
-  display: flex; flex-direction: column; align-items: center;
-  min-width: 80px; gap: 6px; position: relative;
-}
-.pipe-step:not(:last-child)::after {
-  content: '';
-  position: absolute; top: 15px; left: calc(50% + 14px);
-  width: calc(100% - 28px); height: 2px;
-  background: var(--border);
-  border-radius: 2px;
-}
-.pipe-step.done:not(:last-child)::after { background: var(--success); }
-.pipe-step.active-step:not(:last-child)::after { background: var(--accent); }
-.pipe-dot {
-  width: 28px; height: 28px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; transition: all 0.3s;
-  background: var(--surface2); border: 2px solid var(--border); color: var(--text3);
-  z-index: 1;
-}
-.pipe-step.done .pipe-dot    { background: rgba(34,197,94,0.15); border-color: var(--success); color: var(--success); }
-.pipe-step.active-step .pipe-dot { background: rgba(79,142,247,0.15); border-color: var(--accent); color: var(--accent); animation: glow 2s infinite; }
-.pipe-step.rejected .pipe-dot { background: rgba(244,63,94,0.1); border-color: var(--danger); color: var(--danger); }
-.pipe-label { font-size: 10px; color: var(--text3); text-align: center; line-height: 1.3; white-space: nowrap; }
-.pipe-step.done .pipe-label  { color: var(--success); }
-.pipe-step.active-step .pipe-label { color: var(--accent); font-weight: 600; }
+    @keyframes glow {
 
-/* ═══════════ DRIVE CARD (student view) ═══════════ */
-.drive-feed { display: flex; flex-direction: column; gap: 16px; }
-.drive-card-s {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px; padding: 20px;
-  transition: border-color 0.2s, transform 0.2s;
-  position: relative; overflow: hidden;
-}
-.drive-card-s::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: var(--grad); border-radius: 16px 16px 0 0;
-}
-.drive-card-s:hover { border-color: rgba(79,142,247,0.35); transform: translateY(-2px); }
-.drive-card-s.status-active::before { background: var(--grad); }
-.drive-card-s.status-upcoming::before { background: linear-gradient(135deg,#8b5cf6,#4f8ef7); }
-.dc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
-.dc-company { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-.dc-company-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: var(--surface2); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
-.dc-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
-.chip { font-size: 11px; padding: 4px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text2); }
-.chip strong { color: var(--text); }
-.dc-desc { font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.6; }
-.dc-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-.dc-deadline { font-size: 11.5px; color: var(--text3); }
-.dc-deadline strong { color: var(--warning); }
-.dc-actions { display: flex; gap: 7px; }
+      0%,
+      100% {
+        box-shadow: 0 0 8px rgba(79, 142, 247, 0.3);
+      }
 
-/* ═══════════ APPLICATION TRACKER CARD ═══════════ */
-.app-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 18px 20px;
-  margin-bottom: 10px;
-  display: flex; flex-direction: column; gap: 12px;
-  transition: border-color 0.2s;
-}
-.app-card:hover { border-color: rgba(79,142,247,0.25); }
-.app-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.app-company { font-size: 14px; font-weight: 700; }
-.app-usn { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+      50% {
+        box-shadow: 0 0 20px rgba(79, 142, 247, 0.6);
+      }
+    }
 
-/* Application status badge */
-.app-status {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 11px; border-radius: 20px;
-  font-size: 11px; font-weight: 700;
-}
-.s-eligible    { background: rgba(141,164,200,0.1); color: var(--text3); border: 1px solid rgba(141,164,200,0.15); }
-.s-applied     { background: rgba(79,142,247,0.1); color: var(--accent); border: 1px solid rgba(79,142,247,0.2); }
-.s-shortlisted { background: rgba(245,158,11,0.1); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
-.s-selected    { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
-.s-rejected    { background: rgba(244,63,94,0.1); color: var(--danger); border: 1px solid rgba(244,63,94,0.2); }
+    @keyframes countUp {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
 
-/* ═══════════ ASSESSMENT CARD ═══════════ */
-.assess-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px;
-  margin-bottom: 10px;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.assess-card:hover { border-color: rgba(139,92,246,0.3); transform: translateY(-1px); }
-.assess-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
-.assess-title { font-size: 14px; font-weight: 700; }
-.assess-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
-.assess-result { margin-top: 10px; }
-.result-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
-.result-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
-/* ═══════════ PROFILE ═══════════ */
-.profile-hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px; padding: 28px;
-  margin-bottom: 20px;
-  position: relative; overflow: hidden;
-}
-.profile-hero::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 90px;
-  background: var(--grad); opacity: 0.08; border-radius: 20px 20px 0 0;
-}
-.profile-avatar {
-  width: 72px; height: 72px; border-radius: 18px;
-  background: var(--grad2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px; font-weight: 700; margin-bottom: 16px;
-  border: 3px solid var(--surface); position: relative;
-}
-.profile-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.profile-usn  { font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px; }
-.profile-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    /* ═══════════ SIDEBAR ═══════════ */
+    .sidebar {
+      width: 256px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 200;
+      transition: width 0.3s;
+    }
 
-.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.profile-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-.profile-section h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 14px; }
-.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(30,45,72,0.4); font-size: 13px; }
-.profile-row:last-child { border-bottom: none; padding-bottom: 0; }
-.profile-row .label { color: var(--text3); }
-.profile-row .value { color: var(--text); font-weight: 600; text-align: right; }
+    .sidebar-header {
+      padding: 22px 18px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-/* ═══════════ FORM ═══════════ */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-full  { grid-column: 1 / -1; }
-.field { margin-bottom: 0; }
-.field label { display: block; font-size: 11.5px; color: var(--text2); margin-bottom: 6px; font-weight: 600; letter-spacing: 0.2px; }
-.field input, .field select, .field textarea {
-  width: 100%; padding: 10px 13px;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 9px; color: var(--text);
-  font-family: inherit; font-size: 13px;
-  transition: border-color 0.2s;
-}
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.08); }
-.field textarea { resize: vertical; min-height: 72px; }
-.field select option { background: var(--surface2); }
+    .sidebar-header .logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      animation: glow 3s ease-in-out infinite;
+    }
 
-/* ═══════════ MODAL ═══════════ */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); z-index: 500; align-items: center; justify-content: center; }
-.overlay.show { display: flex; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; width: 92%; max-width: 580px;
-  max-height: 90vh; overflow-y: auto;
-  padding: 30px; animation: fadeUp 0.3s ease;
-}
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-.modal-title  { font-size: 18px; font-weight: 700; }
-.modal-close  { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.modal-close:hover { background: var(--surface2); color: var(--text); }
-.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .sidebar-header .logo-text h2 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
 
-/* ═══════════ QUIZ ENGINE ═══════════ */
-.quiz-wrap { max-width: 680px; margin: 0 auto; }
-.quiz-header { text-align: center; margin-bottom: 28px; }
-.quiz-timer {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: 8px 18px; border-radius: 20px;
-  font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600;
-  color: var(--accent); margin-bottom: 16px;
-}
-.quiz-timer.warn { color: var(--danger); border-color: rgba(244,63,94,0.3); animation: pulse 1s infinite; }
-.quiz-progress { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-bottom: 24px; }
-.quiz-progress-fill { height: 100%; background: var(--grad); border-radius: 2px; transition: width 0.4s; }
-.q-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 24px; margin-bottom: 16px;
-  animation: fadeUp 0.3s ease;
-}
-.q-num { font-size: 11px; color: var(--text3); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 10px; }
-.q-text { font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 18px; }
-.q-options { display: flex; flex-direction: column; gap: 8px; }
-.q-opt {
-  padding: 12px 16px; border-radius: 10px;
-  border: 1.5px solid var(--border);
-  background: var(--surface2); cursor: pointer;
-  font-size: 13.5px; color: var(--text2);
-  transition: all 0.15s; display: flex; align-items: center; gap: 10px;
-}
-.q-opt:hover { border-color: var(--accent); color: var(--text); background: rgba(79,142,247,0.06); }
-.q-opt.selected { border-color: var(--accent); background: rgba(79,142,247,0.1); color: var(--text); }
-.q-opt.correct  { border-color: var(--success); background: rgba(34,197,94,0.1); color: var(--success); }
-.q-opt.wrong    { border-color: var(--danger);  background: rgba(244,63,94,0.08); color: var(--danger); }
-.q-opt-letter {
-  width: 24px; height: 24px; border-radius: 6px;
-  background: var(--surface3); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0;
-}
+    .sidebar-header .logo-text span {
+      font-size: 11px;
+      color: var(--text3);
+    }
 
-/* Quiz result */
-.quiz-result {
-  text-align: center; padding: 40px 20px;
-  animation: fadeUp 0.5s ease;
-}
-.result-circle {
-  width: 100px; height: 100px; border-radius: 50%;
-  background: var(--grad); margin: 0 auto 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 36px; font-weight: 800;
-  box-shadow: 0 0 30px rgba(79,142,247,0.3);
-}
-.result-circle.fail { background: linear-gradient(135deg, var(--warning), var(--danger)); }
+    .nav-group {
+      padding: 14px 10px 4px;
+    }
 
-/* ═══════════ NOTIFICATIONS ═══════════ */
-.notif-panel {
-  position: fixed; top: 62px; right: 20px;
-  width: 340px; max-height: 480px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-  z-index: 300; display: none;
-  animation: slideIn 0.25s ease;
-}
-.notif-panel.show { display: block; }
-.notif-panel-header {
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.notif-panel-header h3 { font-size: 14px; font-weight: 700; }
-.notif-list { overflow-y: auto; max-height: 400px; }
-.notif-item {
-  padding: 13px 18px; border-bottom: 1px solid rgba(30,45,72,0.4);
-  cursor: pointer; transition: background 0.15s;
-  display: flex; gap: 12px; align-items: flex-start;
-}
-.notif-item:hover { background: var(--surface2); }
-.notif-item.unread { background: rgba(79,142,247,0.04); }
-.notif-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-.notif-body .notif-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-.notif-body .notif-msg   { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
-.notif-body .notif-time  { font-size: 10.5px; color: var(--text3); margin-top: 3px; }
-.notif-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+    .nav-group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text3);
+      padding: 0 10px;
+      margin-bottom: 4px;
+    }
 
-/* ═══════════ TOAST ═══════════ */
-.toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.toast {
-  background: var(--surface); border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: 12px; padding: 13px 16px;
-  min-width: 270px; max-width: 340px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-  animation: slideIn 0.3s ease;
-  pointer-events: all;
-}
-.toast.s { border-left-color: var(--success); }
-.toast.e { border-left-color: var(--danger); }
-.toast.w { border-left-color: var(--warning); }
-.toast-t { font-size: 13px; font-weight: 700; }
-.toast-m { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text2);
+      transition: all 0.18s;
+      margin-bottom: 1px;
+      position: relative;
+    }
 
-/* ═══════════ MISC ═══════════ */
-.loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
-.empty { text-align: center; padding: 52px 24px; color: var(--text3); }
-.empty .e-icon { font-size: 38px; margin-bottom: 12px; }
-.empty p { font-size: 14px; }
-.divider { height: 1px; background: var(--border); margin: 18px 0; }
-.section-gap { margin-bottom: 24px; }
-.prog-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
-.prog-fill { height: 100%; background: var(--grad); border-radius: 3px; transition: width 0.6s ease; }
+    .nav-item:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
 
-.section-title { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+    .nav-item.active {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
 
-/* Welcome banner */
-.welcome-banner {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px; padding: 22px 24px;
-  margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  position: relative; overflow: hidden;
-}
-.welcome-banner::before {
-  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
-  background: var(--grad);
-}
-.wb-left { padding-left: 8px; }
-.wb-greeting { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.wb-sub { font-size: 13px; color: var(--text2); }
-.wb-cgpa { text-align: right; }
-.wb-cgpa .cgpa-val { font-size: 34px; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
-.wb-cgpa .cgpa-lbl { font-size: 11px; color: var(--text3); margin-top: 3px; }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--accent);
+    }
 
-/* Empty state with illustration */
-.empty-fancy { text-align: center; padding: 60px 24px; }
-.empty-fancy .ef-icon { font-size: 52px; margin-bottom: 14px; opacity: 0.7; }
-.empty-fancy h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-.empty-fancy p { font-size: 13px; color: var(--text2); }
+    .nav-icon {
+      font-size: 15px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
 
-/* ═══════════ RESPONSIVE ═══════════ */
-@media (max-width: 900px) {
-  .sidebar { width: 0; overflow: hidden; }
-  .main { margin-left: 0; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .profile-grid { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .page { padding: 18px 16px; }
-}
-</style>
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--grad2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .user-info .name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-info .role {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .logout-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 17px;
+      padding: 5px;
+      border-radius: 7px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+    }
+
+    /* ═══════════ MAIN ═══════════ */
+    .main {
+      margin-left: 256px;
+      min-height: 100vh;
+      flex: 1;
+      background: var(--bg);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left h1 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .topbar-left p {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Notification bell */
+    .notif-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 9px;
+      transition: all 0.2s;
+    }
+
+    .notif-btn:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .notif-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      border: 2px solid var(--bg);
+      animation: pulse 2s infinite;
+    }
+
+    /* ═══════════ PAGE ═══════════ */
+    .page {
+      display: none;
+      padding: 28px 32px;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ═══════════ BUTTONS ═══════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--grad);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    .btn-success {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-purple {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--purple);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .btn-cyan {
+      background: rgba(0, 212, 170, 0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(0, 212, 170, 0.2);
+    }
+
+    .btn-sm {
+      padding: 5px 11px;
+      font-size: 12px;
+      border-radius: 7px;
+    }
+
+    .btn-icon {
+      padding: 7px;
+      width: 32px;
+      height: 32px;
+      justify-content: center;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ═══════════ CARDS ═══════════ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 3px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════ STAT CARDS ═══════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(79, 142, 247, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .stat-card .accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .stat-card .sc-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card .sc-value {
+      font-size: 30px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      animation: countUp 0.5s ease;
+    }
+
+    .stat-card .sc-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 6px;
+    }
+
+    .stat-card .sc-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 5px;
+    }
+
+    /* ═══════════ BADGES ═══════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .b-blue {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
+
+    .b-green {
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--success);
+    }
+
+    .b-yellow {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--warning);
+    }
+
+    .b-red {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--danger);
+    }
+
+    .b-purple {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--purple);
+    }
+
+    .b-cyan {
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--accent2);
+    }
+
+    .b-gray {
+      background: rgba(141, 164, 200, 0.1);
+      color: var(--text3);
+    }
+
+    /* ═══════════ APPLICATION STATUS PIPELINE ═══════════ */
+    .status-pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 14px 0;
+      overflow-x: auto;
+    }
+
+    .pipe-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+      gap: 6px;
+      position: relative;
+    }
+
+    .pipe-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: calc(50% + 14px);
+      width: calc(100% - 28px);
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .pipe-step.done:not(:last-child)::after {
+      background: var(--success);
+    }
+
+    .pipe-step.active-step:not(:last-child)::after {
+      background: var(--accent);
+    }
+
+    .pipe-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.3s;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      color: var(--text3);
+      z-index: 1;
+    }
+
+    .pipe-step.done .pipe-dot {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .pipe-step.active-step .pipe-dot {
+      background: rgba(79, 142, 247, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      animation: glow 2s infinite;
+    }
+
+    .pipe-step.rejected .pipe-dot {
+      background: rgba(244, 63, 94, 0.1);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .pipe-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: center;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .pipe-step.done .pipe-label {
+      color: var(--success);
+    }
+
+    .pipe-step.active-step .pipe-label {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ═══════════ DRIVE CARD (student view) ═══════════ */
+    .drive-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .drive-card-s {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drive-card-s::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--grad);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .drive-card-s:hover {
+      border-color: rgba(79, 142, 247, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .drive-card-s.status-active::before {
+      background: var(--grad);
+    }
+
+    .drive-card-s.status-upcoming::before {
+      background: linear-gradient(135deg, #8b5cf6, #4f8ef7);
+    }
+
+    .dc-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .dc-company {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dc-company-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .dc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text2);
+    }
+
+    .chip strong {
+      color: var(--text);
+    }
+
+    .dc-desc {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    .dc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dc-deadline {
+      font-size: 11.5px;
+      color: var(--text3);
+    }
+
+    .dc-deadline strong {
+      color: var(--warning);
+    }
+
+    .dc-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    /* ═══════════ APPLICATION TRACKER CARD ═══════════ */
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .app-card:hover {
+      border-color: rgba(79, 142, 247, 0.25);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .app-company {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .app-usn {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Application status badge */
+    .app-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .s-eligible {
+      background: rgba(141, 164, 200, 0.1);
+      color: var(--text3);
+      border: 1px solid rgba(141, 164, 200, 0.15);
+    }
+
+    .s-applied {
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(79, 142, 247, 0.2);
+    }
+
+    .s-shortlisted {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .s-selected {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .s-rejected {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    /* ═══════════ ASSESSMENT CARD ═══════════ */
+    .assess-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .assess-card:hover {
+      border-color: rgba(139, 92, 246, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .assess-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .assess-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .assess-meta {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .assess-result {
+      margin-top: 10px;
+    }
+
+    .result-bar {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .result-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+
+    /* ═══════════ PROFILE ═══════════ */
+    .profile-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 90px;
+      background: var(--grad);
+      opacity: 0.08;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: var(--grad2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      border: 3px solid var(--surface);
+      position: relative;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profile-usn {
+      font-size: 12px;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 12px;
+    }
+
+    .profile-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .profile-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .profile-section h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text3);
+      margin-bottom: 14px;
+    }
+
+    .profile-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(30, 45, 72, 0.4);
+      font-size: 13px;
+    }
+
+    .profile-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .profile-row .label {
+      color: var(--text3);
+    }
+
+    .profile-row .value {
+      color: var(--text);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* ═══════════ FORM ═══════════ */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-full {
+      grid-column: 1 / -1;
+    }
+
+    .field {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 13px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.08);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .field select option {
+      background: var(--surface2);
+    }
+
+    /* ═══════════ MODAL ═══════════ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 92%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 18px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ═══════════ QUIZ ENGINE ═══════════ */
+    .quiz-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .quiz-timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .quiz-timer.warn {
+      color: var(--danger);
+      border-color: rgba(244, 63, 94, 0.3);
+      animation: pulse 1s infinite;
+    }
+
+    .quiz-progress {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .quiz-progress-fill {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 2px;
+      transition: width 0.4s;
+    }
+
+    .q-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .q-num {
+      font-size: 11px;
+      color: var(--text3);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .q-text {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .q-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .q-opt {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--text2);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .q-opt:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      background: rgba(79, 142, 247, 0.06);
+    }
+
+    .q-opt.selected {
+      border-color: var(--accent);
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--text);
+    }
+
+    .q-opt.correct {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+    }
+
+    .q-opt.wrong {
+      border-color: var(--danger);
+      background: rgba(244, 63, 94, 0.08);
+      color: var(--danger);
+    }
+
+    .q-opt-letter {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Quiz result */
+    .quiz-result {
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .result-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--grad);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      box-shadow: 0 0 30px rgba(79, 142, 247, 0.3);
+    }
+
+    .result-circle.fail {
+      background: linear-gradient(135deg, var(--warning), var(--danger));
+    }
+
+    /* ═══════════ NOTIFICATIONS ═══════════ */
+    .notif-panel {
+      position: fixed;
+      top: 62px;
+      right: 20px;
+      width: 340px;
+      max-height: 480px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      z-index: 300;
+      display: none;
+      animation: slideIn 0.25s ease;
+    }
+
+    .notif-panel.show {
+      display: block;
+    }
+
+    .notif-panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notif-panel-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .notif-list {
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    .notif-item {
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(30, 45, 72, 0.4);
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .notif-item:hover {
+      background: var(--surface2);
+    }
+
+    .notif-item.unread {
+      background: rgba(79, 142, 247, 0.04);
+    }
+
+    .notif-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .notif-body .notif-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .notif-body .notif-msg {
+      font-size: 11.5px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .notif-body .notif-time {
+      font-size: 10.5px;
+      color: var(--text3);
+      margin-top: 3px;
+    }
+
+    .notif-unread-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    /* ═══════════ TOAST ═══════════ */
+    .toast-wrap {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 13px 16px;
+      min-width: 270px;
+      max-width: 340px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.3s ease;
+      pointer-events: all;
+    }
+
+    .toast.s {
+      border-left-color: var(--success);
+    }
+
+    .toast.e {
+      border-left-color: var(--danger);
+    }
+
+    .toast.w {
+      border-left-color: var(--warning);
+    }
+
+    .toast-t {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toast-m {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    /* ═══════════ MISC ═══════════ */
+    .loader {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--text3);
+    }
+
+    .empty .e-icon {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .empty p {
+      font-size: 14px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    .section-gap {
+      margin-bottom: 24px;
+    }
+
+    .prog-bar {
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 14px;
+    }
+
+    /* Welcome banner */
+    .welcome-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--grad);
+    }
+
+    .wb-left {
+      padding-left: 8px;
+    }
+
+    .wb-greeting {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .wb-sub {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .wb-cgpa {
+      text-align: right;
+    }
+
+    .wb-cgpa .cgpa-val {
+      font-size: 34px;
+      font-weight: 800;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .wb-cgpa .cgpa-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 3px;
+    }
+
+    /* Empty state with illustration */
+    .empty-fancy {
+      text-align: center;
+      padding: 60px 24px;
+    }
+
+    .empty-fancy .ef-icon {
+      font-size: 52px;
+      margin-bottom: 14px;
+      opacity: 0.7;
+    }
+
+    .empty-fancy h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .empty-fancy p {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    /* ═══════════ RESPONSIVE ═══════════ */
+    @media (max-width: 900px) {
+      .sidebar {
+        width: 0;
+        overflow: hidden;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        padding: 18px 16px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- TOAST -->
-<div class="toast-wrap" id="toast-wrap"></div>
+  <!-- TOAST -->
+  <div class="toast-wrap" id="toast-wrap"></div>
 
-<!-- NOTIFICATION PANEL -->
-<div class="notif-panel" id="notif-panel">
-  <div class="notif-panel-header">
-    <h3>🔔 Notifications</h3>
-    <button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
-  </div>
-  <div class="notif-list" id="notif-list">
-    <div class="empty"><div class="e-icon">📭</div><p>No notifications</p></div>
-  </div>
-</div>
-
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sidebar-header">
-    <div class="logo-icon">🎓</div>
-    <div class="logo-text">
-      <h2>PlacementPro</h2>
-      <span>Student Portal</span>
+  <!-- NOTIFICATION PANEL -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-panel-header">
+      <h3>🔔 Notifications</h3>
+      <button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
     </div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Main</div>
-    <div class="nav-item active" onclick="go('home')" id="nav-home">
-      <span class="nav-icon">🏠</span> Home
-    </div>
-    <div class="nav-item" onclick="go('feed')" id="nav-feed">
-      <span class="nav-icon">📡</span> Drive Feed
-      <span class="nav-badge" id="feed-badge" style="display:none;">0</span>
-    </div>
-    <div class="nav-item" onclick="go('tracker')" id="nav-tracker">
-      <span class="nav-icon">📊</span> My Applications
-    </div>
-    <div class="nav-item" onclick="go('assessments')" id="nav-assessments">
-      <span class="nav-icon">📝</span> Assessments
-      <span class="nav-badge" id="assess-badge" style="display:none;">0</span>
-    </div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Account</div>
-    <div class="nav-item" onclick="go('profile')" id="nav-profile">
-      <span class="nav-icon">👤</span> My Profile
-    </div>
-  </div>
-
-  <div class="sidebar-footer">
-    <div class="avatar" id="sb-avatar">?</div>
-    <div class="user-info">
-      <div class="name" id="sb-name">Loading…</div>
-      <div class="role" id="sb-usn">—</div>
-    </div>
-    <button class="logout-btn" onclick="logout()" title="Logout">⇤</button>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <h1 id="page-title">Home</h1>
-      <p id="page-sub">Your placement journey</p>
-    </div>
-    <div class="topbar-right">
-      <button class="notif-btn" onclick="toggleNotifPanel()" id="notif-btn">
-        🔔
-        <span class="notif-dot" id="notif-dot" style="display:none;"></span>
-      </button>
-      <button class="btn btn-outline btn-sm" onclick="refreshCurrent()">↻ Refresh</button>
-    </div>
-  </div>
-
-  <!-- ══════ PAGE: HOME ══════ -->
-  <div class="page active" id="page-home">
-
-    <!-- Welcome Banner -->
-    <div class="welcome-banner" id="welcome-banner">
-      <div class="wb-left">
-        <div class="wb-greeting" id="wb-greeting">Welcome back! 👋</div>
-        <div class="wb-sub" id="wb-sub">Loading your profile…</div>
+    <div class="notif-list" id="notif-list">
+      <div class="empty">
+        <div class="e-icon">📭</div>
+        <p>No notifications</p>
       </div>
-      <div class="wb-cgpa">
-        <div class="cgpa-val" id="wb-cgpa">—</div>
-        <div class="cgpa-lbl">Current CGPA</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">🎓</div>
+      <div class="logo-text">
+        <h2>PlacementPro</h2>
+        <span>Student Portal</span>
       </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="accent-line" style="background:var(--grad)"></div>
-        <div class="sc-icon">📡</div>
-        <div class="sc-value" id="h-eligible">—</div>
-        <div class="sc-label">Eligible Drives</div>
-        <div class="sc-sub">for you right now</div>
+    <div class="nav-group">
+      <div class="nav-group-label">Main</div>
+      <div class="nav-item active" onclick="go('home')" id="nav-home">
+        <span class="nav-icon">🏠</span> Home
       </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:linear-gradient(135deg,#4f8ef7,#8b5cf6)"></div>
-        <div class="sc-icon">📋</div>
-        <div class="sc-value" id="h-applied">—</div>
-        <div class="sc-label">Applied</div>
-        <div class="sc-sub">applications sent</div>
+      <div class="nav-item" onclick="go('feed')" id="nav-feed">
+        <span class="nav-icon">📡</span> Drive Feed
+        <span class="nav-badge" id="feed-badge" style="display:none;">0</span>
       </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:linear-gradient(135deg,#f59e0b,#00d4aa)"></div>
-        <div class="sc-icon">⭐</div>
-        <div class="sc-value" id="h-shortlisted">—</div>
-        <div class="sc-label">Shortlisted</div>
-        <div class="sc-sub">companies selected you</div>
+      <div class="nav-item" onclick="go('tracker')" id="nav-tracker">
+        <span class="nav-icon">📊</span> My Applications
       </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
-        <div class="sc-icon">🏆</div>
-        <div class="sc-value" id="h-selected">—</div>
-        <div class="sc-label">Selected</div>
-        <div class="sc-sub">offers received</div>
+      <div class="nav-item" onclick="go('assessments')" id="nav-assessments">
+        <span class="nav-icon">📝</span> Assessments
+        <span class="nav-badge" id="assess-badge" style="display:none;">0</span>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
-      <!-- Recent Drive Activity -->
-      <div class="card" style="margin-bottom:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Recent Drive Activity</div>
-            <div class="card-sub">Latest updates from companies</div>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="go('feed')">View All →</button>
+    <div class="nav-group">
+      <div class="nav-group-label">Account</div>
+      <div class="nav-item" onclick="window.location.href='/alumni-connect'" id="nav-alumni">
+        <span class="nav-icon">🤝</span> Alumni Connect
+      </div>
+      <div class="nav-item" onclick="go('profile')" id="nav-profile">
+        <span class="nav-icon">👤</span> My Profile
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar" id="sb-avatar">?</div>
+      <div class="user-info">
+        <div class="name" id="sb-name">Loading…</div>
+        <div class="role" id="sb-usn">—</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">⇤</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="page-title">Home</h1>
+        <p id="page-sub">Your placement journey</p>
+      </div>
+      <div class="topbar-right">
+        <button class="notif-btn" onclick="toggleNotifPanel()" id="notif-btn">
+          🔔
+          <span class="notif-dot" id="notif-dot" style="display:none;"></span>
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="refreshCurrent()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: HOME ══════ -->
+    <div class="page active" id="page-home">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner" id="welcome-banner">
+        <div class="wb-left">
+          <div class="wb-greeting" id="wb-greeting">Welcome back! 👋</div>
+          <div class="wb-sub" id="wb-sub">Loading your profile…</div>
         </div>
-        <div id="home-recent-drives"></div>
+        <div class="wb-cgpa">
+          <div class="cgpa-val" id="wb-cgpa">—</div>
+          <div class="cgpa-lbl">Current CGPA</div>
+        </div>
       </div>
 
-      <!-- Quick Stats / Snapshot -->
-      <div class="card" style="margin-bottom:0;">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Profile Snapshot</div>
-            <div class="card-sub">Your academic overview</div>
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="accent-line" style="background:var(--grad)"></div>
+          <div class="sc-icon">📡</div>
+          <div class="sc-value" id="h-eligible">—</div>
+          <div class="sc-label">Eligible Drives</div>
+          <div class="sc-sub">for you right now</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:linear-gradient(135deg,#4f8ef7,#8b5cf6)"></div>
+          <div class="sc-icon">📋</div>
+          <div class="sc-value" id="h-applied">—</div>
+          <div class="sc-label">Applied</div>
+          <div class="sc-sub">applications sent</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:linear-gradient(135deg,#f59e0b,#00d4aa)"></div>
+          <div class="sc-icon">⭐</div>
+          <div class="sc-value" id="h-shortlisted">—</div>
+          <div class="sc-label">Shortlisted</div>
+          <div class="sc-sub">companies selected you</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
+          <div class="sc-icon">🏆</div>
+          <div class="sc-value" id="h-selected">—</div>
+          <div class="sc-label">Selected</div>
+          <div class="sc-sub">offers received</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+        <!-- Recent Drive Activity -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Drive Activity</div>
+              <div class="card-sub">Latest updates from companies</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="go('feed')">View All →</button>
+          </div>
+          <div id="home-recent-drives"></div>
+        </div>
+
+        <!-- Quick Stats / Snapshot -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Profile Snapshot</div>
+              <div class="card-sub">Your academic overview</div>
+            </div>
+          </div>
+          <div id="home-profile-snapshot"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════ PAGE: DRIVE FEED ══════ -->
+    <div class="page" id="page-feed">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;">📡 Personalised Drive Feed</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;">Only companies you're eligible for — no clutter
           </div>
         </div>
-        <div id="home-profile-snapshot"></div>
+        <div style="display:flex;gap:8px;">
+          <select class="field" style="width:auto;padding:7px 12px;font-size:12px;" id="feed-filter"
+            onchange="renderFeed()">
+            <option value="">All Status</option>
+            <option value="active">🟢 Active</option>
+            <option value="upcoming">🔵 Upcoming</option>
+          </select>
+        </div>
+      </div>
+      <div class="drive-feed" id="drive-feed-list">
+        <div class="empty">
+          <div class="e-icon">⏳</div>
+          <p>Loading eligible drives…</p>
+        </div>
       </div>
     </div>
 
+    <!-- ══════ PAGE: APPLICATION TRACKER ══════ -->
+    <div class="page" id="page-tracker">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">📊 My Applications</div>
+        <div style="font-size:12px;color:var(--text2);">Track your placement journey across all companies</div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="filterTracker('')" id="tf-all">All</button>
+        <button class="btn btn-outline btn-sm" onclick="filterTracker('eligible')" id="tf-eligible">Eligible</button>
+        <button class="btn btn-outline btn-sm" onclick="filterTracker('applied')" id="tf-applied">Applied</button>
+        <button class="btn btn-outline btn-sm" onclick="filterTracker('shortlisted')"
+          id="tf-shortlisted">Shortlisted</button>
+        <button class="btn btn-outline btn-sm" onclick="filterTracker('selected')" id="tf-selected">Selected</button>
+        <button class="btn btn-outline btn-sm" onclick="filterTracker('rejected')" id="tf-rejected">Rejected</button>
+      </div>
+
+      <div id="tracker-list">
+        <div class="empty">
+          <div class="e-icon">⏳</div>
+          <p>Loading applications…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: ASSESSMENTS ══════ -->
+    <div class="page" id="page-assessments">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;">📝 Assessments</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px;">Aptitude, technical and coding tests assigned
+            to you</div>
+        </div>
+      </div>
+      <div id="assessments-list-student">
+        <div class="empty">
+          <div class="e-icon">⏳</div>
+          <p>Loading assessments…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: QUIZ (FULL SCREEN) ══════ -->
+    <div class="page" id="page-quiz">
+      <div class="quiz-wrap" id="quiz-wrap">
+        <div class="empty">
+          <div class="e-icon">📝</div>
+          <p>No assessment loaded</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: PROFILE ══════ -->
+    <div class="page" id="page-profile">
+      <div class="profile-hero">
+        <div class="profile-avatar" id="prof-avatar">?</div>
+        <div class="profile-name" id="prof-name">—</div>
+        <div class="profile-usn" id="prof-usn">—</div>
+        <div class="profile-chips" id="prof-chips"></div>
+      </div>
+
+      <div class="profile-grid">
+        <div class="profile-section">
+          <h3>Academic Details</h3>
+          <div id="prof-academic"></div>
+        </div>
+        <div class="profile-section">
+          <h3>Contact Information</h3>
+          <div id="prof-contact"></div>
+        </div>
+        <div class="profile-section">
+          <h3>Previous Education</h3>
+          <div id="prof-prev-edu"></div>
+        </div>
+        <div class="profile-section">
+          <h3>Assessment Performance</h3>
+          <div id="prof-assessments"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- APPLY CONFIRM MODAL -->
+  <div class="overlay" id="apply-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Apply for Drive</div>
+        <button class="modal-close" onclick="closeOverlay('apply-overlay')">✕</button>
+      </div>
+      <div id="apply-modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeOverlay('apply-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmApply()">✓ Confirm Application</button>
+      </div>
+    </div>
   </div>
 
-  <!-- ══════ PAGE: DRIVE FEED ══════ -->
-  <div class="page" id="page-feed">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div>
-        <div style="font-size:15px;font-weight:700;">📡 Personalised Drive Feed</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:3px;">Only companies you're eligible for — no clutter</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <select class="field" style="width:auto;padding:7px 12px;font-size:12px;" id="feed-filter" onchange="renderFeed()">
-          <option value="">All Status</option>
-          <option value="active">🟢 Active</option>
-          <option value="upcoming">🔵 Upcoming</option>
-        </select>
-      </div>
-    </div>
-    <div class="drive-feed" id="drive-feed-list">
-      <div class="empty"><div class="e-icon">⏳</div><p>Loading eligible drives…</p></div>
-    </div>
-  </div>
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // GLOBALS
+    // ═══════════════════════════════════════════════════════════
+    let currentUser = null;
+    let studentData = null;
+    let allDrives = [];
+    let myApplications = [];
+    let allAssessments = [];
+    let currentQuiz = null;
+    let quizTimerInterval = null;
+    let quizAnswers = {};
+    let pendingApplyDriveId = null;
+    let currentPage = 'home';
+    let trackerFilter = '';
 
-  <!-- ══════ PAGE: APPLICATION TRACKER ══════ -->
-  <div class="page" id="page-tracker">
-    <div style="margin-bottom:20px;">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">📊 My Applications</div>
-      <div style="font-size:12px;color:var(--text2);">Track your placement journey across all companies</div>
-    </div>
+    // ═══════════════════════════════════════════════════════════
+    // API HELPER
+    // ═══════════════════════════════════════════════════════════
+    async function api(method, url, body) {
+      try {
+        const opts = { method, headers: { 'Content-Type': 'application/json' } };
+        if (body) opts.body = JSON.stringify(body);
+        const r = await fetch(url, opts);
+        return r.json();
+      } catch (e) { return { error: e.message }; }
+    }
 
-    <!-- Filter tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" onclick="filterTracker('')" id="tf-all">All</button>
-      <button class="btn btn-outline btn-sm" onclick="filterTracker('eligible')" id="tf-eligible">Eligible</button>
-      <button class="btn btn-outline btn-sm" onclick="filterTracker('applied')" id="tf-applied">Applied</button>
-      <button class="btn btn-outline btn-sm" onclick="filterTracker('shortlisted')" id="tf-shortlisted">Shortlisted</button>
-      <button class="btn btn-outline btn-sm" onclick="filterTracker('selected')" id="tf-selected">Selected</button>
-      <button class="btn btn-outline btn-sm" onclick="filterTracker('rejected')" id="tf-rejected">Rejected</button>
-    </div>
+    // ═══════════════════════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════════════════════
+    function toast(title, msg = '', type = '') {
+      const w = document.getElementById('toast-wrap');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<div class="toast-t">${title}</div>${msg ? `<div class="toast-m">${msg}</div>` : ''}`;
+      w.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
 
-    <div id="tracker-list">
-      <div class="empty"><div class="e-icon">⏳</div><p>Loading applications…</p></div>
-    </div>
-  </div>
+    // ═══════════════════════════════════════════════════════════
+    // NAVIGATION
+    // ═══════════════════════════════════════════════════════════
+    const pageTitles = {
+      home: ['Home', 'Your placement journey at a glance'],
+      feed: ['Drive Feed', 'Companies you\'re eligible for'],
+      tracker: ['My Applications', 'Track your placement progress'],
+      assessments: ['Assessments', 'Tests & evaluations'],
+      quiz: ['Take Assessment', 'Complete your test'],
+      profile: ['My Profile', 'Your academic profile']
+    };
 
-  <!-- ══════ PAGE: ASSESSMENTS ══════ -->
-  <div class="page" id="page-assessments">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div>
-        <div style="font-size:15px;font-weight:700;">📝 Assessments</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:3px;">Aptitude, technical and coding tests assigned to you</div>
-      </div>
-    </div>
-    <div id="assessments-list-student">
-      <div class="empty"><div class="e-icon">⏳</div><p>Loading assessments…</p></div>
-    </div>
-  </div>
+    function go(page) {
+      currentPage = page;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const el = document.getElementById(`page-${page}`);
+      const nav = document.getElementById(`nav-${page}`);
+      if (el) el.classList.add('active');
+      if (nav) nav.classList.add('active');
+      const [title, sub] = pageTitles[page] || [page, ''];
+      document.getElementById('page-title').textContent = title;
+      document.getElementById('page-sub').textContent = sub;
+      if (page === 'home') loadHome();
+      if (page === 'feed') loadFeed();
+      if (page === 'tracker') loadTracker();
+      if (page === 'assessments') loadAssessments();
+      if (page === 'profile') loadProfile();
+      // Close notif panel on nav
+      document.getElementById('notif-panel').classList.remove('show');
+    }
 
-  <!-- ══════ PAGE: QUIZ (FULL SCREEN) ══════ -->
-  <div class="page" id="page-quiz">
-    <div class="quiz-wrap" id="quiz-wrap">
-      <div class="empty"><div class="e-icon">📝</div><p>No assessment loaded</p></div>
-    </div>
-  </div>
+    function refreshCurrent() { go(currentPage); }
 
-  <!-- ══════ PAGE: PROFILE ══════ -->
-  <div class="page" id="page-profile">
-    <div class="profile-hero">
-      <div class="profile-avatar" id="prof-avatar">?</div>
-      <div class="profile-name" id="prof-name">—</div>
-      <div class="profile-usn" id="prof-usn">—</div>
-      <div class="profile-chips" id="prof-chips"></div>
-    </div>
+    // ═══════════════════════════════════════════════════════════
+    // AUTH
+    // ═══════════════════════════════════════════════════════════
+    async function logout() {
+      await api('POST', '/api/auth/logout');
+      window.location.href = '/';
+    }
 
-    <div class="profile-grid">
-      <div class="profile-section">
-        <h3>Academic Details</h3>
-        <div id="prof-academic"></div>
-      </div>
-      <div class="profile-section">
-        <h3>Contact Information</h3>
-        <div id="prof-contact"></div>
-      </div>
-      <div class="profile-section">
-        <h3>Previous Education</h3>
-        <div id="prof-prev-edu"></div>
-      </div>
-      <div class="profile-section">
-        <h3>Assessment Performance</h3>
-        <div id="prof-assessments"></div>
-      </div>
-    </div>
-  </div>
+    // ═══════════════════════════════════════════════════════════
+    // HELPERS
+    // ═══════════════════════════════════════════════════════════
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function timeAgo(d) {
+      const diff = Date.now() - new Date(d).getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h / 24)}d ago`;
+    }
+    function initials(name) {
+      return name ? name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() : '?';
+    }
+    function statusBadge(status) {
+      const map = {
+        eligible: ['b-gray', 'Eligible'],
+        applied: ['b-blue', 'Applied'],
+        shortlisted: ['b-yellow', '⭐ Shortlisted'],
+        selected: ['b-green', '🏆 Selected'],
+        rejected: ['b-red', 'Rejected']
+      };
+      const [cls, label] = map[status] || ['b-gray', status];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+    function notifIcon(type) {
+      return { drive: '🏢', assessment: '📝', shortlist: '⭐', general: '📣' }[type] || '🔔';
+    }
+    function notifColor(type) {
+      return { drive: 'rgba(79,142,247,0.1)', assessment: 'rgba(139,92,246,0.1)', shortlist: 'rgba(245,158,11,0.1)', general: 'rgba(0,212,170,0.1)' }[type] || 'var(--surface2)';
+    }
 
-</div><!-- /main -->
+    function showOverlay(id) { document.getElementById(id).classList.add('show'); }
+    function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
 
-<!-- APPLY CONFIRM MODAL -->
-<div class="overlay" id="apply-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Apply for Drive</div>
-      <button class="modal-close" onclick="closeOverlay('apply-overlay')">✕</button>
-    </div>
-    <div id="apply-modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeOverlay('apply-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmApply()">✓ Confirm Application</button>
-    </div>
-  </div>
-</div>
+    // ═══════════════════════════════════════════════════════════
+    // HOME PAGE
+    // ═══════════════════════════════════════════════════════════
+    async function loadHome() {
+      if (!studentData) return;
+      const s = studentData;
 
-<script>
-// ═══════════════════════════════════════════════════════════
-// GLOBALS
-// ═══════════════════════════════════════════════════════════
-let currentUser = null;
-let studentData = null;
-let allDrives = [];
-let myApplications = [];
-let allAssessments = [];
-let currentQuiz = null;
-let quizTimerInterval = null;
-let quizAnswers = {};
-let pendingApplyDriveId = null;
-let currentPage = 'home';
-let trackerFilter = '';
+      // Set welcome banner
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('wb-greeting').textContent = `${greeting}, ${s.name.split(' ')[0]}! 👋`;
+      document.getElementById('wb-sub').textContent = `${s.branch} · Year ${s.year} · ${s.backlogs === 0 ? '0 backlogs' : `${s.backlogs} backlog(s)`}`;
+      document.getElementById('wb-cgpa').textContent = s.cgpa.toFixed(2);
 
-// ═══════════════════════════════════════════════════════════
-// API HELPER
-// ═══════════════════════════════════════════════════════════
-async function api(method, url, body) {
-  try {
-    const opts = { method, headers: { 'Content-Type': 'application/json' } };
-    if (body) opts.body = JSON.stringify(body);
-    const r = await fetch(url, opts);
-    return r.json();
-  } catch(e) { return { error: e.message }; }
-}
+      // Count application stats
+      const apps = s.driveApplications || [];
+      document.getElementById('h-eligible').textContent = allDrives.length;
+      document.getElementById('h-applied').textContent = apps.filter(a => a.status === 'applied').length;
+      document.getElementById('h-shortlisted').textContent = apps.filter(a => a.status === 'shortlisted').length;
+      document.getElementById('h-selected').textContent = apps.filter(a => a.status === 'selected').length;
 
-// ═══════════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════════
-function toast(title, msg = '', type = '') {
-  const w = document.getElementById('toast-wrap');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = `<div class="toast-t">${title}</div>${msg ? `<div class="toast-m">${msg}</div>` : ''}`;
-  w.appendChild(t);
-  setTimeout(() => t.remove(), 4000);
-}
-
-// ═══════════════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════════════
-const pageTitles = {
-  home: ['Home', 'Your placement journey at a glance'],
-  feed: ['Drive Feed', 'Companies you\'re eligible for'],
-  tracker: ['My Applications', 'Track your placement progress'],
-  assessments: ['Assessments', 'Tests & evaluations'],
-  quiz: ['Take Assessment', 'Complete your test'],
-  profile: ['My Profile', 'Your academic profile']
-};
-
-function go(page) {
-  currentPage = page;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const el = document.getElementById(`page-${page}`);
-  const nav = document.getElementById(`nav-${page}`);
-  if (el) el.classList.add('active');
-  if (nav) nav.classList.add('active');
-  const [title, sub] = pageTitles[page] || [page, ''];
-  document.getElementById('page-title').textContent = title;
-  document.getElementById('page-sub').textContent = sub;
-  if (page === 'home') loadHome();
-  if (page === 'feed') loadFeed();
-  if (page === 'tracker') loadTracker();
-  if (page === 'assessments') loadAssessments();
-  if (page === 'profile') loadProfile();
-  // Close notif panel on nav
-  document.getElementById('notif-panel').classList.remove('show');
-}
-
-function refreshCurrent() { go(currentPage); }
-
-// ═══════════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════════
-async function logout() {
-  await api('POST', '/api/auth/logout');
-  window.location.href = '/';
-}
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════
-function fmtDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-function timeAgo(d) {
-  const diff = Date.now() - new Date(d).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h/24)}d ago`;
-}
-function initials(name) {
-  return name ? name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase() : '?';
-}
-function statusBadge(status) {
-  const map = {
-    eligible:    ['b-gray','Eligible'],
-    applied:     ['b-blue','Applied'],
-    shortlisted: ['b-yellow','⭐ Shortlisted'],
-    selected:    ['b-green','🏆 Selected'],
-    rejected:    ['b-red','Rejected']
-  };
-  const [cls, label] = map[status] || ['b-gray', status];
-  return `<span class="badge ${cls}">${label}</span>`;
-}
-function notifIcon(type) {
-  return { drive:'🏢', assessment:'📝', shortlist:'⭐', general:'📣' }[type] || '🔔';
-}
-function notifColor(type) {
-  return { drive:'rgba(79,142,247,0.1)', assessment:'rgba(139,92,246,0.1)', shortlist:'rgba(245,158,11,0.1)', general:'rgba(0,212,170,0.1)' }[type] || 'var(--surface2)';
-}
-
-function showOverlay(id)  { document.getElementById(id).classList.add('show'); }
-function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
-
-// ═══════════════════════════════════════════════════════════
-// HOME PAGE
-// ═══════════════════════════════════════════════════════════
-async function loadHome() {
-  if (!studentData) return;
-  const s = studentData;
-
-  // Set welcome banner
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('wb-greeting').textContent = `${greeting}, ${s.name.split(' ')[0]}! 👋`;
-  document.getElementById('wb-sub').textContent = `${s.branch} · Year ${s.year} · ${s.backlogs === 0 ? '0 backlogs' : `${s.backlogs} backlog(s)`}`;
-  document.getElementById('wb-cgpa').textContent = s.cgpa.toFixed(2);
-
-  // Count application stats
-  const apps = s.driveApplications || [];
-  document.getElementById('h-eligible').textContent = allDrives.length;
-  document.getElementById('h-applied').textContent = apps.filter(a=>a.status==='applied').length;
-  document.getElementById('h-shortlisted').textContent = apps.filter(a=>a.status==='shortlisted').length;
-  document.getElementById('h-selected').textContent = apps.filter(a=>a.status==='selected').length;
-
-  // Recent drives (top 3)
-  const recent = allDrives.slice(0,3);
-  document.getElementById('home-recent-drives').innerHTML = recent.length ?
-    recent.map(d => {
-      const app = apps.find(a => a.driveId === d._id);
-      const status = app ? app.status : 'eligible';
-      return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(30,45,72,0.4);">
+      // Recent drives (top 3)
+      const recent = allDrives.slice(0, 3);
+      document.getElementById('home-recent-drives').innerHTML = recent.length ?
+        recent.map(d => {
+          const app = apps.find(a => a.driveId === d._id);
+          const status = app ? app.status : 'eligible';
+          return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(30,45,72,0.4);">
         <div style="width:36px;height:36px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🏢</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:700;margin-bottom:2px;">${d.companyName}</div>
@@ -950,58 +2076,58 @@ async function loadHome() {
         </div>
         ${statusBadge(status)}
       </div>`;
-    }).join('') :
-    '<div class="empty" style="padding:30px"><div class="e-icon">📡</div><p>No active drives</p></div>';
+        }).join('') :
+        '<div class="empty" style="padding:30px"><div class="e-icon">📡</div><p>No active drives</p></div>';
 
-  // Profile snapshot
-  document.getElementById('home-profile-snapshot').innerHTML = `
+      // Profile snapshot
+      document.getElementById('home-profile-snapshot').innerHTML = `
     <div class="profile-row"><span class="label">Branch</span><span class="value">${s.branch}</span></div>
     <div class="profile-row"><span class="label">Year</span><span class="value">Year ${s.year}</span></div>
-    <div class="profile-row"><span class="label">CGPA</span><span class="value" style="color:${s.cgpa>=8?'var(--success)':s.cgpa>=6?'var(--text)':'var(--danger)'}">${s.cgpa}</span></div>
-    <div class="profile-row"><span class="label">Backlogs</span><span class="value" style="color:${s.backlogs===0?'var(--success)':'var(--danger)'}">${s.backlogs}</span></div>
-    <div class="profile-row"><span class="label">Assessments Done</span><span class="value">${(s.assessmentScores||[]).length}</span></div>
+    <div class="profile-row"><span class="label">CGPA</span><span class="value" style="color:${s.cgpa >= 8 ? 'var(--success)' : s.cgpa >= 6 ? 'var(--text)' : 'var(--danger)'}">${s.cgpa}</span></div>
+    <div class="profile-row"><span class="label">Backlogs</span><span class="value" style="color:${s.backlogs === 0 ? 'var(--success)' : 'var(--danger)'}">${s.backlogs}</span></div>
+    <div class="profile-row"><span class="label">Assessments Done</span><span class="value">${(s.assessmentScores || []).length}</span></div>
     <div class="profile-row"><span class="label">Applications</span><span class="value">${apps.length}</span></div>
   `;
-}
+    }
 
-// ═══════════════════════════════════════════════════════════
-// DRIVE FEED
-// ═══════════════════════════════════════════════════════════
-async function loadFeed() {
-  const el = document.getElementById('drive-feed-list');
-  el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>';
-  const drives = await api('GET', `/api/drives/student/${currentUser.username}`);
-  allDrives = Array.isArray(drives) ? drives : [];
-  // Update badge
-  const badge = document.getElementById('feed-badge');
-  if (allDrives.length > 0) { badge.style.display = ''; badge.textContent = allDrives.length; }
-  else badge.style.display = 'none';
-  renderFeed();
-}
+    // ═══════════════════════════════════════════════════════════
+    // DRIVE FEED
+    // ═══════════════════════════════════════════════════════════
+    async function loadFeed() {
+      const el = document.getElementById('drive-feed-list');
+      el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>';
+      const drives = await api('GET', `/api/drives/student/${currentUser.username}`);
+      allDrives = Array.isArray(drives) ? drives : [];
+      // Update badge
+      const badge = document.getElementById('feed-badge');
+      if (allDrives.length > 0) { badge.style.display = ''; badge.textContent = allDrives.length; }
+      else badge.style.display = 'none';
+      renderFeed();
+    }
 
-function renderFeed() {
-  const filter = document.getElementById('feed-filter').value;
-  const el = document.getElementById('drive-feed-list');
-  const drives = filter ? allDrives.filter(d => d.status === filter) : allDrives;
-  if (!drives.length) {
-    el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">🎯</div><h3>No drives found</h3><p>Check back later for new opportunities</p></div>`;
-    return;
-  }
-  const apps = studentData?.driveApplications || [];
-  el.innerHTML = drives.map(d => {
-    const app = apps.find(a => a.driveId === d._id);
-    const status = app ? app.status : 'eligible';
-    const applied = ['applied','shortlisted','selected'].includes(status);
-    const deadline = d.deadline ? new Date(d.deadline) : null;
-    const isExpired = deadline && deadline < new Date();
-    return `<div class="drive-card-s status-${d.status}">
+    function renderFeed() {
+      const filter = document.getElementById('feed-filter').value;
+      const el = document.getElementById('drive-feed-list');
+      const drives = filter ? allDrives.filter(d => d.status === filter) : allDrives;
+      if (!drives.length) {
+        el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">🎯</div><h3>No drives found</h3><p>Check back later for new opportunities</p></div>`;
+        return;
+      }
+      const apps = studentData?.driveApplications || [];
+      el.innerHTML = drives.map(d => {
+        const app = apps.find(a => a.driveId === d._id);
+        const status = app ? app.status : 'eligible';
+        const applied = ['applied', 'shortlisted', 'selected'].includes(status);
+        const deadline = d.deadline ? new Date(d.deadline) : null;
+        const isExpired = deadline && deadline < new Date();
+        return `<div class="drive-card-s status-${d.status}">
       <div class="dc-header">
         <div class="dc-company">
           <div class="dc-company-icon">🏢</div>
           ${d.companyName}
         </div>
         <div style="display:flex;gap:7px;align-items:center;">
-          <span class="badge ${d.status==='active'?'b-green':d.status==='upcoming'?'b-blue':'b-gray'}">${d.status==='active'?'🟢 Active':d.status==='upcoming'?'🔵 Upcoming':'✓ Completed'}</span>
+          <span class="badge ${d.status === 'active' ? 'b-green' : d.status === 'upcoming' ? 'b-blue' : 'b-gray'}">${d.status === 'active' ? '🟢 Active' : d.status === 'upcoming' ? '🔵 Upcoming' : '✓ Completed'}</span>
           ${statusBadge(status)}
         </div>
       </div>
@@ -1016,26 +2142,26 @@ function renderFeed() {
       ${d.description ? `<div class="dc-desc">${d.description}</div>` : ''}
       <div class="dc-footer">
         <div class="dc-deadline">
-          Deadline: ${deadline ? `<strong ${isExpired?'style="color:var(--danger)"':''}>${fmtDate(d.deadline)}${isExpired?' (Expired)':''}</strong>` : '<strong>Open</strong>'}
+          Deadline: ${deadline ? `<strong ${isExpired ? 'style="color:var(--danger)"' : ''}>${fmtDate(d.deadline)}${isExpired ? ' (Expired)' : ''}</strong>` : '<strong>Open</strong>'}
         </div>
         <div class="dc-actions">
           ${!applied && !isExpired && d.status !== 'completed' ?
             `<button class="btn btn-primary btn-sm" onclick="openApply('${d._id}','${d.companyName}')">Apply Now →</button>` :
-            applied ? `<button class="btn btn-outline btn-sm" disabled>✓ ${status.charAt(0).toUpperCase()+status.slice(1)}</button>` :
-            `<button class="btn btn-outline btn-sm" disabled>Closed</button>`
+            applied ? `<button class="btn btn-outline btn-sm" disabled>✓ ${status.charAt(0).toUpperCase() + status.slice(1)}</button>` :
+              `<button class="btn btn-outline btn-sm" disabled>Closed</button>`
           }
         </div>
       </div>
     </div>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// APPLY
-// ═══════════════════════════════════════════════════════════
-function openApply(driveId, companyName) {
-  pendingApplyDriveId = driveId;
-  document.getElementById('apply-modal-body').innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // APPLY
+    // ═══════════════════════════════════════════════════════════
+    function openApply(driveId, companyName) {
+      pendingApplyDriveId = driveId;
+      document.getElementById('apply-modal-body').innerHTML = `
     <div style="text-align:center;padding:14px 0 20px;">
       <div style="font-size:48px;margin-bottom:14px;">🏢</div>
       <div style="font-size:18px;font-weight:700;margin-bottom:6px;">${companyName}</div>
@@ -1044,73 +2170,73 @@ function openApply(driveId, companyName) {
     <div style="background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.15);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text2);">
       ℹ️ Your profile (CGPA: <strong>${studentData.cgpa}</strong>, Branch: <strong>${studentData.branch}</strong>) meets the eligibility criteria.
     </div>`;
-  showOverlay('apply-overlay');
-}
+      showOverlay('apply-overlay');
+    }
 
-async function confirmApply() {
-  if (!pendingApplyDriveId || !studentData) return;
-  // Update student driveApplications status to 'applied'
-  const apps = studentData.driveApplications || [];
-  const existing = apps.find(a => a.driveId === pendingApplyDriveId);
-  if (existing) {
-    existing.status = 'applied';
-  } else {
-    apps.push({ driveId: pendingApplyDriveId, status: 'applied' });
-  }
-  const res = await api('PUT', `/api/students/${studentData._id}`, { driveApplications: apps });
-  if (res && res._id) {
-    studentData = res;
-    toast('Applied! ✓', 'Your application has been submitted', 's');
-    closeOverlay('apply-overlay');
-    renderFeed();
-    loadTracker();
-  } else {
-    toast('Error', res?.error || 'Failed to apply', 'e');
-  }
-  pendingApplyDriveId = null;
-}
+    async function confirmApply() {
+      if (!pendingApplyDriveId || !studentData) return;
+      // Update student driveApplications status to 'applied'
+      const apps = studentData.driveApplications || [];
+      const existing = apps.find(a => a.driveId === pendingApplyDriveId);
+      if (existing) {
+        existing.status = 'applied';
+      } else {
+        apps.push({ driveId: pendingApplyDriveId, status: 'applied' });
+      }
+      const res = await api('PUT', `/api/students/${studentData._id}`, { driveApplications: apps });
+      if (res && res._id) {
+        studentData = res;
+        toast('Applied! ✓', 'Your application has been submitted', 's');
+        closeOverlay('apply-overlay');
+        renderFeed();
+        loadTracker();
+      } else {
+        toast('Error', res?.error || 'Failed to apply', 'e');
+      }
+      pendingApplyDriveId = null;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// APPLICATION TRACKER
-// ═══════════════════════════════════════════════════════════
-async function loadTracker() {
-  const el = document.getElementById('tracker-list');
-  el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>';
-  if (!studentData) return;
-  const apps = studentData.driveApplications || [];
-  myApplications = apps;
-  renderTracker();
-}
+    // ═══════════════════════════════════════════════════════════
+    // APPLICATION TRACKER
+    // ═══════════════════════════════════════════════════════════
+    async function loadTracker() {
+      const el = document.getElementById('tracker-list');
+      el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>';
+      if (!studentData) return;
+      const apps = studentData.driveApplications || [];
+      myApplications = apps;
+      renderTracker();
+    }
 
-function filterTracker(status) {
-  trackerFilter = status;
-  // Update tab styles
-  document.querySelectorAll('[id^="tf-"]').forEach(b => {
-    b.className = 'btn btn-outline btn-sm';
-  });
-  const active = document.getElementById(`tf-${status || 'all'}`);
-  if (active) active.className = 'btn btn-primary btn-sm';
-  renderTracker();
-}
+    function filterTracker(status) {
+      trackerFilter = status;
+      // Update tab styles
+      document.querySelectorAll('[id^="tf-"]').forEach(b => {
+        b.className = 'btn btn-outline btn-sm';
+      });
+      const active = document.getElementById(`tf-${status || 'all'}`);
+      if (active) active.className = 'btn btn-primary btn-sm';
+      renderTracker();
+    }
 
-function renderTracker() {
-  const el = document.getElementById('tracker-list');
-  const apps = trackerFilter ? myApplications.filter(a => a.status === trackerFilter) : myApplications;
-  if (!apps.length) {
-    el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">📋</div><h3>${trackerFilter ? 'No '+trackerFilter+' applications' : 'No applications yet'}</h3><p>${trackerFilter ? 'Try a different filter' : 'Apply to drives from the Feed page'}</p></div>`;
-    return;
-  }
-  const STAGES = [
-    { key: 'eligible',    label: 'Eligible',    icon: '✓' },
-    { key: 'applied',     label: 'Applied',     icon: '📋' },
-    { key: 'shortlisted', label: 'Shortlisted', icon: '⭐' },
-    { key: 'selected',    label: 'Selected',    icon: '🏆' }
-  ];
-  const stageIdx = s => STAGES.findIndex(st => st.key === s);
-  el.innerHTML = apps.map(app => {
-    const drive = allDrives.find(d => d._id === app.driveId) || { companyName: 'Unknown Company', package: '', status: '' };
-    const si = app.status === 'rejected' ? -1 : stageIdx(app.status);
-    return `<div class="app-card">
+    function renderTracker() {
+      const el = document.getElementById('tracker-list');
+      const apps = trackerFilter ? myApplications.filter(a => a.status === trackerFilter) : myApplications;
+      if (!apps.length) {
+        el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">📋</div><h3>${trackerFilter ? 'No ' + trackerFilter + ' applications' : 'No applications yet'}</h3><p>${trackerFilter ? 'Try a different filter' : 'Apply to drives from the Feed page'}</p></div>`;
+        return;
+      }
+      const STAGES = [
+        { key: 'eligible', label: 'Eligible', icon: '✓' },
+        { key: 'applied', label: 'Applied', icon: '📋' },
+        { key: 'shortlisted', label: 'Shortlisted', icon: '⭐' },
+        { key: 'selected', label: 'Selected', icon: '🏆' }
+      ];
+      const stageIdx = s => STAGES.findIndex(st => st.key === s);
+      el.innerHTML = apps.map(app => {
+        const drive = allDrives.find(d => d._id === app.driveId) || { companyName: 'Unknown Company', package: '', status: '' };
+        const si = app.status === 'rejected' ? -1 : stageIdx(app.status);
+        return `<div class="app-card">
       <div class="app-header">
         <div>
           <div class="app-company">${drive.companyName}</div>
@@ -1118,15 +2244,15 @@ function renderTracker() {
         </div>
         <div style="text-align:right;">
           ${statusBadge(app.status)}
-          ${app.ranking ? `<div style="margin-top:5px;"><span class="badge ${app.ranking==='Best'?'b-green':app.ranking==='Better'?'b-blue':'b-yellow'}">${app.ranking}</span></div>` : ''}
+          ${app.ranking ? `<div style="margin-top:5px;"><span class="badge ${app.ranking === 'Best' ? 'b-green' : app.ranking === 'Better' ? 'b-blue' : 'b-yellow'}">${app.ranking}</span></div>` : ''}
         </div>
       </div>
       ${app.status !== 'rejected' ? `
       <div class="status-pipeline">
         ${STAGES.map((st, i) => {
-          const isDone   = si > i;
+          const isDone = si > i;
           const isActive = si === i;
-          return `<div class="pipe-step ${isDone?'done':''} ${isActive?'active-step':''}">
+          return `<div class="pipe-step ${isDone ? 'done' : ''} ${isActive ? 'active-step' : ''}">
             <div class="pipe-dot">${isDone ? '✓' : st.icon}</div>
             <div class="pipe-label">${st.label}</div>
           </div>`;
@@ -1136,31 +2262,31 @@ function renderTracker() {
         ⛔ Application was not shortlisted for this drive. Keep applying!
       </div>`}
     </div>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ASSESSMENTS
-// ═══════════════════════════════════════════════════════════
-async function loadAssessments() {
-  const el = document.getElementById('assessments-list-student');
-  el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading assessments…</p></div>';
-  const data = await api('GET', '/api/assessments');
-  allAssessments = Array.isArray(data) ? data.filter(a => a.isActive) : [];
-  const badge = document.getElementById('assess-badge');
-  const taken = studentData?.assessmentScores || [];
-  const pending = allAssessments.filter(a => !taken.find(t => t.assessmentId === a._id));
-  if (pending.length > 0) { badge.style.display=''; badge.textContent = pending.length; }
-  else badge.style.display = 'none';
-  if (!allAssessments.length) {
-    el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">📝</div><h3>No Assessments Available</h3><p>The TPO will publish tests when drives are active</p></div>`;
-    return;
-  }
-  el.innerHTML = allAssessments.map(a => {
-    const done = taken.find(t => t.assessmentId === a._id || t.assessmentId?.toString() === a._id);
-    const pct  = done && done.maxScore > 0 ? Math.round((done.score/done.maxScore)*100) : null;
-    const color = pct === null ? 'var(--text3)' : pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)';
-    return `<div class="assess-card">
+    // ═══════════════════════════════════════════════════════════
+    // ASSESSMENTS
+    // ═══════════════════════════════════════════════════════════
+    async function loadAssessments() {
+      const el = document.getElementById('assessments-list-student');
+      el.innerHTML = '<div class="empty"><div class="e-icon">⏳</div><p>Loading assessments…</p></div>';
+      const data = await api('GET', '/api/assessments');
+      allAssessments = Array.isArray(data) ? data.filter(a => a.isActive) : [];
+      const badge = document.getElementById('assess-badge');
+      const taken = studentData?.assessmentScores || [];
+      const pending = allAssessments.filter(a => !taken.find(t => t.assessmentId === a._id));
+      if (pending.length > 0) { badge.style.display = ''; badge.textContent = pending.length; }
+      else badge.style.display = 'none';
+      if (!allAssessments.length) {
+        el.innerHTML = `<div class="empty-fancy"><div class="ef-icon">📝</div><h3>No Assessments Available</h3><p>The TPO will publish tests when drives are active</p></div>`;
+        return;
+      }
+      el.innerHTML = allAssessments.map(a => {
+        const done = taken.find(t => t.assessmentId === a._id || t.assessmentId?.toString() === a._id);
+        const pct = done && done.maxScore > 0 ? Math.round((done.score / done.maxScore) * 100) : null;
+        const color = pct === null ? 'var(--text3)' : pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)';
+        return `<div class="assess-card">
       <div class="assess-header">
         <div>
           <div class="assess-title">${a.title}</div>
@@ -1180,37 +2306,37 @@ async function loadAssessments() {
             <strong style="color:${color};">${pct}%</strong>
           </div>
           <div class="result-bar" style="margin-top:8px;">
-            <div class="result-fill" style="width:${pct}%;background:${pct>=70?'var(--grad)':pct>=40?'linear-gradient(135deg,#f59e0b,#f43f5e)':'var(--danger)'}"></div>
+            <div class="result-fill" style="width:${pct}%;background:${pct >= 70 ? 'var(--grad)' : pct >= 40 ? 'linear-gradient(135deg,#f59e0b,#f43f5e)' : 'var(--danger)'}"></div>
           </div>
         </div>` : `
         <div style="margin-top:4px;">
           <button class="btn btn-primary btn-sm" onclick="startQuiz('${a._id}')">▶ Start Assessment</button>
         </div>`}
     </div>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// QUIZ ENGINE
-// ═══════════════════════════════════════════════════════════
-async function startQuiz(id) {
-  const el = document.getElementById('quiz-wrap');
-  el.innerHTML = '<div class="empty"><div class="e-icon"><div class="loader"></div></div><p>Loading assessment…</p></div>';
-  go('quiz');
-  const data = await api('GET', `/api/assessments/${id}/take`);
-  if (!data || data.error) { el.innerHTML = `<div class="empty"><div class="e-icon">❌</div><p>${data?.error || 'Failed to load'}</p></div>`; return; }
-  currentQuiz = { ...data, id, started: Date.now() };
-  quizAnswers = {};
-  renderQuiz();
-}
+    // ═══════════════════════════════════════════════════════════
+    // QUIZ ENGINE
+    // ═══════════════════════════════════════════════════════════
+    async function startQuiz(id) {
+      const el = document.getElementById('quiz-wrap');
+      el.innerHTML = '<div class="empty"><div class="e-icon"><div class="loader"></div></div><p>Loading assessment…</p></div>';
+      go('quiz');
+      const data = await api('GET', `/api/assessments/${id}/take`);
+      if (!data || data.error) { el.innerHTML = `<div class="empty"><div class="e-icon">❌</div><p>${data?.error || 'Failed to load'}</p></div>`; return; }
+      currentQuiz = { ...data, id, started: Date.now() };
+      quizAnswers = {};
+      renderQuiz();
+    }
 
-function renderQuiz() {
-  const q = currentQuiz;
-  const el = document.getElementById('quiz-wrap');
-  const LETTERS = ['A','B','C','D'];
-  el.innerHTML = `
+    function renderQuiz() {
+      const q = currentQuiz;
+      const el = document.getElementById('quiz-wrap');
+      const LETTERS = ['A', 'B', 'C', 'D'];
+      el.innerHTML = `
     <div class="quiz-header">
-      <div class="quiz-timer" id="quiz-timer">⏱ ${String(Math.floor(q.timeLimit)).padStart(2,'0')}:00</div>
+      <div class="quiz-timer" id="quiz-timer">⏱ ${String(Math.floor(q.timeLimit)).padStart(2, '0')}:00</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:4px;">${q.title}</div>
       <div style="font-size:12px;color:var(--text2);">${q.type} · ${q.questions.length} questions · ${q.totalMarks} marks</div>
       <div class="quiz-progress" style="margin-top:14px;">
@@ -1220,7 +2346,7 @@ function renderQuiz() {
     <div id="quiz-questions">
       ${q.questions.map((qu, qi) => `
         <div class="q-card" id="qc-${qi}">
-          <div class="q-num">Question ${qi+1} of ${q.questions.length} · ${qu.marks} mark${qu.marks>1?'s':''}</div>
+          <div class="q-num">Question ${qi + 1} of ${q.questions.length} · ${qu.marks} mark${qu.marks > 1 ? 's' : ''}</div>
           <div class="q-text">${qu.question}</div>
           <div class="q-options">
             ${qu.options.map((opt, oi) => `
@@ -1236,135 +2362,135 @@ function renderQuiz() {
       <button class="btn btn-primary" onclick="submitQuiz()">Submit Assessment ✓</button>
     </div>`;
 
-  // Timer
-  let remaining = q.timeLimit * 60;
-  if (quizTimerInterval) clearInterval(quizTimerInterval);
-  quizTimerInterval = setInterval(() => {
-    remaining--;
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    const timerEl = document.getElementById('quiz-timer');
-    if (timerEl) {
-      timerEl.textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      if (remaining <= 60) timerEl.classList.add('warn');
+      // Timer
+      let remaining = q.timeLimit * 60;
+      if (quizTimerInterval) clearInterval(quizTimerInterval);
+      quizTimerInterval = setInterval(() => {
+        remaining--;
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        const timerEl = document.getElementById('quiz-timer');
+        if (timerEl) {
+          timerEl.textContent = `⏱ ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+          if (remaining <= 60) timerEl.classList.add('warn');
+        }
+        if (remaining <= 0) { clearInterval(quizTimerInterval); submitQuiz(); }
+      }, 1000);
     }
-    if (remaining <= 0) { clearInterval(quizTimerInterval); submitQuiz(); }
-  }, 1000);
-}
 
-function selectOpt(qi, oi) {
-  // Clear previous selection for this question
-  const prev = quizAnswers[qi];
-  if (prev !== undefined) document.getElementById(`qo-${qi}-${prev}`)?.classList.remove('selected');
-  quizAnswers[qi] = oi;
-  document.getElementById(`qo-${qi}-${oi}`)?.classList.add('selected');
-  // Update progress
-  const answered = Object.keys(quizAnswers).length;
-  const pct = Math.round((answered / currentQuiz.questions.length) * 100);
-  const prog = document.getElementById('quiz-prog');
-  if (prog) prog.style.width = pct + '%';
-}
+    function selectOpt(qi, oi) {
+      // Clear previous selection for this question
+      const prev = quizAnswers[qi];
+      if (prev !== undefined) document.getElementById(`qo-${qi}-${prev}`)?.classList.remove('selected');
+      quizAnswers[qi] = oi;
+      document.getElementById(`qo-${qi}-${oi}`)?.classList.add('selected');
+      // Update progress
+      const answered = Object.keys(quizAnswers).length;
+      const pct = Math.round((answered / currentQuiz.questions.length) * 100);
+      const prog = document.getElementById('quiz-prog');
+      if (prog) prog.style.width = pct + '%';
+    }
 
-async function submitQuiz() {
-  if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
-  const unanswered = currentQuiz.questions.length - Object.keys(quizAnswers).length;
-  if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
-  const res = await api('POST', `/api/assessments/${currentQuiz.id}/submit`, {
-    usn: currentUser.username,
-    answers: quizAnswers
-  });
-  if (res.error) { toast('Error', res.error, 'e'); return; }
-  showQuizResult(res);
-  // Refresh student data
-  const fresh = await api('GET', `/api/students/me/${currentUser.username}`);
-  if (fresh && fresh._id) studentData = fresh;
-}
+    async function submitQuiz() {
+      if (quizTimerInterval) { clearInterval(quizTimerInterval); quizTimerInterval = null; }
+      const unanswered = currentQuiz.questions.length - Object.keys(quizAnswers).length;
+      if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+      const res = await api('POST', `/api/assessments/${currentQuiz.id}/submit`, {
+        usn: currentUser.username,
+        answers: quizAnswers
+      });
+      if (res.error) { toast('Error', res.error, 'e'); return; }
+      showQuizResult(res);
+      // Refresh student data
+      const fresh = await api('GET', `/api/students/me/${currentUser.username}`);
+      if (fresh && fresh._id) studentData = fresh;
+    }
 
-function showQuizResult(res) {
-  const pct = res.percentage;
-  const pass = pct >= 50;
-  const el = document.getElementById('quiz-wrap');
-  el.innerHTML = `
+    function showQuizResult(res) {
+      const pct = res.percentage;
+      const pass = pct >= 50;
+      const el = document.getElementById('quiz-wrap');
+      el.innerHTML = `
     <div class="quiz-result">
-      <div class="result-circle ${!pass?'fail':''}">${pct}%</div>
+      <div class="result-circle ${!pass ? 'fail' : ''}">${pct}%</div>
       <div style="font-size:22px;font-weight:800;margin-bottom:8px;">${pass ? '🎉 Well Done!' : '📚 Keep Practicing!'}</div>
       <div style="font-size:14px;color:var(--text2);margin-bottom:24px;">
         You scored <strong>${res.score}</strong> out of <strong>${res.maxScore}</strong> marks
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:340px;margin:0 auto 24px;text-align:left;">
         <div class="profile-row"><span class="label">Score</span><span class="value">${res.score} / ${res.maxScore}</span></div>
-        <div class="profile-row"><span class="label">Percentage</span><span class="value" style="color:${pct>=70?'var(--success)':pct>=40?'var(--warning)':'var(--danger)'}">${pct}%</span></div>
-        <div class="profile-row"><span class="label">Status</span><span class="value" style="color:${pass?'var(--success)':'var(--danger)'}">${pass?'Pass':'Needs Improvement'}</span></div>
+        <div class="profile-row"><span class="label">Percentage</span><span class="value" style="color:${pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)'}">${pct}%</span></div>
+        <div class="profile-row"><span class="label">Status</span><span class="value" style="color:${pass ? 'var(--success)' : 'var(--danger)'}">${pass ? 'Pass' : 'Needs Improvement'}</span></div>
       </div>
       <div style="display:flex;gap:12px;justify-content:center;">
         <button class="btn btn-outline" onclick="go('assessments')">← Back to Assessments</button>
         <button class="btn btn-primary" onclick="go('home')">Go to Home</button>
       </div>
     </div>`;
-}
+    }
 
-// ═══════════════════════════════════════════════════════════
-// PROFILE
-// ═══════════════════════════════════════════════════════════
-async function loadProfile() {
-  if (!studentData) return;
-  const s = studentData;
-  const ini = initials(s.name);
-  document.getElementById('prof-avatar').textContent = ini;
-  document.getElementById('sb-avatar').textContent = ini;
-  document.getElementById('prof-name').textContent = s.name;
-  document.getElementById('prof-usn').textContent = s.usn;
-  document.getElementById('prof-chips').innerHTML = `
+    // ═══════════════════════════════════════════════════════════
+    // PROFILE
+    // ═══════════════════════════════════════════════════════════
+    async function loadProfile() {
+      if (!studentData) return;
+      const s = studentData;
+      const ini = initials(s.name);
+      document.getElementById('prof-avatar').textContent = ini;
+      document.getElementById('sb-avatar').textContent = ini;
+      document.getElementById('prof-name').textContent = s.name;
+      document.getElementById('prof-usn').textContent = s.usn;
+      document.getElementById('prof-chips').innerHTML = `
     <span class="badge b-blue">${s.branch}</span>
     <span class="badge b-purple">Year ${s.year}</span>
-    <span class="badge ${s.cgpa>=8?'b-green':s.cgpa>=6?'b-blue':'b-red'}">${s.cgpa} CGPA</span>
-    <span class="badge ${s.backlogs===0?'b-green':'b-red'}">${s.backlogs} Backlog${s.backlogs!==1?'s':''}</span>`;
-  document.getElementById('prof-academic').innerHTML = `
+    <span class="badge ${s.cgpa >= 8 ? 'b-green' : s.cgpa >= 6 ? 'b-blue' : 'b-red'}">${s.cgpa} CGPA</span>
+    <span class="badge ${s.backlogs === 0 ? 'b-green' : 'b-red'}">${s.backlogs} Backlog${s.backlogs !== 1 ? 's' : ''}</span>`;
+      document.getElementById('prof-academic').innerHTML = `
     <div class="profile-row"><span class="label">Branch</span><span class="value">${s.branch}</span></div>
     <div class="profile-row"><span class="label">Year</span><span class="value">Year ${s.year}</span></div>
-    <div class="profile-row"><span class="label">CGPA</span><span class="value" style="color:${s.cgpa>=8?'var(--success)':'var(--text)'}">${s.cgpa}</span></div>
-    <div class="profile-row"><span class="label">Backlogs</span><span class="value" style="color:${s.backlogs===0?'var(--success)':'var(--danger)'}">${s.backlogs}</span></div>`;
-  document.getElementById('prof-contact').innerHTML = `
+    <div class="profile-row"><span class="label">CGPA</span><span class="value" style="color:${s.cgpa >= 8 ? 'var(--success)' : 'var(--text)'}">${s.cgpa}</span></div>
+    <div class="profile-row"><span class="label">Backlogs</span><span class="value" style="color:${s.backlogs === 0 ? 'var(--success)' : 'var(--danger)'}">${s.backlogs}</span></div>`;
+      document.getElementById('prof-contact').innerHTML = `
     <div class="profile-row"><span class="label">Email</span><span class="value" style="font-size:12px;">${s.email || '—'}</span></div>
     <div class="profile-row"><span class="label">Phone</span><span class="value">${s.phone || '—'}</span></div>
     <div class="profile-row"><span class="label">Personal Email</span><span class="value" style="font-size:12px;">${s.profile?.personalEmail || '—'}</span></div>
     <div class="profile-row"><span class="label">Gender</span><span class="value">${s.profile?.gender || '—'}</span></div>`;
-  const p = s.profile || {};
-  document.getElementById('prof-prev-edu').innerHTML = `
-    <div class="profile-row"><span class="label">10th Marks</span><span class="value">${p.marks10th||'—'}${p.marks10th?'%':''}</span></div>
-    <div class="profile-row"><span class="label">10th Board</span><span class="value">${p.board10th||'—'}</span></div>
-    <div class="profile-row"><span class="label">12th Marks</span><span class="value">${p.marks12th||'—'}${p.marks12th?'%':''}</span></div>
-    <div class="profile-row"><span class="label">12th Board</span><span class="value">${p.board12th||'—'}</span></div>
+      const p = s.profile || {};
+      document.getElementById('prof-prev-edu').innerHTML = `
+    <div class="profile-row"><span class="label">10th Marks</span><span class="value">${p.marks10th || '—'}${p.marks10th ? '%' : ''}</span></div>
+    <div class="profile-row"><span class="label">10th Board</span><span class="value">${p.board10th || '—'}</span></div>
+    <div class="profile-row"><span class="label">12th Marks</span><span class="value">${p.marks12th || '—'}${p.marks12th ? '%' : ''}</span></div>
+    <div class="profile-row"><span class="label">12th Board</span><span class="value">${p.board12th || '—'}</span></div>
     ${p.diplomaPct ? `<div class="profile-row"><span class="label">Diploma</span><span class="value">${p.diplomaPct}%</span></div>` : ''}`;
-  const scores = s.assessmentScores || [];
-  document.getElementById('prof-assessments').innerHTML = scores.length ?
-    scores.map(sc => {
-      const pct = sc.maxScore > 0 ? Math.round((sc.score/sc.maxScore)*100) : 0;
-      const color = pct>=70?'var(--success)':pct>=40?'var(--warning)':'var(--danger)';
-      return `<div style="margin-bottom:12px;">
+      const scores = s.assessmentScores || [];
+      document.getElementById('prof-assessments').innerHTML = scores.length ?
+        scores.map(sc => {
+          const pct = sc.maxScore > 0 ? Math.round((sc.score / sc.maxScore) * 100) : 0;
+          const color = pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)';
+          return `<div style="margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">
           <span style="color:var(--text2);font-weight:500;">Assessment</span>
           <strong style="color:${color}">${sc.score}/${sc.maxScore} (${pct}%)</strong>
         </div>
-        <div class="result-bar"><div class="result-fill" style="width:${pct}%;background:${pct>=70?'var(--grad)':pct>=40?'linear-gradient(135deg,#f59e0b,#f43f5e)':'var(--danger)'}"></div></div>
+        <div class="result-bar"><div class="result-fill" style="width:${pct}%;background:${pct >= 70 ? 'var(--grad)' : pct >= 40 ? 'linear-gradient(135deg,#f59e0b,#f43f5e)' : 'var(--danger)'}"></div></div>
       </div>`;
-    }).join('') :
-    '<div style="color:var(--text3);font-size:13px;padding:8px 0;">No assessments taken yet</div>';
-}
+        }).join('') :
+        '<div style="color:var(--text3);font-size:13px;padding:8px 0;">No assessments taken yet</div>';
+    }
 
-// ═══════════════════════════════════════════════════════════
-// NOTIFICATIONS
-// ═══════════════════════════════════════════════════════════
-async function loadNotifications() {
-  const data = await api('GET', `/api/notifications/${currentUser.username}`);
-  const notifs = Array.isArray(data) ? data : [];
-  const unread = notifs.filter(n => !n.isRead).length;
-  const dot = document.getElementById('notif-dot');
-  const badge = document.getElementById('notif-btn');
-  if (unread > 0) dot.style.display = ''; else dot.style.display = 'none';
-  const list = document.getElementById('notif-list');
-  list.innerHTML = notifs.length ?
-    notifs.map(n => `<div class="notif-item ${!n.isRead?'unread':''}" onclick="readNotif('${n._id}')">
+    // ═══════════════════════════════════════════════════════════
+    // NOTIFICATIONS
+    // ═══════════════════════════════════════════════════════════
+    async function loadNotifications() {
+      const data = await api('GET', `/api/notifications/${currentUser.username}`);
+      const notifs = Array.isArray(data) ? data : [];
+      const unread = notifs.filter(n => !n.isRead).length;
+      const dot = document.getElementById('notif-dot');
+      const badge = document.getElementById('notif-btn');
+      if (unread > 0) dot.style.display = ''; else dot.style.display = 'none';
+      const list = document.getElementById('notif-list');
+      list.innerHTML = notifs.length ?
+        notifs.map(n => `<div class="notif-item ${!n.isRead ? 'unread' : ''}" onclick="readNotif('${n._id}')">
       <div class="notif-icon" style="background:${notifColor(n.type)}">${notifIcon(n.type)}</div>
       <div class="notif-body" style="flex:1;">
         <div class="notif-title">${n.title}</div>
@@ -1373,380 +2499,737 @@ async function loadNotifications() {
       </div>
       ${!n.isRead ? '<div class="notif-unread-dot"></div>' : ''}
     </div>`).join('') :
-    '<div class="empty" style="padding:32px"><div class="e-icon">📭</div><p>All caught up!</p></div>';
-}
-
-async function readNotif(id) {
-  await api('PUT', `/api/notifications/${id}/read`);
-  loadNotifications();
-}
-
-async function markAllRead() {
-  await api('PUT', `/api/notifications/markall/${currentUser.username}`);
-  toast('All read', 'Notifications cleared', 's');
-  loadNotifications();
-}
-
-function toggleNotifPanel() {
-  const p = document.getElementById('notif-panel');
-  const show = p.classList.toggle('show');
-  if (show) loadNotifications();
-}
-
-// Close notif panel when clicking outside
-document.addEventListener('click', e => {
-  const panel = document.getElementById('notif-panel');
-  const btn = document.getElementById('notif-btn');
-  if (!panel.contains(e.target) && !btn.contains(e.target)) {
-    panel.classList.remove('show');
-  }
-});
-
-// ═══════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════
-(async () => {
-  const me = await api('GET', '/api/auth/me');
-  if (!me || me.error || me.role !== 'student') {
-    window.location.href = '/';
-    return;
-  }
-  currentUser = me;
-  document.getElementById('sb-name').textContent = me.name || me.username;
-  document.getElementById('sb-usn').textContent = me.username;
-  document.getElementById('sb-avatar').textContent = initials(me.name || me.username);
-
-  // Load student data
-  const s = await api('GET', `/api/students/me/${me.username}`);
-  if (s && s._id) {
-    studentData = s;
-    document.getElementById('sb-avatar').textContent = initials(s.name);
-  } else {
-    // Fallback for test/demo login with no DB record
-    studentData = {
-      _id: null, name: me.name || 'Test Student', usn: me.username,
-      branch: 'CSE', year: 4, cgpa: 8.5, backlogs: 0,
-      email: 'test@example.com', phone: '', profile: {},
-      driveApplications: [], assessmentScores: []
-    };
-  }
-
-  // Load eligible drives
-  const drives = await api('GET', `/api/drives/student/${me.username}`);
-  allDrives = Array.isArray(drives) ? drives : [];
-
-  // Initial notification check
-  loadNotifications();
-
-  // Load home
-  loadHome();
-
-  // Periodic notification check
-  setInterval(loadNotifications, 30000);
-})();
-</script>
-
-
-<!-- ═══ PLACEMENT COACH CHATBOT ═══ -->
-<style>
-#pc-toggle{position:fixed;bottom:24px;right:24px;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;font-size:26px;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(79,142,247,0.45);z-index:9998;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;}
-#pc-toggle:hover{transform:scale(1.08);}
-#pc-panel{position:fixed;bottom:100px;right:24px;width:420px;max-width:calc(100vw - 48px);height:580px;max-height:calc(100vh - 120px);background:#0d1424;border:1px solid #1e2d48;border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,0.6);z-index:9997;display:none;flex-direction:column;overflow:hidden;animation:fadeUp 0.25s ease;}
-#pc-header{background:linear-gradient(135deg,#4f8ef7,#8b5cf6);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-#pc-header .pc-title{color:#fff;font-weight:700;font-size:15px;}
-#pc-header .pc-sub{color:rgba(255,255,255,0.75);font-size:11px;}
-#pc-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px;border-radius:6px;}
-#pc-close:hover{background:rgba(255,255,255,0.15);}
-#pc-tabs{display:flex;gap:6px;padding:10px 12px;background:#070b14;border-bottom:1px solid #1e2d48;flex-shrink:0;}
-.pc-tab{flex:1;padding:7px 4px;border-radius:8px;border:1px solid #1e2d48;background:#0d1424;color:#8da4c8;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.18s;}
-.pc-tab:hover{background:#1e2d48;color:#e8f0fe;}
-.pc-tab.active{background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border-color:transparent;}
-#pc-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#070b14;}
-#pc-messages::-webkit-scrollbar{width:4px;}
-#pc-messages::-webkit-scrollbar-thumb{background:#1e2d48;border-radius:4px;}
-.pc-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;word-wrap:break-word;}
-.pc-msg.user{background:linear-gradient(135deg,#4f8ef7,#6366f1);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
-.pc-msg.bot{background:#1a2540;color:#e8f0fe;align-self:flex-start;border-bottom-left-radius:4px;}
-.pc-msg.bot b{color:#4f8ef7;}
-.pc-typing{align-self:flex-start;background:#1a2540;border-radius:14px;padding:10px 16px;}
-.pc-typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#8da4c8;margin:0 2px;animation:pcBounce 1.2s infinite;}
-.pc-typing span:nth-child(2){animation-delay:0.2s;}
-.pc-typing span:nth-child(3){animation-delay:0.4s;}
-@keyframes pcBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-#pc-chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:#070b14;flex-shrink:0;}
-.pc-chip{padding:5px 12px;border-radius:20px;background:#1a2540;color:#8da4c8;font-size:12px;cursor:pointer;border:1px solid #1e2d48;transition:all 0.15s;white-space:nowrap;}
-.pc-chip:hover{background:#4f8ef7;color:#fff;border-color:#4f8ef7;}
-#pc-input-row{display:flex;gap:8px;padding:10px 12px;background:#0d1424;border-top:1px solid #1e2d48;flex-shrink:0;}
-#pc-input{flex:1;padding:9px 14px;background:#070b14;border:1px solid #1e2d48;border-radius:10px;color:#e8f0fe;font-size:13px;outline:none;font-family:inherit;}
-#pc-input:focus{border-color:#4f8ef7;}
-#pc-send{padding:9px 16px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;transition:opacity 0.2s;}
-#pc-send:hover{opacity:0.88;}
-#pc-send:disabled{opacity:0.4;cursor:not-allowed;}
-#pc-quiz{flex:1;overflow-y:auto;padding:14px;background:#070b14;display:none;flex-direction:column;gap:14px;}
-#pc-quiz::-webkit-scrollbar{width:4px;}
-#pc-quiz::-webkit-scrollbar-thumb{background:#1e2d48;border-radius:4px;}
-.pq-question{background:#1a2540;border-radius:12px;padding:14px;}
-.pq-q-text{font-size:14px;font-weight:600;color:#e8f0fe;margin-bottom:12px;line-height:1.5;}
-.pq-q-num{font-size:11px;color:#4f8ef7;font-weight:700;margin-bottom:6px;}
-.pq-opts{display:flex;flex-direction:column;gap:8px;}
-.pq-opt{padding:9px 14px;border-radius:9px;border:1px solid #1e2d48;background:#0d1424;color:#e8f0fe;cursor:pointer;font-size:13px;transition:all 0.15s;text-align:left;}
-.pq-opt:hover:not(:disabled){border-color:#4f8ef7;background:#1a2540;}
-.pq-opt.correct{background:rgba(34,197,94,0.15);border-color:#22c55e;color:#22c55e;}
-.pq-opt.wrong{background:rgba(244,63,94,0.15);border-color:#f43f5e;color:#f43f5e;}
-.pq-opt.reveal{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,0.08);}
-.pq-score-bar{background:#1a2540;border-radius:12px;padding:20px;text-align:center;border:1px solid #1e2d48;}
-.pq-score-num{font-size:36px;font-weight:800;background:linear-gradient(135deg,#4f8ef7,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-#pc-quiz-header{display:none;background:#0d1424;border-bottom:1px solid #1e2d48;padding:8px 14px;flex-shrink:0;}
-.qh-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#8da4c8;}
-.qh-score{color:#22c55e;font-weight:700;}
-.pc-loading{text-align:center;padding:30px;color:#8da4c8;font-size:14px;}
-.pc-loader{width:32px;height:32px;border:3px solid #1e2d48;border-top-color:#4f8ef7;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
-</style>
-
-<button id="pc-toggle" onclick="pcToggle()" title="Placement Coach AI">&#129302;</button>
-
-<div id="pc-panel">
-  <div id="pc-header">
-    <div><div class="pc-title">&#127891; Placement Coach</div><div class="pc-sub">AI-powered career assistant</div></div>
-    <button id="pc-close" onclick="pcToggle()">&#x2715;</button>
-  </div>
-  <div id="pc-tabs">
-    <div class="pc-tab active" onclick="pcSetMode('chat')" id="pctab-chat">&#128172; Chat</div>
-    <div class="pc-tab" onclick="pcSetMode('aptitude')" id="pctab-aptitude">&#129504; Aptitude</div>
-    <div class="pc-tab" onclick="pcSetMode('technical')" id="pctab-technical">&#128187; Technical</div>
-    <div class="pc-tab" onclick="pcSetMode('hr')" id="pctab-hr">&#127908; HR</div>
-  </div>
-  <div id="pc-quiz-header"><div class="qh-row"><span id="pc-q-num">Q 1/10</span><span class="qh-score">Score: <span id="pc-q-score">0</span> / <span id="pc-q-total">0</span></span></div></div>
-  <div id="pc-messages"></div>
-  <div id="pc-chips"></div>
-  <div id="pc-quiz"></div>
-  <div id="pc-input-row">
-    <input id="pc-input" type="text" placeholder="Ask anything about placements...">
-    <button id="pc-send">&#10148;</button>
-  </div>
-</div>
-
-<script>
-(function() {
-  var pcOpen = false;
-  var pcMode = 'chat';
-  var pcHistory = [];
-  var pcQuizData = [];
-  var pcQIndex = 0;
-  var pcScore = 0;
-  var pcAnswered = false;
-
-  var CHIPS = {
-    chat: ['Top hiring companies','How to crack TCS NQT','Resume tips','DSA roadmap','Salary packages','Mock interview tips'],
-    aptitude: ['Start Aptitude Quiz','Number Series','Time and Work','Percentages','Logical Reasoning'],
-    technical: ['Start Technical Quiz','Arrays & Strings','DBMS Concepts','OS Interview Qs','SQL Queries'],
-    hr: ['Start HR Quiz','Tell me about yourself','Strengths & Weaknesses','Why hire you','Salary negotiation']
-  };
-
-  // Wire up send button and enter key AFTER DOM ready
-  document.getElementById('pc-send').addEventListener('click', pcSend);
-  document.getElementById('pc-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') pcSend();
-  });
-
-  window.pcToggle = function() {
-    pcOpen = !pcOpen;
-    var panel = document.getElementById('pc-panel');
-    panel.style.display = pcOpen ? 'flex' : 'none';
-    if (pcOpen && document.getElementById('pc-messages').children.length === 0) {
-      pcBotMsg('Hi! I am your Placement Coach. I can help with:\n\n- Company info & interview prep\n- Aptitude & Technical quizzes\n- Resume tips & HR questions\n- Salary trends\n\nWhat would you like to explore?');
-      pcShowChips(CHIPS.chat);
+        '<div class="empty" style="padding:32px"><div class="e-icon">📭</div><p>All caught up!</p></div>';
     }
-    if (pcOpen) { setTimeout(function() { document.getElementById('pc-input').focus(); }, 200); }
-  };
 
-  window.pcSetMode = function(mode) {
-    pcMode = mode;
-    ['chat','aptitude','technical','hr'].forEach(function(m) {
-      document.getElementById('pctab-' + m).classList.toggle('active', m === mode);
+    async function readNotif(id) {
+      await api('PUT', `/api/notifications/${id}/read`);
+      loadNotifications();
+    }
+
+    async function markAllRead() {
+      await api('PUT', `/api/notifications/markall/${currentUser.username}`);
+      toast('All read', 'Notifications cleared', 's');
+      loadNotifications();
+    }
+
+    function toggleNotifPanel() {
+      const p = document.getElementById('notif-panel');
+      const show = p.classList.toggle('show');
+      if (show) loadNotifications();
+    }
+
+    // Close notif panel when clicking outside
+    document.addEventListener('click', e => {
+      const panel = document.getElementById('notif-panel');
+      const btn = document.getElementById('notif-btn');
+      if (!panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('show');
+      }
     });
-    var showChat = mode === 'chat';
-    document.getElementById('pc-messages').style.display = showChat ? 'flex' : 'none';
-    document.getElementById('pc-chips').style.display = showChat ? 'flex' : 'none';
-    document.getElementById('pc-quiz').style.display = showChat ? 'none' : 'flex';
-    document.getElementById('pc-input-row').style.display = showChat ? 'flex' : 'none';
-    document.getElementById('pc-quiz-header').style.display = 'none';
-    if (!showChat) { pcStartQuiz(mode); } else { pcShowChips(CHIPS.chat); }
-  };
 
-  function pcSend() {
-    var input = document.getElementById('pc-input');
-    var msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    document.getElementById('pc-send').disabled = true;
-    pcUserMsg(msg);
-    pcShowChips([]);
-    pcHistory.push({ role: 'user', content: msg });
-    var lower = msg.toLowerCase();
-    if (lower.indexOf('aptitude quiz') !== -1 || lower.indexOf('start aptitude') !== -1) { pcSetMode('aptitude'); document.getElementById('pc-send').disabled = false; return; }
-    if (lower.indexOf('technical quiz') !== -1 || lower.indexOf('start technical') !== -1) { pcSetMode('technical'); document.getElementById('pc-send').disabled = false; return; }
-    if (lower.indexOf('hr quiz') !== -1 || lower.indexOf('start hr') !== -1) { pcSetMode('hr'); document.getElementById('pc-send').disabled = false; return; }
-    var typingId = pcShowTyping();
-    fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, history: pcHistory.slice(-12) })
-    }).then(function(r) { return r.json(); }).then(function(data) {
-      pcRemoveTyping(typingId);
-      var reply = data.reply || data.error || 'Sorry, something went wrong.';
-      pcBotMsg(reply);
-      pcHistory.push({ role: 'assistant', content: reply });
-      pcShowChips(CHIPS[pcMode] || CHIPS.chat);
-      document.getElementById('pc-send').disabled = false;
-    }).catch(function() {
-      pcRemoveTyping(typingId);
-      pcBotMsg('Connection error. Please try again.');
-      document.getElementById('pc-send').disabled = false;
-    });
-  }
+    // ═══════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════
+    (async () => {
+      const me = await api('GET', '/api/auth/me');
+      if (!me || me.error || me.role !== 'student') {
+        window.location.href = '/';
+        return;
+      }
+      currentUser = me;
+      document.getElementById('sb-name').textContent = me.name || me.username;
+      document.getElementById('sb-usn').textContent = me.username;
+      document.getElementById('sb-avatar').textContent = initials(me.name || me.username);
 
-  function pcStartQuiz(mode) {
-    var quizEl = document.getElementById('pc-quiz');
-    quizEl.innerHTML = '<div class="pc-loading"><div class="pc-loader"></div>Generating questions with AI...</div>';
-    document.getElementById('pc-quiz-header').style.display = 'none';
-    pcQuizData = []; pcQIndex = 0; pcScore = 0; pcAnswered = false;
-    var configs = {
-      aptitude:  { categories: ['Aptitude','Logical Reasoning'], subTopics: ['Number Series','Time and Work','Percentages','Data Interpretation'] },
-      technical: { categories: ['Technical','Programming'],      subTopics: ['Data Structures','Algorithms','DBMS','Operating Systems','OOP','SQL'] },
-      hr:        { categories: ['HR Interview','Soft Skills'],   subTopics: ['Communication','Behavioral Questions','Leadership','Teamwork'] }
-    };
-    var cfg = configs[mode] || configs.aptitude;
-    fetch('/api/quiz/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ categories: cfg.categories, subTopics: cfg.subTopics, questionCount: 10, difficulty: 'mixed' })
-    }).then(function(r) { return r.json(); }).then(function(data) {
-      if (!data.success || !data.questions || !data.questions.length) throw new Error(data.error || 'No questions');
-      pcQuizData = data.questions;
-      pcRenderQuestion();
-    }).catch(function(e) {
-      quizEl.innerHTML = '<div class="pc-loading"><div style="font-size:28px;margin-bottom:8px;">⚠️</div><div style="color:#f43f5e;margin-bottom:12px;">Failed: ' + e.message + '</div><button onclick="pcSetMode(\'' + mode + '\')" style="padding:8px 20px;background:#4f8ef7;color:#fff;border:none;border-radius:8px;cursor:pointer;">Retry</button></div>';
-    });
-  }
+      // Load student data
+      const s = await api('GET', `/api/students/me/${me.username}`);
+      if (s && s._id) {
+        studentData = s;
+        document.getElementById('sb-avatar').textContent = initials(s.name);
+      } else {
+        // Fallback for test/demo login with no DB record
+        studentData = {
+          _id: null, name: me.name || 'Test Student', usn: me.username,
+          branch: 'CSE', year: 4, cgpa: 8.5, backlogs: 0,
+          email: 'test@example.com', phone: '', profile: {},
+          driveApplications: [], assessmentScores: []
+        };
+      }
 
-  function pcRenderQuestion() {
-    var q = pcQuizData[pcQIndex];
-    if (!q) { pcShowResult(); return; }
-    pcAnswered = false;
-    var quizEl = document.getElementById('pc-quiz');
-    document.getElementById('pc-quiz-header').style.display = 'block';
-    document.getElementById('pc-q-num').textContent = 'Q ' + (pcQIndex + 1) + ' / ' + pcQuizData.length;
-    document.getElementById('pc-q-score').textContent = pcScore;
-    document.getElementById('pc-q-total').textContent = pcQIndex;
-    var optsHtml = '';
-    for (var i = 0; i < q.options.length; i++) {
-      optsHtml += '<button class="pq-opt" id="pqo-' + i + '" data-idx="' + i + '">' + String.fromCharCode(65 + i) + '. ' + q.options[i] + '</button>';
+      // Load eligible drives
+      const drives = await api('GET', `/api/drives/student/${me.username}`);
+      allDrives = Array.isArray(drives) ? drives : [];
+
+      // Initial notification check
+      loadNotifications();
+
+      // Load home
+      loadHome();
+
+      // Periodic notification check
+      setInterval(loadNotifications, 30000);
+    })();
+  </script>
+
+
+  <!-- ═══ PLACEMENT COACH CHATBOT ═══ -->
+  <style>
+    #pc-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f8ef7, #8b5cf6);
+      color: #fff;
+      font-size: 26px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(79, 142, 247, 0.45);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
     }
-    quizEl.innerHTML = '<div class="pq-question"><div class="pq-q-num">Question ' + (pcQIndex + 1) + ' of ' + pcQuizData.length + ' &bull; ' + (q.topic || '') + '</div><div class="pq-q-text">' + q.question + '</div><div class="pq-opts" id="pq-opts">' + optsHtml + '</div></div>';
-    quizEl.scrollTop = 0;
-    // Wire up option clicks
-    var opts = quizEl.querySelectorAll('.pq-opt');
-    for (var j = 0; j < opts.length; j++) {
-      opts[j].addEventListener('click', function() { pcAnswer(parseInt(this.getAttribute('data-idx'))); });
+
+    #pc-toggle:hover {
+      transform: scale(1.08);
     }
-  }
 
-  window.pcAnswer = function(idx) {
-    if (pcAnswered) return;
-    pcAnswered = true;
-    var q = pcQuizData[pcQIndex];
-    var correct = q.correctAnswer;
-    var isRight = idx === correct;
-    if (isRight) pcScore++;
-    for (var i = 0; i < q.options.length; i++) {
-      var btn = document.getElementById('pqo-' + i);
-      if (!btn) continue;
-      btn.disabled = true;
-      if (i === correct) btn.classList.add('reveal');
-      if (i === idx && !isRight) btn.classList.add('wrong');
-      if (i === idx && isRight) { btn.classList.remove('reveal'); btn.classList.add('correct'); }
+    #pc-panel {
+      position: fixed;
+      bottom: 100px;
+      right: 24px;
+      width: 420px;
+      max-width: calc(100vw - 48px);
+      height: 580px;
+      max-height: calc(100vh - 120px);
+      background: #0d1424;
+      border: 1px solid #1e2d48;
+      border-radius: 18px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      z-index: 9997;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeUp 0.25s ease;
     }
-    document.getElementById('pc-q-score').textContent = pcScore;
-    document.getElementById('pc-q-total').textContent = pcQIndex + 1;
-    var quizEl = document.getElementById('pc-quiz');
-    var nextDiv = document.createElement('div');
-    nextDiv.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;';
-    var feedback = isRight ? '<span style="color:#22c55e;font-weight:700;">✅ Correct!</span>' : '<span style="color:#f43f5e;font-weight:700;">❌ Wrong</span>';
-    var nextLabel = (pcQIndex + 1 < pcQuizData.length) ? 'Next →' : 'See Results';
-    nextDiv.innerHTML = feedback + '<button onclick="pcNextQ()" style="padding:8px 20px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;">' + nextLabel + '</button>';
-    quizEl.querySelector('.pq-question').appendChild(nextDiv);
-  };
 
-  window.pcNextQ = function() {
-    pcQIndex++;
-    if (pcQIndex >= pcQuizData.length) { pcShowResult(); } else { pcRenderQuestion(); }
-  };
-
-  function pcShowResult() {
-    var quizEl = document.getElementById('pc-quiz');
-    var pct = Math.round((pcScore / pcQuizData.length) * 100);
-    var emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
-    var label = pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good Job!' : pct >= 40 ? 'Keep Practicing' : 'Need More Practice';
-    var clr = pct >= 80 ? '#22c55e' : pct >= 60 ? '#4f8ef7' : pct >= 40 ? '#f59e0b' : '#f43f5e';
-    document.getElementById('pc-quiz-header').style.display = 'none';
-    var modeRef = pcMode;
-    quizEl.innerHTML = '<div class="pq-score-bar"><div style="font-size:40px;margin-bottom:8px;">' + emoji + '</div><div class="pq-score-num">' + pcScore + ' / ' + pcQuizData.length + '</div><div style="font-size:14px;color:' + clr + ';font-weight:700;margin:6px 0;">' + label + ' — ' + pct + '%</div></div><div style="display:flex;flex-direction:column;gap:8px;"><button onclick="pcSetMode(\'' + modeRef + '\')" style="padding:10px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">🔄 Retry Quiz</button><button onclick="pcSetMode(\'chat\')" style="padding:10px;background:#1a2540;color:#e8f0fe;border:1px solid #1e2d48;border-radius:10px;cursor:pointer;font-size:14px;">💬 Back to Chat</button></div>';
-  }
-
-  window.pcChipClick = function(text) {
-    document.getElementById('pc-input').value = text;
-    pcSend();
-  };
-
-  function pcShowChips(chips) {
-    var el = document.getElementById('pc-chips');
-    var html = '';
-    for (var i = 0; i < chips.length; i++) {
-      html += '<div class="pc-chip" onclick="pcChipClick(\'' + chips[i].replace(/'/g, '') + '\')">' + chips[i] + '</div>';
+    #pc-header {
+      background: linear-gradient(135deg, #4f8ef7, #8b5cf6);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
     }
-    el.innerHTML = html;
-  }
 
-  function pcUserMsg(text) {
-    var el = document.getElementById('pc-messages');
-    var d = document.createElement('div');
-    d.className = 'pc-msg user';
-    d.textContent = text;
-    el.appendChild(d);
-    el.scrollTop = el.scrollHeight;
-  }
+    #pc-header .pc-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+    }
 
-  function pcBotMsg(text) {
-    var el = document.getElementById('pc-messages');
-    var d = document.createElement('div');
-    d.className = 'pc-msg bot';
-    var html = text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-      .replace(/\n/g, '<br>');
-    d.innerHTML = html;
-    el.appendChild(d);
-    el.scrollTop = el.scrollHeight;
-  }
+    #pc-header .pc-sub {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 11px;
+    }
 
-  function pcShowTyping() {
-    var el = document.getElementById('pc-messages');
-    var id = 'pct-' + Date.now();
-    var d = document.createElement('div');
-    d.className = 'pc-typing'; d.id = id;
-    d.innerHTML = '<span></span><span></span><span></span>';
-    el.appendChild(d);
-    el.scrollTop = el.scrollHeight;
-    return id;
-  }
+    #pc-close {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
 
-  function pcRemoveTyping(id) {
-    var el = document.getElementById(id);
-    if (el) el.remove();
-  }
-})();
-</script>
+    #pc-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    #pc-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      background: #070b14;
+      border-bottom: 1px solid #1e2d48;
+      flex-shrink: 0;
+    }
+
+    .pc-tab {
+      flex: 1;
+      padding: 7px 4px;
+      border-radius: 8px;
+      border: 1px solid #1e2d48;
+      background: #0d1424;
+      color: #8da4c8;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s;
+    }
+
+    .pc-tab:hover {
+      background: #1e2d48;
+      color: #e8f0fe;
+    }
+
+    .pc-tab.active {
+      background: linear-gradient(135deg, #4f8ef7, #8b5cf6);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    #pc-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #070b14;
+    }
+
+    #pc-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #pc-messages::-webkit-scrollbar-thumb {
+      background: #1e2d48;
+      border-radius: 4px;
+    }
+
+    .pc-msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      word-wrap: break-word;
+    }
+
+    .pc-msg.user {
+      background: linear-gradient(135deg, #4f8ef7, #6366f1);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .pc-msg.bot {
+      background: #1a2540;
+      color: #e8f0fe;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .pc-msg.bot b {
+      color: #4f8ef7;
+    }
+
+    .pc-typing {
+      align-self: flex-start;
+      background: #1a2540;
+      border-radius: 14px;
+      padding: 10px 16px;
+    }
+
+    .pc-typing span {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8da4c8;
+      margin: 0 2px;
+      animation: pcBounce 1.2s infinite;
+    }
+
+    .pc-typing span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .pc-typing span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pcBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0)
+      }
+
+      30% {
+        transform: translateY(-6px)
+      }
+    }
+
+    #pc-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #070b14;
+      flex-shrink: 0;
+    }
+
+    .pc-chip {
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #1a2540;
+      color: #8da4c8;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid #1e2d48;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .pc-chip:hover {
+      background: #4f8ef7;
+      color: #fff;
+      border-color: #4f8ef7;
+    }
+
+    #pc-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #0d1424;
+      border-top: 1px solid #1e2d48;
+      flex-shrink: 0;
+    }
+
+    #pc-input {
+      flex: 1;
+      padding: 9px 14px;
+      background: #070b14;
+      border: 1px solid #1e2d48;
+      border-radius: 10px;
+      color: #e8f0fe;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    #pc-input:focus {
+      border-color: #4f8ef7;
+    }
+
+    #pc-send {
+      padding: 9px 16px;
+      background: linear-gradient(135deg, #4f8ef7, #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+
+    #pc-send:hover {
+      opacity: 0.88;
+    }
+
+    #pc-send:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #pc-quiz {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      background: #070b14;
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #pc-quiz::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #pc-quiz::-webkit-scrollbar-thumb {
+      background: #1e2d48;
+      border-radius: 4px;
+    }
+
+    .pq-question {
+      background: #1a2540;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .pq-q-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e8f0fe;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .pq-q-num {
+      font-size: 11px;
+      color: #4f8ef7;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .pq-opts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pq-opt {
+      padding: 9px 14px;
+      border-radius: 9px;
+      border: 1px solid #1e2d48;
+      background: #0d1424;
+      color: #e8f0fe;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .pq-opt:hover:not(:disabled) {
+      border-color: #4f8ef7;
+      background: #1a2540;
+    }
+
+    .pq-opt.correct {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+
+    .pq-opt.wrong {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: #f43f5e;
+      color: #f43f5e;
+    }
+
+    .pq-opt.reveal {
+      border-color: #22c55e;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .pq-score-bar {
+      background: #1a2540;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid #1e2d48;
+    }
+
+    .pq-score-num {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4f8ef7, #22c55e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #pc-quiz-header {
+      display: none;
+      background: #0d1424;
+      border-bottom: 1px solid #1e2d48;
+      padding: 8px 14px;
+      flex-shrink: 0;
+    }
+
+    .qh-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #8da4c8;
+    }
+
+    .qh-score {
+      color: #22c55e;
+      font-weight: 700;
+    }
+
+    .pc-loading {
+      text-align: center;
+      padding: 30px;
+      color: #8da4c8;
+      font-size: 14px;
+    }
+
+    .pc-loader {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #1e2d48;
+      border-top-color: #4f8ef7;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+  </style>
+
+  <button id="pc-toggle" onclick="pcToggle()" title="Placement Coach AI">&#129302;</button>
+
+  <div id="pc-panel">
+    <div id="pc-header">
+      <div>
+        <div class="pc-title">&#127891; Placement Coach</div>
+        <div class="pc-sub">AI-powered career assistant</div>
+      </div>
+      <button id="pc-close" onclick="pcToggle()">&#x2715;</button>
+    </div>
+    <div id="pc-tabs">
+      <div class="pc-tab active" onclick="pcSetMode('chat')" id="pctab-chat">&#128172; Chat</div>
+      <div class="pc-tab" onclick="pcSetMode('aptitude')" id="pctab-aptitude">&#129504; Aptitude</div>
+      <div class="pc-tab" onclick="pcSetMode('technical')" id="pctab-technical">&#128187; Technical</div>
+      <div class="pc-tab" onclick="pcSetMode('hr')" id="pctab-hr">&#127908; HR</div>
+    </div>
+    <div id="pc-quiz-header">
+      <div class="qh-row"><span id="pc-q-num">Q 1/10</span><span class="qh-score">Score: <span id="pc-q-score">0</span>
+          / <span id="pc-q-total">0</span></span></div>
+    </div>
+    <div id="pc-messages"></div>
+    <div id="pc-chips"></div>
+    <div id="pc-quiz"></div>
+    <div id="pc-input-row">
+      <input id="pc-input" type="text" placeholder="Ask anything about placements...">
+      <button id="pc-send">&#10148;</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var pcOpen = false;
+      var pcMode = 'chat';
+      var pcHistory = [];
+      var pcQuizData = [];
+      var pcQIndex = 0;
+      var pcScore = 0;
+      var pcAnswered = false;
+
+      var CHIPS = {
+        chat: ['Top hiring companies', 'How to crack TCS NQT', 'Resume tips', 'DSA roadmap', 'Salary packages', 'Mock interview tips'],
+        aptitude: ['Start Aptitude Quiz', 'Number Series', 'Time and Work', 'Percentages', 'Logical Reasoning'],
+        technical: ['Start Technical Quiz', 'Arrays & Strings', 'DBMS Concepts', 'OS Interview Qs', 'SQL Queries'],
+        hr: ['Start HR Quiz', 'Tell me about yourself', 'Strengths & Weaknesses', 'Why hire you', 'Salary negotiation']
+      };
+
+      // Wire up send button and enter key AFTER DOM ready
+      document.getElementById('pc-send').addEventListener('click', pcSend);
+      document.getElementById('pc-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') pcSend();
+      });
+
+      window.pcToggle = function () {
+        pcOpen = !pcOpen;
+        var panel = document.getElementById('pc-panel');
+        panel.style.display = pcOpen ? 'flex' : 'none';
+        if (pcOpen && document.getElementById('pc-messages').children.length === 0) {
+          pcBotMsg('Hi! I am your Placement Coach. I can help with:\n\n- Company info & interview prep\n- Aptitude & Technical quizzes\n- Resume tips & HR questions\n- Salary trends\n\nWhat would you like to explore?');
+          pcShowChips(CHIPS.chat);
+        }
+        if (pcOpen) { setTimeout(function () { document.getElementById('pc-input').focus(); }, 200); }
+      };
+
+      window.pcSetMode = function (mode) {
+        pcMode = mode;
+        ['chat', 'aptitude', 'technical', 'hr'].forEach(function (m) {
+          document.getElementById('pctab-' + m).classList.toggle('active', m === mode);
+        });
+        var showChat = mode === 'chat';
+        document.getElementById('pc-messages').style.display = showChat ? 'flex' : 'none';
+        document.getElementById('pc-chips').style.display = showChat ? 'flex' : 'none';
+        document.getElementById('pc-quiz').style.display = showChat ? 'none' : 'flex';
+        document.getElementById('pc-input-row').style.display = showChat ? 'flex' : 'none';
+        document.getElementById('pc-quiz-header').style.display = 'none';
+        if (!showChat) { pcStartQuiz(mode); } else { pcShowChips(CHIPS.chat); }
+      };
+
+      function pcSend() {
+        var input = document.getElementById('pc-input');
+        var msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+        document.getElementById('pc-send').disabled = true;
+        pcUserMsg(msg);
+        pcShowChips([]);
+        pcHistory.push({ role: 'user', content: msg });
+        var lower = msg.toLowerCase();
+        if (lower.indexOf('aptitude quiz') !== -1 || lower.indexOf('start aptitude') !== -1) { pcSetMode('aptitude'); document.getElementById('pc-send').disabled = false; return; }
+        if (lower.indexOf('technical quiz') !== -1 || lower.indexOf('start technical') !== -1) { pcSetMode('technical'); document.getElementById('pc-send').disabled = false; return; }
+        if (lower.indexOf('hr quiz') !== -1 || lower.indexOf('start hr') !== -1) { pcSetMode('hr'); document.getElementById('pc-send').disabled = false; return; }
+        var typingId = pcShowTyping();
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg, history: pcHistory.slice(-12) })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+          pcRemoveTyping(typingId);
+          var reply = data.reply || data.error || 'Sorry, something went wrong.';
+          pcBotMsg(reply);
+          pcHistory.push({ role: 'assistant', content: reply });
+          pcShowChips(CHIPS[pcMode] || CHIPS.chat);
+          document.getElementById('pc-send').disabled = false;
+        }).catch(function () {
+          pcRemoveTyping(typingId);
+          pcBotMsg('Connection error. Please try again.');
+          document.getElementById('pc-send').disabled = false;
+        });
+      }
+
+      function pcStartQuiz(mode) {
+        var quizEl = document.getElementById('pc-quiz');
+        quizEl.innerHTML = '<div class="pc-loading"><div class="pc-loader"></div>Generating questions with AI...</div>';
+        document.getElementById('pc-quiz-header').style.display = 'none';
+        pcQuizData = []; pcQIndex = 0; pcScore = 0; pcAnswered = false;
+        var configs = {
+          aptitude: { categories: ['Aptitude', 'Logical Reasoning'], subTopics: ['Number Series', 'Time and Work', 'Percentages', 'Data Interpretation'] },
+          technical: { categories: ['Technical', 'Programming'], subTopics: ['Data Structures', 'Algorithms', 'DBMS', 'Operating Systems', 'OOP', 'SQL'] },
+          hr: { categories: ['HR Interview', 'Soft Skills'], subTopics: ['Communication', 'Behavioral Questions', 'Leadership', 'Teamwork'] }
+        };
+        var cfg = configs[mode] || configs.aptitude;
+        fetch('/api/quiz/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categories: cfg.categories, subTopics: cfg.subTopics, questionCount: 10, difficulty: 'mixed' })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+          if (!data.success || !data.questions || !data.questions.length) throw new Error(data.error || 'No questions');
+          pcQuizData = data.questions;
+          pcRenderQuestion();
+        }).catch(function (e) {
+          quizEl.innerHTML = '<div class="pc-loading"><div style="font-size:28px;margin-bottom:8px;">⚠️</div><div style="color:#f43f5e;margin-bottom:12px;">Failed: ' + e.message + '</div><button onclick="pcSetMode(\'' + mode + '\')" style="padding:8px 20px;background:#4f8ef7;color:#fff;border:none;border-radius:8px;cursor:pointer;">Retry</button></div>';
+        });
+      }
+
+      function pcRenderQuestion() {
+        var q = pcQuizData[pcQIndex];
+        if (!q) { pcShowResult(); return; }
+        pcAnswered = false;
+        var quizEl = document.getElementById('pc-quiz');
+        document.getElementById('pc-quiz-header').style.display = 'block';
+        document.getElementById('pc-q-num').textContent = 'Q ' + (pcQIndex + 1) + ' / ' + pcQuizData.length;
+        document.getElementById('pc-q-score').textContent = pcScore;
+        document.getElementById('pc-q-total').textContent = pcQIndex;
+        var optsHtml = '';
+        for (var i = 0; i < q.options.length; i++) {
+          optsHtml += '<button class="pq-opt" id="pqo-' + i + '" data-idx="' + i + '">' + String.fromCharCode(65 + i) + '. ' + q.options[i] + '</button>';
+        }
+        quizEl.innerHTML = '<div class="pq-question"><div class="pq-q-num">Question ' + (pcQIndex + 1) + ' of ' + pcQuizData.length + ' &bull; ' + (q.topic || '') + '</div><div class="pq-q-text">' + q.question + '</div><div class="pq-opts" id="pq-opts">' + optsHtml + '</div></div>';
+        quizEl.scrollTop = 0;
+        // Wire up option clicks
+        var opts = quizEl.querySelectorAll('.pq-opt');
+        for (var j = 0; j < opts.length; j++) {
+          opts[j].addEventListener('click', function () { pcAnswer(parseInt(this.getAttribute('data-idx'))); });
+        }
+      }
+
+      window.pcAnswer = function (idx) {
+        if (pcAnswered) return;
+        pcAnswered = true;
+        var q = pcQuizData[pcQIndex];
+        var correct = q.correctAnswer;
+        var isRight = idx === correct;
+        if (isRight) pcScore++;
+        for (var i = 0; i < q.options.length; i++) {
+          var btn = document.getElementById('pqo-' + i);
+          if (!btn) continue;
+          btn.disabled = true;
+          if (i === correct) btn.classList.add('reveal');
+          if (i === idx && !isRight) btn.classList.add('wrong');
+          if (i === idx && isRight) { btn.classList.remove('reveal'); btn.classList.add('correct'); }
+        }
+        document.getElementById('pc-q-score').textContent = pcScore;
+        document.getElementById('pc-q-total').textContent = pcQIndex + 1;
+        var quizEl = document.getElementById('pc-quiz');
+        var nextDiv = document.createElement('div');
+        nextDiv.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;';
+        var feedback = isRight ? '<span style="color:#22c55e;font-weight:700;">✅ Correct!</span>' : '<span style="color:#f43f5e;font-weight:700;">❌ Wrong</span>';
+        var nextLabel = (pcQIndex + 1 < pcQuizData.length) ? 'Next →' : 'See Results';
+        nextDiv.innerHTML = feedback + '<button onclick="pcNextQ()" style="padding:8px 20px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;">' + nextLabel + '</button>';
+        quizEl.querySelector('.pq-question').appendChild(nextDiv);
+      };
+
+      window.pcNextQ = function () {
+        pcQIndex++;
+        if (pcQIndex >= pcQuizData.length) { pcShowResult(); } else { pcRenderQuestion(); }
+      };
+
+      function pcShowResult() {
+        var quizEl = document.getElementById('pc-quiz');
+        var pct = Math.round((pcScore / pcQuizData.length) * 100);
+        var emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
+        var label = pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good Job!' : pct >= 40 ? 'Keep Practicing' : 'Need More Practice';
+        var clr = pct >= 80 ? '#22c55e' : pct >= 60 ? '#4f8ef7' : pct >= 40 ? '#f59e0b' : '#f43f5e';
+        document.getElementById('pc-quiz-header').style.display = 'none';
+        var modeRef = pcMode;
+        quizEl.innerHTML = '<div class="pq-score-bar"><div style="font-size:40px;margin-bottom:8px;">' + emoji + '</div><div class="pq-score-num">' + pcScore + ' / ' + pcQuizData.length + '</div><div style="font-size:14px;color:' + clr + ';font-weight:700;margin:6px 0;">' + label + ' — ' + pct + '%</div></div><div style="display:flex;flex-direction:column;gap:8px;"><button onclick="pcSetMode(\'' + modeRef + '\')" style="padding:10px;background:linear-gradient(135deg,#4f8ef7,#8b5cf6);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">🔄 Retry Quiz</button><button onclick="pcSetMode(\'chat\')" style="padding:10px;background:#1a2540;color:#e8f0fe;border:1px solid #1e2d48;border-radius:10px;cursor:pointer;font-size:14px;">💬 Back to Chat</button></div>';
+      }
+
+      window.pcChipClick = function (text) {
+        document.getElementById('pc-input').value = text;
+        pcSend();
+      };
+
+      function pcShowChips(chips) {
+        var el = document.getElementById('pc-chips');
+        var html = '';
+        for (var i = 0; i < chips.length; i++) {
+          html += '<div class="pc-chip" onclick="pcChipClick(\'' + chips[i].replace(/'/g, '') + '\')">' + chips[i] + '</div>';
+        }
+        el.innerHTML = html;
+      }
+
+      function pcUserMsg(text) {
+        var el = document.getElementById('pc-messages');
+        var d = document.createElement('div');
+        d.className = 'pc-msg user';
+        d.textContent = text;
+        el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
+      }
+
+      function pcBotMsg(text) {
+        var el = document.getElementById('pc-messages');
+        var d = document.createElement('div');
+        d.className = 'pc-msg bot';
+        var html = text
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+          .replace(/\n/g, '<br>');
+        d.innerHTML = html;
+        el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
+      }
+
+      function pcShowTyping() {
+        var el = document.getElementById('pc-messages');
+        var id = 'pct-' + Date.now();
+        var d = document.createElement('div');
+        d.className = 'pc-typing'; d.id = id;
+        d.innerHTML = '<span></span><span></span><span></span>';
+        el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
+        return id;
+      }
+
+      function pcRemoveTyping(id) {
+        var el = document.getElementById(id);
+        if (el) el.remove();
+      }
+    })();
+  </script>
 
 </body>
+
 </html>

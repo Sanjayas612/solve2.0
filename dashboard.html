@@ -1,1126 +1,1954 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PlacementPro – TPO Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:       #070b14;
-  --surface:  #0d1424;
-  --surface2: #121c30;
-  --surface3: #182236;
-  --border:   #1e2d48;
-  --accent:   #4f8ef7;
-  --accent2:  #00d4aa;
-  --purple:   #8b5cf6;
-  --success:  #22c55e;
-  --warning:  #f59e0b;
-  --danger:   #f43f5e;
-  --text:     #e8f0fe;
-  --text2:    #8da4c8;
-  --text3:    #3d5a80;
-  --grad:     linear-gradient(135deg, #4f8ef7 0%, #00d4aa 100%);
-  --grad2:    linear-gradient(135deg, #8b5cf6 0%, #4f8ef7 100%);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlacementPro – TPO Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b14;
+      --surface: #0d1424;
+      --surface2: #121c30;
+      --surface3: #182236;
+      --border: #1e2d48;
+      --accent: #4f8ef7;
+      --accent2: #00d4aa;
+      --purple: #8b5cf6;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --text: #e8f0fe;
+      --text2: #8da4c8;
+      --text3: #3d5a80;
+      --grad: linear-gradient(135deg, #4f8ef7 0%, #00d4aa 100%);
+      --grad2: linear-gradient(135deg, #8b5cf6 0%, #4f8ef7 100%);
+    }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
-code { font-family: 'JetBrains Mono', monospace; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
 
-@keyframes fadeUp   { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes spin     { to { transform: rotate(360deg); } }
-@keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:.4; } }
-@keyframes shimmer  { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-/* ═══════════ SIDEBAR ═══════════ */
-.sidebar {
-  width: 256px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  position: fixed; top: 0; left: 0; height: 100vh;
-  display: flex; flex-direction: column;
-  overflow-y: auto; z-index: 200;
-  transition: width 0.3s;
-}
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
 
-.sidebar-header {
-  padding: 22px 18px 18px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-}
-.sidebar-header .logo-icon {
-  width: 42px; height: 42px; border-radius: 12px;
-  background: var(--grad);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-}
-.sidebar-header .logo-text h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-.sidebar-header .logo-text span { font-size: 11px; color: var(--text3); }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-.nav-group { padding: 14px 10px 4px; }
-.nav-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); padding: 0 10px; margin-bottom: 4px; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
 
-.nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: 10px;
-  cursor: pointer; font-size: 13.5px; font-weight: 500;
-  color: var(--text2); transition: all 0.18s; margin-bottom: 1px;
-  position: relative;
-}
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); }
-.nav-item.active::before {
-  content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
-  width: 3px; border-radius: 0 3px 3px 0;
-  background: var(--accent);
-}
-.nav-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
-.nav-badge {
-  margin-left: auto; background: var(--danger);
-  color: white; font-size: 10px; font-weight: 700;
-  padding: 2px 6px; border-radius: 20px;
-}
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
-.sidebar-footer {
-  margin-top: auto; padding: 14px 16px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.avatar {
-  width: 34px; height: 34px; border-radius: 10px;
-  background: var(--grad);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px; flex-shrink: 0;
-}
-.user-info .name  { font-size: 13px; font-weight: 600; }
-.user-info .role  { font-size: 11px; color: var(--text3); }
-.logout-btn {
-  margin-left: auto; background: none; border: none;
-  color: var(--text3); cursor: pointer; font-size: 17px;
-  padding: 5px; border-radius: 7px; transition: all 0.2s;
-}
-.logout-btn:hover { background: rgba(244,63,94,0.1); color: var(--danger); }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-/* ═══════════ MAIN CONTENT ═══════════ */
-.main {
-  margin-left: 256px;
-  min-height: 100vh;
-  flex: 1;
-  background: var(--bg);
-}
+    @keyframes slideIn {
+      from {
+        transform: translateX(120%);
+        opacity: 0;
+      }
 
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(7,11,20,0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 62px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.topbar-left h1  { font-size: 17px; font-weight: 700; }
-.topbar-left p   { font-size: 12px; color: var(--text3); margin-top: 1px; }
-.topbar-right    { display: flex; align-items: center; gap: 10px; }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
 
-/* ═══════════ PAGE ═══════════ */
-.page { display: none; padding: 28px 32px; animation: fadeUp 0.35s ease; }
-.page.active { display: block; }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-/* ═══════════ BUTTONS ═══════════ */
-.btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 9px 18px; border-radius: 9px;
-  font-family: inherit; font-size: 13px; font-weight: 600;
-  cursor: pointer; border: none; transition: all 0.18s; white-space: nowrap;
-}
-.btn-primary { background: var(--grad); color: white; }
-.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-.btn-danger  { background: rgba(244,63,94,0.1); color: var(--danger); border: 1px solid rgba(244,63,94,0.2); }
-.btn-success { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
-.btn-purple  { background: rgba(139,92,246,0.12); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
-.btn-sm      { padding: 5px 11px; font-size: 12px; border-radius: 7px; }
-.btn-icon    { padding: 7px; width: 32px; height: 32px; justify-content: center; }
+    @keyframes pulse {
 
-/* ═══════════ STATS ═══════════ */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px; margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
-  position: relative; overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.stat-card:hover { border-color: rgba(79,142,247,0.3); transform: translateY(-2px); }
-.stat-card .accent-line {
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 16px 16px 0 0;
-}
-.stat-card .sc-icon  { font-size: 22px; margin-bottom: 12px; }
-.stat-card .sc-value { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
-.stat-card .sc-label { font-size: 12px; color: var(--text2); margin-top: 6px; }
-.stat-card .sc-sub   { font-size: 11px; color: var(--text3); margin-top: 5px; }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-/* ═══════════ CARDS ═══════════ */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
-  margin-bottom: 20px;
-}
-.card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 10px; }
-.card-title  { font-size: 15px; font-weight: 700; }
-.card-sub    { font-size: 12px; color: var(--text2); margin-top: 3px; }
-.card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+      50% {
+        opacity: .4;
+      }
+    }
 
-/* ═══════════ TABLE ═══════════ */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th {
-  text-align: left; padding: 10px 14px;
-  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px;
-  color: var(--text3); border-bottom: 1px solid var(--border); font-weight: 600;
-}
-tbody tr { border-bottom: 1px solid rgba(30,45,72,0.4); transition: background 0.12s; }
-tbody tr:hover { background: var(--surface2); }
-tbody tr:last-child { border-bottom: none; }
-tbody td { padding: 11px 14px; color: var(--text2); }
-tbody td:first-child { color: var(--text); font-weight: 500; }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
 
-/* ═══════════ BADGES ═══════════ */
-.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.b-blue   { background: rgba(79,142,247,0.12); color: var(--accent); }
-.b-green  { background: rgba(34,197,94,0.12);  color: var(--success); }
-.b-yellow { background: rgba(245,158,11,0.12); color: var(--warning); }
-.b-red    { background: rgba(244,63,94,0.12);  color: var(--danger); }
-.b-purple { background: rgba(139,92,246,0.12); color: var(--purple); }
-.b-cyan   { background: rgba(0,212,170,0.12);  color: var(--accent2); }
+      100% {
+        background-position: 200% 0;
+      }
+    }
 
-/* ═══════════ RANKING ═══════════ */
-.rank { display: inline-block; padding: 2px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-.rank-best    { background: rgba(34,197,94,0.12);  color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
-.rank-better  { background: rgba(79,142,247,0.12); color: var(--accent);  border: 1px solid rgba(79,142,247,0.2); }
-.rank-average { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
+    /* ═══════════ SIDEBAR ═══════════ */
+    .sidebar {
+      width: 256px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 200;
+      transition: width 0.3s;
+    }
 
-/* ═══════════ FORM ═══════════ */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-full  { grid-column: 1 / -1; }
-.field { margin-bottom: 0; }
-.field label {
-  display: block; font-size: 11.5px; color: var(--text2);
-  margin-bottom: 6px; font-weight: 600; letter-spacing: 0.2px;
-}
-.field input,
-.field select,
-.field textarea {
-  width: 100%; padding: 10px 13px;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 9px; color: var(--text);
-  font-family: inherit; font-size: 13px;
-  transition: border-color 0.2s;
-}
-.field input:focus,
-.field select:focus,
-.field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.08); }
-.field textarea { resize: vertical; min-height: 72px; }
-.field select option { background: var(--surface2); }
+    .sidebar-header {
+      padding: 22px 18px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-.checkbox-group { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
-.check-chip {
-  display: flex; align-items: center; gap: 5px; cursor: pointer;
-  font-size: 12px; color: var(--text2); padding: 6px 12px;
-  border-radius: 8px; border: 1px solid var(--border);
-  background: var(--surface2); transition: all 0.15s; user-select: none;
-}
-.check-chip:hover { border-color: var(--accent); color: var(--text); }
-.check-chip input { accent-color: var(--accent); }
-.check-chip.on { background: rgba(79,142,247,0.1); border-color: var(--accent); color: var(--accent); }
+    .sidebar-header .logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
 
-/* ═══════════ SEARCH ═══════════ */
-.search-row { display: flex; gap: 10px; margin-bottom: 16px; }
-.search-input {
-  flex: 1; padding: 9px 14px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 9px; color: var(--text); font-family: inherit; font-size: 13px;
-}
-.search-input:focus { outline: none; border-color: var(--accent); }
-.filter-select {
-  padding: 9px 12px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 9px; color: var(--text2); font-family: inherit; font-size: 12px; cursor: pointer;
-}
+    .sidebar-header .logo-text h2 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
 
-/* ═══════════ DRIVE CARD ═══════════ */
-.drives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 16px; }
-.drive-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 20px;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.drive-card:hover { border-color: rgba(79,142,247,0.3); transform: translateY(-2px); }
-.drive-card .company { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.drive-card .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.chip { font-size: 11px; padding: 4px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text2); }
-.chip strong { color: var(--text); }
-.eligible-pill {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
-  color: var(--success); padding: 5px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600; margin-bottom: 14px;
-}
-.drive-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .sidebar-header .logo-text span {
+      font-size: 11px;
+      color: var(--text3);
+    }
 
-/* ═══════════ MODAL ═══════════ */
-.overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
-  z-index: 500; align-items: center; justify-content: center;
-}
-.overlay.show { display: flex; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; width: 92%; max-width: 620px;
-  max-height: 90vh; overflow-y: auto;
-  padding: 30px; animation: fadeUp 0.3s ease;
-}
-.modal-lg { max-width: 720px; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
-.modal-title  { font-size: 18px; font-weight: 700; }
-.modal-close  { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.modal-close:hover { background: var(--surface2); color: var(--text); }
-.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .nav-group {
+      padding: 14px 10px 4px;
+    }
 
-/* ═══════════ QUESTION BUILDER ═══════════ */
-.q-builder {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px; margin-bottom: 12px;
-  position: relative;
-}
-.q-builder .q-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text3);
+      padding: 0 10px;
+      margin-bottom: 4px;
+    }
 
-/* ═══════════ UPLOAD ZONE ═══════════ */
-.upload-zone {
-  border: 2px dashed var(--border); border-radius: 12px;
-  padding: 36px 24px; text-align: center; cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-.upload-zone:hover { border-color: var(--accent); background: rgba(79,142,247,0.03); }
-.upload-zone .u-icon { font-size: 36px; margin-bottom: 10px; }
-.upload-zone p { color: var(--text2); font-size: 13px; }
-.upload-zone small { color: var(--text3); font-size: 11.5px; margin-top: 4px; display: block; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text2);
+      transition: all 0.18s;
+      margin-bottom: 1px;
+      position: relative;
+    }
 
-/* ═══════════ BAR CHART ═══════════ */
-.bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 110px; padding: 0 4px; }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.bar-fill { width: 100%; border-radius: 5px 5px 0 0; background: var(--grad); min-height: 4px; transition: height 0.7s cubic-bezier(.34,1.4,.64,1); }
-.bar-name { font-size: 10px; color: var(--text3); }
-.bar-num  { font-size: 11px; font-weight: 600; color: var(--text2); }
+    .nav-item:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
 
-/* ═══════════ PROGRESS ═══════════ */
-.prog-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 6px; }
-.prog-fill { height: 100%; background: var(--grad); border-radius: 3px; transition: width 0.6s ease; }
+    .nav-item.active {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
 
-/* ═══════════ TOAST ═══════════ */
-.toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.toast {
-  background: var(--surface); border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: 12px; padding: 13px 16px;
-  min-width: 270px; max-width: 340px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-  animation: slideIn 0.3s ease;
-  pointer-events: all;
-}
-.toast.s { border-left-color: var(--success); }
-.toast.e { border-left-color: var(--danger); }
-.toast.w { border-left-color: var(--warning); }
-.toast-t { font-size: 13px; font-weight: 700; }
-.toast-m { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 20%;
+      bottom: 20%;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--accent);
+    }
 
-/* ═══════════ MISC ═══════════ */
-.loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
-.empty { text-align: center; padding: 52px 24px; color: var(--text3); }
-.empty .e-icon { font-size: 38px; margin-bottom: 12px; }
-.empty p { font-size: 14px; }
-.divider { height: 1px; background: var(--border); margin: 18px 0; }
-.section-gap { margin-bottom: 24px; }
+    .nav-icon {
+      font-size: 15px;
+      width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
 
-.cgpa-high   { color: var(--success); font-weight: 700; }
-.cgpa-mid    { color: var(--text);    font-weight: 700; }
-.cgpa-low    { color: var(--danger);  font-weight: 700; }
-.zero-backlog { color: var(--success); }
-.has-backlog  { color: var(--danger); }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 20px;
+    }
 
-@media (max-width: 900px) {
-  .stats-grid { grid-template-columns: repeat(2,1fr); }
-  .form-grid  { grid-template-columns: 1fr; }
-  .sidebar    { width: 64px; }
-  .sidebar .logo-text, .sidebar .nav-item span:not(.nav-icon), .sidebar-footer .user-info { display: none; }
-  .main       { margin-left: 64px; }
-}
-</style>
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .user-info .name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-info .role {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .logout-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 17px;
+      padding: 5px;
+      border-radius: 7px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+    }
+
+    /* ═══════════ MAIN CONTENT ═══════════ */
+    .main {
+      margin-left: 256px;
+      min-height: 100vh;
+      flex: 1;
+      background: var(--bg);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left h1 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .topbar-left p {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ═══════════ PAGE ═══════════ */
+    .page {
+      display: none;
+      padding: 28px 32px;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ═══════════ BUTTONS ═══════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--grad);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+    }
+
+    .btn-success {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .btn-purple {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--purple);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .btn-sm {
+      padding: 5px 11px;
+      font-size: 12px;
+      border-radius: 7px;
+    }
+
+    .btn-icon {
+      padding: 7px;
+      width: 32px;
+      height: 32px;
+      justify-content: center;
+    }
+
+    /* ═══════════ STATS ═══════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(79, 142, 247, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .stat-card .accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .stat-card .sc-icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card .sc-value {
+      font-size: 30px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .stat-card .sc-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 6px;
+    }
+
+    .stat-card .sc-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 5px;
+    }
+
+    /* ═══════════ CARDS ═══════════ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 3px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════ TABLE ═══════════ */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text3);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(30, 45, 72, 0.4);
+      transition: background 0.12s;
+    }
+
+    tbody tr:hover {
+      background: var(--surface2);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody td {
+      padding: 11px 14px;
+      color: var(--text2);
+    }
+
+    tbody td:first-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ═══════════ BADGES ═══════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .b-blue {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+    }
+
+    .b-green {
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--success);
+    }
+
+    .b-yellow {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--warning);
+    }
+
+    .b-red {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--danger);
+    }
+
+    .b-purple {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--purple);
+    }
+
+    .b-cyan {
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--accent2);
+    }
+
+    /* ═══════════ RANKING ═══════════ */
+    .rank {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .rank-best {
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .rank-better {
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(79, 142, 247, 0.2);
+    }
+
+    .rank-average {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    /* ═══════════ FORM ═══════════ */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-full {
+      grid-column: 1 / -1;
+    }
+
+    .field {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 13px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.08);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .field select option {
+      background: var(--surface2);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .check-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text2);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .check-chip:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .check-chip input {
+      accent-color: var(--accent);
+    }
+
+    .check-chip.on {
+      background: rgba(79, 142, 247, 0.1);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ═══════════ SEARCH ═══════════ */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 9px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .filter-select {
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text2);
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ═══════════ DRIVE CARD ═══════════ */
+    .drives-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .drive-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .drive-card:hover {
+      border-color: rgba(79, 142, 247, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .drive-card .company {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drive-card .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text2);
+    }
+
+    .chip strong {
+      color: var(--text);
+    }
+
+    .eligible-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: var(--success);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .drive-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    /* ═══════════ MODAL ═══════════ */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 92%;
+      max-width: 620px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .modal-lg {
+      max-width: 720px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 18px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ═══════════ QUESTION BUILDER ═══════════ */
+    .q-builder {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .q-builder .q-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ═══════════ UPLOAD ZONE ═══════════ */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent);
+      background: rgba(79, 142, 247, 0.03);
+    }
+
+    .upload-zone .u-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .upload-zone p {
+      color: var(--text2);
+      font-size: 13px;
+    }
+
+    .upload-zone small {
+      color: var(--text3);
+      font-size: 11.5px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ═══════════ BAR CHART ═══════════ */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 110px;
+      padding: 0 4px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bar-fill {
+      width: 100%;
+      border-radius: 5px 5px 0 0;
+      background: var(--grad);
+      min-height: 4px;
+      transition: height 0.7s cubic-bezier(.34, 1.4, .64, 1);
+    }
+
+    .bar-name {
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    .bar-num {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    /* ═══════════ PROGRESS ═══════════ */
+    .prog-bar {
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    /* ═══════════ TOAST ═══════════ */
+    .toast-wrap {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 13px 16px;
+      min-width: 270px;
+      max-width: 340px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.3s ease;
+      pointer-events: all;
+    }
+
+    .toast.s {
+      border-left-color: var(--success);
+    }
+
+    .toast.e {
+      border-left-color: var(--danger);
+    }
+
+    .toast.w {
+      border-left-color: var(--warning);
+    }
+
+    .toast-t {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toast-m {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    /* ═══════════ MISC ═══════════ */
+    .loader {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--text3);
+    }
+
+    .empty .e-icon {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .empty p {
+      font-size: 14px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    .section-gap {
+      margin-bottom: 24px;
+    }
+
+    .cgpa-high {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .cgpa-mid {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cgpa-low {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .zero-backlog {
+      color: var(--success);
+    }
+
+    .has-backlog {
+      color: var(--danger);
+    }
+
+    @media (max-width: 900px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        width: 64px;
+      }
+
+      .sidebar .logo-text,
+      .sidebar .nav-item span:not(.nav-icon),
+      .sidebar-footer .user-info {
+        display: none;
+      }
+
+      .main {
+        margin-left: 64px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- TOAST -->
-<div class="toast-wrap" id="toasts"></div>
+  <!-- TOAST -->
+  <div class="toast-wrap" id="toasts"></div>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sidebar-header">
-    <div class="logo-icon">🎓</div>
-    <div class="logo-text">
-      <h2>PlacementPro</h2>
-      <span>TPO Dashboard</span>
-    </div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Overview</div>
-    <div class="nav-item active" onclick="go('overview')">
-      <span class="nav-icon">📊</span><span>Overview</span>
-    </div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Management</div>
-    <div class="nav-item" onclick="go('students')">
-      <span class="nav-icon">👥</span><span>Students</span>
-    </div>
-    <div class="nav-item" onclick="go('drives')">
-      <span class="nav-icon">🏢</span><span>Placement Drives</span>
-    </div>
-    <div class="nav-item" onclick="go('assessments')">
-      <span class="nav-icon">📝</span><span>Assessments</span>
-    </div>
-    <div class="nav-item" onclick="go('assignment-monitor')">
-      <span class="nav-icon">🎯</span><span>Assignment Monitor</span>
-    </div>
-    <div class="nav-item" onclick="go('shortlist')">
-      <span class="nav-icon">⭐</span><span>Shortlisting</span>
-    </div>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-group-label">Tools</div>
-    <div class="nav-item" onclick="showOverlay('import-overlay')">
-      <span class="nav-icon">📂</span><span>Import CSV</span>
-    </div>
-  </div>
-
-  <div class="sidebar-footer">
-    <div class="avatar">T</div>
-    <div class="user-info">
-      <div class="name">TPO Admin</div>
-      <div class="role">Administrator</div>
-    </div>
-    <button class="logout-btn" onclick="logout()" title="Logout">⇤</button>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <h1 id="page-title">Overview</h1>
-      <p id="page-sub">Welcome back, TPO Admin</p>
-    </div>
-    <div class="topbar-right">
-      <button class="btn btn-outline btn-sm" onclick="refreshCurrent()">↻ Refresh</button>
-    </div>
-  </div>
-
-  <!-- ══════ PAGE: OVERVIEW ══════ -->
-  <div class="page active" id="page-overview">
-
-    <div class="stats-grid" id="stat-cards">
-      <div class="stat-card">
-        <div class="accent-line" style="background:var(--grad)"></div>
-        <div class="sc-icon">👥</div>
-        <div class="sc-value" id="st-students">—</div>
-        <div class="sc-label">Total Students</div>
-        <div class="sc-sub" id="st-students-sub">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:var(--grad2)"></div>
-        <div class="sc-icon">🏢</div>
-        <div class="sc-value" id="st-drives">—</div>
-        <div class="sc-label">Placement Drives</div>
-        <div class="sc-sub" id="st-drives-sub">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
-        <div class="sc-icon">⭐</div>
-        <div class="sc-value" id="st-shortlisted">—</div>
-        <div class="sc-label">Shortlisted</div>
-        <div class="sc-sub">students ranked</div>
-      </div>
-      <div class="stat-card">
-        <div class="accent-line" style="background:linear-gradient(135deg,#8b5cf6,#f43f5e)"></div>
-        <div class="sc-icon">📝</div>
-        <div class="sc-value" id="st-assessments">—</div>
-        <div class="sc-label">Assessments</div>
-        <div class="sc-sub" id="st-assessments-sub">—</div>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">🎓</div>
+      <div class="logo-text">
+        <h2>PlacementPro</h2>
+        <span>TPO Dashboard</span>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="section-gap">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item active" onclick="go('overview')">
+        <span class="nav-icon">📊</span><span>Overview</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Management</div>
+      <div class="nav-item" onclick="go('students')">
+        <span class="nav-icon">👥</span><span>Students</span>
+      </div>
+      <div class="nav-item" onclick="go('drives')">
+        <span class="nav-icon">🏢</span><span>Placement Drives</span>
+      </div>
+      <div class="nav-item" onclick="go('assessments')">
+        <span class="nav-icon">📝</span><span>Assessments</span>
+      </div>
+      <div class="nav-item" onclick="go('assignment-monitor')">
+        <span class="nav-icon">🎯</span><span>Assignment Monitor</span>
+      </div>
+      <div class="nav-item" onclick="go('shortlist')">
+        <span class="nav-icon">⭐</span><span>Shortlisting</span>
+      </div>
+      <div class="nav-item" onclick="go('alumni-groups')">
+        <span class="nav-icon">🤝</span><span>Alumni Groups</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Tools</div>
+      <div class="nav-item" onclick="showOverlay('import-overlay')">
+        <span class="nav-icon">📂</span><span>Import CSV</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">T</div>
+      <div class="user-info">
+        <div class="name">TPO Admin</div>
+        <div class="role">Administrator</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">⇤</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="page-title">Overview</h1>
+        <p id="page-sub">Welcome back, TPO Admin</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="refreshCurrent()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- ══════ PAGE: OVERVIEW ══════ -->
+    <div class="page active" id="page-overview">
+
+      <div class="stats-grid" id="stat-cards">
+        <div class="stat-card">
+          <div class="accent-line" style="background:var(--grad)"></div>
+          <div class="sc-icon">👥</div>
+          <div class="sc-value" id="st-students">—</div>
+          <div class="sc-label">Total Students</div>
+          <div class="sc-sub" id="st-students-sub">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:var(--grad2)"></div>
+          <div class="sc-icon">🏢</div>
+          <div class="sc-value" id="st-drives">—</div>
+          <div class="sc-label">Placement Drives</div>
+          <div class="sc-sub" id="st-drives-sub">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
+          <div class="sc-icon">⭐</div>
+          <div class="sc-value" id="st-shortlisted">—</div>
+          <div class="sc-label">Shortlisted</div>
+          <div class="sc-sub">students ranked</div>
+        </div>
+        <div class="stat-card">
+          <div class="accent-line" style="background:linear-gradient(135deg,#8b5cf6,#f43f5e)"></div>
+          <div class="sc-icon">📝</div>
+          <div class="sc-value" id="st-assessments">—</div>
+          <div class="sc-label">Assessments</div>
+          <div class="sc-sub" id="st-assessments-sub">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="section-gap">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Branch Distribution</div>
+              <div class="card-sub">Students per department</div>
+            </div>
+          </div>
+          <div class="bar-chart" id="branch-chart">
+            <div class="empty">
+              <div class="e-icon">📊</div>
+              <p>Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Drives</div>
+              <div class="card-sub">Latest placement activities</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="go('drives')">View All →</button>
+          </div>
+          <div id="recent-drives"></div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Branch Distribution</div>
-            <div class="card-sub">Students per department</div>
+            <div class="card-title">CGPA Distribution</div>
+            <div class="card-sub">Academic performance breakdown</div>
           </div>
         </div>
-        <div class="bar-chart" id="branch-chart"><div class="empty"><div class="e-icon">📊</div><p>Loading...</p></div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Recent Drives</div>
-            <div class="card-sub">Latest placement activities</div>
-          </div>
-          <button class="btn btn-outline btn-sm" onclick="go('drives')">View All →</button>
-        </div>
-        <div id="recent-drives"></div>
+        <div id="cgpa-dist"></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">CGPA Distribution</div>
-          <div class="card-sub">Academic performance breakdown</div>
-        </div>
-      </div>
-      <div id="cgpa-dist"></div>
-    </div>
-  </div>
-
-  <!-- ══════ PAGE: STUDENTS ══════ -->
-  <div class="page" id="page-students">
-    <div class="search-row" style="margin-bottom:16px;">
-      <input class="search-input" type="text" placeholder="🔍  Search name, USN, branch..." oninput="filterStudents(this.value)" id="stu-search">
-      <select class="filter-select" onchange="filterByBranch(this.value)">
-        <option value="">All Branches</option>
-        <option>CSE</option><option>ECE</option><option>ME</option>
-        <option>CE</option><option>EEE</option><option>ISE</option>
-      </select>
-      <select class="filter-select" onchange="filterByYear(this.value)">
-        <option value="">All Years</option>
-        <option value="1">Year 1</option><option value="2">Year 2</option>
-        <option value="3">Year 3</option><option value="4">Year 4</option>
-      </select>
-      <button class="btn btn-outline btn-sm" onclick="showOverlay('import-overlay')">📂 Import CSV</button>
-      <button class="btn btn-primary btn-sm" onclick="showOverlay('add-student-overlay')">+ Add Student</button>
-    </div>
-
-    <div class="card" style="margin-bottom:0;">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>USN</th>
-              <th>Branch</th>
-              <th>Year</th>
-              <th>CGPA</th>
-              <th>Backlogs</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="students-table"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════ PAGE: DRIVES ══════ -->
-  <div class="page" id="page-drives">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-      <button class="btn btn-primary" onclick="showOverlay('add-drive-overlay')">+ Create Drive</button>
-    </div>
-    <div class="drives-grid" id="drives-grid"></div>
-  </div>
-
-  <!-- ══════ PAGE: ASSESSMENTS ══════ -->
-  <div class="page" id="page-assessments">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-      <div>
-        <div style="font-size:15px;font-weight:700;">Assessments & AI Quiz Generator</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px;">Create manually or auto-generate with AI from best-in-class question banks</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-purple btn-sm" onclick="showOverlay('ai-quiz-overlay')">🤖 Generate with AI</button>
-        <button class="btn btn-primary" onclick="openAssessmentModal()">+ Create Manually</button>
-      </div>
-    </div>
-    <div id="assessments-list"></div>
-  </div>
-
-  <!-- ══════ PAGE: ASSIGNMENT MONITOR ══════ -->
-  <div class="page" id="page-assignment-monitor">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-      <div>
-        <div style="font-size:15px;font-weight:700;">📊 Assignment Monitor</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px;">Live view of student assignment status and malpractice flags</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select class="filter-select" id="monitor-assessment-filter" onchange="loadMonitor()">
-          <option value="">All Assessments</option>
+    <!-- ══════ PAGE: STUDENTS ══════ -->
+    <div class="page" id="page-students">
+      <div class="search-row" style="margin-bottom:16px;">
+        <input class="search-input" type="text" placeholder="🔍  Search name, USN, branch..."
+          oninput="filterStudents(this.value)" id="stu-search">
+        <select class="filter-select" onchange="filterByBranch(this.value)">
+          <option value="">All Branches</option>
+          <option>CSE</option>
+          <option>ECE</option>
+          <option>ME</option>
+          <option>CE</option>
+          <option>EEE</option>
+          <option>ISE</option>
         </select>
-        <button class="btn btn-outline btn-sm" onclick="loadMonitor()">↻ Refresh</button>
+        <select class="filter-select" onchange="filterByYear(this.value)">
+          <option value="">All Years</option>
+          <option value="1">Year 1</option>
+          <option value="2">Year 2</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="showOverlay('import-overlay')">📂 Import CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="showOverlay('add-student-overlay')">+ Add Student</button>
+      </div>
+
+      <div class="card" style="margin-bottom:0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>USN</th>
+                <th>Branch</th>
+                <th>Year</th>
+                <th>CGPA</th>
+                <th>Backlogs</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-table"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Stats row -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;" id="monitor-stats">
-      <div class="stat-card" style="padding:16px;">
-        <div class="accent-line" style="background:var(--grad)"></div>
-        <div class="sc-icon">🎯</div>
-        <div class="sc-value" id="ms-total">—</div>
-        <div class="sc-label">Total Attempts</div>
+    <!-- ══════ PAGE: DRIVES ══════ -->
+    <div class="page" id="page-drives">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="showOverlay('add-drive-overlay')">+ Create Drive</button>
       </div>
-      <div class="stat-card" style="padding:16px;">
-        <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
-        <div class="sc-icon">✅</div>
-        <div class="sc-value" id="ms-submitted">—</div>
-        <div class="sc-label">Submitted</div>
-      </div>
-      <div class="stat-card" style="padding:16px;">
-        <div class="accent-line" style="background:linear-gradient(135deg,#f59e0b,#f43f5e)"></div>
-        <div class="sc-icon">⚠️</div>
-        <div class="sc-value" id="ms-inprogress">—</div>
-        <div class="sc-label">In Progress</div>
-      </div>
-      <div class="stat-card" style="padding:16px;">
-        <div class="accent-line" style="background:var(--danger)"></div>
-        <div class="sc-icon">🚨</div>
-        <div class="sc-value" id="ms-malpractice">—</div>
-        <div class="sc-label">Malpractice</div>
-      </div>
+      <div class="drives-grid" id="drives-grid"></div>
     </div>
 
-    <!-- Malpractice alerts -->
-    <div id="malpractice-alerts"></div>
-
-    <!-- Attempts table -->
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-header">
-        <div class="card-title">Student Attempts</div>
+    <!-- ══════ PAGE: ASSESSMENTS ══════ -->
+    <div class="page" id="page-assessments">
+      <div
+        style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;">Assessments & AI Quiz Generator</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">Create manually or auto-generate with AI from
+            best-in-class question banks</div>
+        </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn btn-outline btn-sm" onclick="filterMonitor('all')" id="mf-all">All</button>
-          <button class="btn btn-outline btn-sm" onclick="filterMonitor('in-progress')" id="mf-inprog">In Progress</button>
-          <button class="btn btn-outline btn-sm" onclick="filterMonitor('submitted')" id="mf-sub">Submitted</button>
-          <button class="btn btn-danger btn-sm" onclick="filterMonitor('malpractice')" id="mf-mal">🚨 Malpractice</button>
+          <button class="btn btn-purple btn-sm" onclick="showOverlay('ai-quiz-overlay')">🤖 Generate with AI</button>
+          <button class="btn btn-primary" onclick="openAssessmentModal()">+ Create Manually</button>
         </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Student</th><th>USN</th><th>Assessment</th><th>Status</th><th>Score</th><th>Warnings</th><th>Started At</th><th>Events</th></tr>
-          </thead>
-          <tbody id="monitor-table"></tbody>
-        </table>
-      </div>
+      <div id="assessments-list"></div>
     </div>
-  </div>
 
-  <!-- ══════ PAGE: SHORTLIST ══════ -->
-  <div class="page" id="page-shortlist">
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-header">
+    <!-- ══════ PAGE: ASSIGNMENT MONITOR ══════ -->
+    <div class="page" id="page-assignment-monitor">
+      <div
+        style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
         <div>
-          <div class="card-title">Select Drive to Preview Rankings</div>
-          <div class="card-sub">Students are ranked by CGPA × 10 + assessment score × 30</div>
+          <div style="font-size:15px;font-weight:700;">📊 Assignment Monitor</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">Live view of student assignment status and
+            malpractice flags</div>
         </div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <select class="search-input" style="max-width:360px;" id="shortlist-select" onchange="previewShortlist()">
-          <option value="">— Choose a drive —</option>
-        </select>
-        <button class="btn btn-success btn-sm" onclick="confirmShortlist()" id="confirm-btn" style="display:none;">⭐ Confirm & Notify Students</button>
-      </div>
-    </div>
-    <div id="shortlist-table"></div>
-  </div>
-
-</div><!-- /main -->
-
-<!-- ══════════════════════ OVERLAYS ══════════════════════ -->
-
-<!-- Add Student -->
-<div class="overlay" id="add-student-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Add New Student</div>
-      <button class="modal-close" onclick="closeOverlay('add-student-overlay')">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="field"><label>Full Name *</label><input type="text" id="sn-name" placeholder="e.g. Rahul Sharma"></div>
-      <div class="field"><label>USN *</label><input type="text" id="sn-usn" placeholder="1MS21CS001"></div>
-      <div class="field"><label>Branch *</label>
-        <select id="sn-branch"><option>CSE</option><option>ECE</option><option>ME</option><option>CE</option><option>EEE</option><option>ISE</option></select>
-      </div>
-      <div class="field"><label>Year *</label>
-        <select id="sn-year"><option value="1">Year 1</option><option value="2">Year 2</option><option value="3">Year 3</option><option value="4" selected>Year 4</option></select>
-      </div>
-      <div class="field"><label>CGPA *</label><input type="number" id="sn-cgpa" step="0.01" min="0" max="10" placeholder="8.50"></div>
-      <div class="field"><label>Backlogs</label><input type="number" id="sn-backlogs" value="0" min="0"></div>
-      <div class="field"><label>Email</label><input type="email" id="sn-email" placeholder="rahul@example.com"></div>
-      <div class="field"><label>Phone</label><input type="text" id="sn-phone" placeholder="9876543210"></div>
-      <div class="field form-full"><label>Password (default: student123)</label><input type="text" id="sn-pass" placeholder="student123"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeOverlay('add-student-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
-    </div>
-  </div>
-</div>
-
-<!-- Import CSV -->
-<div class="overlay" id="import-overlay">
-  <div class="modal" style="max-width:480px;">
-    <div class="modal-header">
-      <div class="modal-title">Import Students from CSV</div>
-      <button class="modal-close" onclick="closeOverlay('import-overlay')">✕</button>
-    </div>
-    <div class="upload-zone" onclick="document.getElementById('csv-input').click()">
-      <div class="u-icon">📁</div>
-      <p>Click to upload CSV file</p>
-      <small>Required columns: Name, USN, Branch, Year, CGPA, Backlogs</small>
-    </div>
-    <input type="file" id="csv-input" accept=".csv" style="display:none;" onchange="importCSV(this)">
-    <div id="import-result" style="margin-top:14px;"></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeOverlay('import-overlay')">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Create Drive -->
-<div class="overlay" id="add-drive-overlay">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title">Create Placement Drive</div>
-      <button class="modal-close" onclick="closeOverlay('add-drive-overlay')">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="field"><label>Company Name *</label><input type="text" id="dr-company" placeholder="e.g. Infosys"></div>
-      <div class="field"><label>Package (LPA)</label><input type="text" id="dr-package" placeholder="e.g. 8–12 LPA"></div>
-      <div class="field"><label>Minimum CGPA *</label><input type="number" id="dr-cgpa" step="0.1" min="0" max="10" value="6.0"></div>
-      <div class="field"><label>Max Backlogs Allowed</label><input type="number" id="dr-backlogs" value="0" min="0"></div>
-      <div class="field"><label>Drive Date</label><input type="date" id="dr-date"></div>
-      <div class="field"><label>Location</label><input type="text" id="dr-location" placeholder="e.g. Bangalore"></div>
-
-      <div class="field form-full">
-        <label>Eligible Branches</label>
-        <div class="checkbox-group" id="dr-branches">
-          <label class="check-chip"><input type="checkbox" value="CSE"> CSE</label>
-          <label class="check-chip"><input type="checkbox" value="ECE"> ECE</label>
-          <label class="check-chip"><input type="checkbox" value="ME">  ME</label>
-          <label class="check-chip"><input type="checkbox" value="CE">  CE</label>
-          <label class="check-chip"><input type="checkbox" value="EEE"> EEE</label>
-          <label class="check-chip"><input type="checkbox" value="ISE"> ISE</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select class="filter-select" id="monitor-assessment-filter" onchange="loadMonitor()">
+            <option value="">All Assessments</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="loadMonitor()">↻ Refresh</button>
         </div>
       </div>
 
-      <div class="field form-full">
-        <label>Eligible Year</label>
-        <div class="checkbox-group">
-          <label class="check-chip"><input type="checkbox" value="1"> Year 1</label>
-          <label class="check-chip"><input type="checkbox" value="2"> Year 2</label>
-          <label class="check-chip"><input type="checkbox" value="3"> Year 3</label>
-          <label class="check-chip" style="background:rgba(79,142,247,0.1);border-color:var(--accent);color:var(--accent);"><input type="checkbox" value="4" checked> Year 4</label>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;" id="monitor-stats">
+        <div class="stat-card" style="padding:16px;">
+          <div class="accent-line" style="background:var(--grad)"></div>
+          <div class="sc-icon">🎯</div>
+          <div class="sc-value" id="ms-total">—</div>
+          <div class="sc-label">Total Attempts</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="accent-line" style="background:linear-gradient(135deg,#22c55e,#00d4aa)"></div>
+          <div class="sc-icon">✅</div>
+          <div class="sc-value" id="ms-submitted">—</div>
+          <div class="sc-label">Submitted</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="accent-line" style="background:linear-gradient(135deg,#f59e0b,#f43f5e)"></div>
+          <div class="sc-icon">⚠️</div>
+          <div class="sc-value" id="ms-inprogress">—</div>
+          <div class="sc-label">In Progress</div>
+        </div>
+        <div class="stat-card" style="padding:16px;">
+          <div class="accent-line" style="background:var(--danger)"></div>
+          <div class="sc-icon">🚨</div>
+          <div class="sc-value" id="ms-malpractice">—</div>
+          <div class="sc-label">Malpractice</div>
         </div>
       </div>
 
-      <div class="field form-full">
-        <label>Description</label>
-        <textarea id="dr-desc" placeholder="Brief about the company, role, selection process..."></textarea>
+      <!-- Malpractice alerts -->
+      <div id="malpractice-alerts"></div>
+
+      <!-- Attempts table -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-header">
+          <div class="card-title">Student Attempts</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="filterMonitor('all')" id="mf-all">All</button>
+            <button class="btn btn-outline btn-sm" onclick="filterMonitor('in-progress')" id="mf-inprog">In
+              Progress</button>
+            <button class="btn btn-outline btn-sm" onclick="filterMonitor('submitted')" id="mf-sub">Submitted</button>
+            <button class="btn btn-danger btn-sm" onclick="filterMonitor('malpractice')" id="mf-mal">🚨
+              Malpractice</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>USN</th>
+                <th>Assessment</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Warnings</th>
+                <th>Started At</th>
+                <th>Events</th>
+              </tr>
+            </thead>
+            <tbody id="monitor-table"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div id="eligible-preview-box" style="display:none;margin-top:12px;">
-      <div class="eligible-pill" style="font-size:13px;">
-        👥 <span id="eligible-num">0</span> students match this criteria
+    <!-- ══════ PAGE: SHORTLIST ══════ -->
+    <div class="page" id="page-shortlist">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Select Drive to Preview Rankings</div>
+            <div class="card-sub">Students are ranked by CGPA × 10 + assessment score × 30</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <select class="search-input" style="max-width:360px;" id="shortlist-select" onchange="previewShortlist()">
+            <option value="">— Choose a drive —</option>
+          </select>
+          <button class="btn btn-success btn-sm" onclick="confirmShortlist()" id="confirm-btn" style="display:none;">⭐
+            Confirm & Notify Students</button>
+        </div>
+      </div>
+      <div id="shortlist-table"></div>
+    </div>
+
+    <!-- ══════ PAGE: ALUMNI GROUPS ══════ -->
+    <div class="page" id="page-alumni-groups">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;">Alumni Groups Management</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">Monitor and manage alumni connect groups</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="loadAlumniGroups()">↻ Refresh</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Group Name</th>
+                <th>Company</th>
+                <th>Members</th>
+                <th>Created By</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="alumni-groups-table"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="previewEligible()">👁 Preview Eligible</button>
-      <button class="btn btn-outline" onclick="closeOverlay('add-drive-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="createDrive()">Create Drive</button>
+  </div><!-- /main -->
+
+  <!-- ══════════════════════ OVERLAYS ══════════════════════ -->
+
+  <!-- Add Student -->
+  <div class="overlay" id="add-student-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add New Student</div>
+        <button class="modal-close" onclick="closeOverlay('add-student-overlay')">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Full Name *</label><input type="text" id="sn-name" placeholder="e.g. Rahul Sharma">
+        </div>
+        <div class="field"><label>USN *</label><input type="text" id="sn-usn" placeholder="1MS21CS001"></div>
+        <div class="field"><label>Branch *</label>
+          <select id="sn-branch">
+            <option>CSE</option>
+            <option>ECE</option>
+            <option>ME</option>
+            <option>CE</option>
+            <option>EEE</option>
+            <option>ISE</option>
+          </select>
+        </div>
+        <div class="field"><label>Year *</label>
+          <select id="sn-year">
+            <option value="1">Year 1</option>
+            <option value="2">Year 2</option>
+            <option value="3">Year 3</option>
+            <option value="4" selected>Year 4</option>
+          </select>
+        </div>
+        <div class="field"><label>CGPA *</label><input type="number" id="sn-cgpa" step="0.01" min="0" max="10"
+            placeholder="8.50"></div>
+        <div class="field"><label>Backlogs</label><input type="number" id="sn-backlogs" value="0" min="0"></div>
+        <div class="field"><label>Email</label><input type="email" id="sn-email" placeholder="rahul@example.com"></div>
+        <div class="field"><label>Phone</label><input type="text" id="sn-phone" placeholder="9876543210"></div>
+        <div class="field form-full"><label>Password (default: student123)</label><input type="text" id="sn-pass"
+            placeholder="student123"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeOverlay('add-student-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="addStudent()">Add Student</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Create Assessment -->
-<div class="overlay" id="add-assessment-overlay">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title">Create Assessment</div>
-      <button class="modal-close" onclick="closeOverlay('add-assessment-overlay')">✕</button>
-    </div>
-    <div class="form-grid" style="margin-bottom:16px;">
-      <div class="field"><label>Assessment Title *</label><input type="text" id="as-title" placeholder="e.g. TCS Aptitude Round 1"></div>
-      <div class="field"><label>Type *</label>
-        <select id="as-type"><option>Aptitude</option><option>Technical</option><option>Coding</option></select>
+  <!-- Import CSV -->
+  <div class="overlay" id="import-overlay">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <div class="modal-title">Import Students from CSV</div>
+        <button class="modal-close" onclick="closeOverlay('import-overlay')">✕</button>
       </div>
-      <div class="field"><label>Time Limit (minutes)</label><input type="number" id="as-time" value="30" min="5"></div>
-      <div class="field"><label>Linked Drive (optional)</label>
-        <select id="as-drive"><option value="">None</option></select>
+      <div class="upload-zone" onclick="document.getElementById('csv-input').click()">
+        <div class="u-icon">📁</div>
+        <p>Click to upload CSV file</p>
+        <small>Required columns: Name, USN, Branch, Year, CGPA, Backlogs</small>
       </div>
-    </div>
-
-    <div class="divider"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div style="font-size:13px;font-weight:700;">Questions</div>
-      <button class="btn btn-outline btn-sm" onclick="addQ()">+ Add Question</button>
-    </div>
-    <div id="q-container"></div>
-
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeOverlay('add-assessment-overlay')">Cancel</button>
-      <button class="btn btn-primary" onclick="createAssessment()">Create Assessment</button>
+      <input type="file" id="csv-input" accept=".csv" style="display:none;" onchange="importCSV(this)">
+      <div id="import-result" style="margin-top:14px;"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeOverlay('import-overlay')">Close</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- AI Quiz Generator -->
-<div class="overlay" id="ai-quiz-overlay">
-  <div class="modal" style="max-width:700px;">
-    <div class="modal-header">
-      <div class="modal-title">🤖 AI Quiz Generator</div>
-      <button class="modal-close" onclick="closeOverlay('ai-quiz-overlay')">✕</button>
-    </div>
-
-    <div class="form-grid" style="margin-bottom:16px;">
-      <div class="field"><label>Assessment Title *</label><input type="text" id="ai-title" placeholder="e.g. TCS Technical Round 1"></div>
-      <div class="field"><label>Time Limit (minutes)</label><input type="number" id="ai-time" value="30" min="5"></div>
-      <div class="field"><label>Number of Questions</label>
-        <select id="ai-qcount">
-          <option value="5">5 Questions</option>
-          <option value="10" selected>10 Questions</option>
-          <option value="15">15 Questions</option>
-          <option value="20">20 Questions</option>
-          <option value="25">25 Questions</option>
-        </select>
+  <!-- Create Drive -->
+  <div class="overlay" id="add-drive-overlay">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">Create Placement Drive</div>
+        <button class="modal-close" onclick="closeOverlay('add-drive-overlay')">✕</button>
       </div>
-      <div class="field"><label>Difficulty Level</label>
-        <select id="ai-difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium" selected>Medium</option>
-          <option value="hard">Hard</option>
-          <option value="mixed">Mixed (Recommended)</option>
-        </select>
+      <div class="form-grid">
+        <div class="field"><label>Company Name *</label><input type="text" id="dr-company" placeholder="e.g. Infosys">
+        </div>
+        <div class="field"><label>Package (LPA)</label><input type="text" id="dr-package" placeholder="e.g. 8–12 LPA">
+        </div>
+        <div class="field"><label>Minimum CGPA *</label><input type="number" id="dr-cgpa" step="0.1" min="0" max="10"
+            value="6.0"></div>
+        <div class="field"><label>Max Backlogs Allowed</label><input type="number" id="dr-backlogs" value="0" min="0">
+        </div>
+        <div class="field"><label>Drive Date</label><input type="date" id="dr-date"></div>
+        <div class="field"><label>Location</label><input type="text" id="dr-location" placeholder="e.g. Bangalore">
+        </div>
+
+        <div class="field form-full">
+          <label>Eligible Branches</label>
+          <div class="checkbox-group" id="dr-branches">
+            <label class="check-chip"><input type="checkbox" value="CSE"> CSE</label>
+            <label class="check-chip"><input type="checkbox" value="ECE"> ECE</label>
+            <label class="check-chip"><input type="checkbox" value="ME"> ME</label>
+            <label class="check-chip"><input type="checkbox" value="CE"> CE</label>
+            <label class="check-chip"><input type="checkbox" value="EEE"> EEE</label>
+            <label class="check-chip"><input type="checkbox" value="ISE"> ISE</label>
+          </div>
+        </div>
+
+        <div class="field form-full">
+          <label>Eligible Year</label>
+          <div class="checkbox-group">
+            <label class="check-chip"><input type="checkbox" value="1"> Year 1</label>
+            <label class="check-chip"><input type="checkbox" value="2"> Year 2</label>
+            <label class="check-chip"><input type="checkbox" value="3"> Year 3</label>
+            <label class="check-chip"
+              style="background:rgba(79,142,247,0.1);border-color:var(--accent);color:var(--accent);"><input
+                type="checkbox" value="4" checked> Year 4</label>
+          </div>
+        </div>
+
+        <div class="field form-full">
+          <label>Description</label>
+          <textarea id="dr-desc" placeholder="Brief about the company, role, selection process..."></textarea>
+        </div>
       </div>
-      <div class="field"><label>Linked Drive (optional)</label>
-        <select id="ai-drive"><option value="">None</option></select>
+
+      <div id="eligible-preview-box" style="display:none;margin-top:12px;">
+        <div class="eligible-pill" style="font-size:13px;">
+          👥 <span id="eligible-num">0</span> students match this criteria
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="previewEligible()">👁 Preview Eligible</button>
+        <button class="btn btn-outline" onclick="closeOverlay('add-drive-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="createDrive()">Create Drive</button>
       </div>
     </div>
+  </div>
 
-    <div class="divider"></div>
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📚 Select Categories</div>
-    <div class="checkbox-group" id="ai-categories" style="margin-bottom:16px;">
-      <label class="check-chip"><input type="checkbox" name="cat" value="Aptitude"> 🧮 Aptitude</label>
-      <label class="check-chip"><input type="checkbox" name="cat" value="Logical Reasoning"> 🧠 Logical Reasoning</label>
-      <label class="check-chip"><input type="checkbox" name="cat" value="Verbal Ability"> 📖 Verbal Ability</label>
-      <label class="check-chip"><input type="checkbox" name="cat" value="Technical"> 💻 Technical</label>
-      <label class="check-chip"><input type="checkbox" name="cat" value="Managerial"> 👔 Managerial</label>
-      <label class="check-chip"><input type="checkbox" name="cat" value="HR Interview"> 🎤 HR Interview</label>
-    </div>
+  <!-- Create Assessment -->
+  <div class="overlay" id="add-assessment-overlay">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">Create Assessment</div>
+        <button class="modal-close" onclick="closeOverlay('add-assessment-overlay')">✕</button>
+      </div>
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field"><label>Assessment Title *</label><input type="text" id="as-title"
+            placeholder="e.g. TCS Aptitude Round 1"></div>
+        <div class="field"><label>Type *</label>
+          <select id="as-type">
+            <option>Aptitude</option>
+            <option>Technical</option>
+            <option>Coding</option>
+          </select>
+        </div>
+        <div class="field"><label>Time Limit (minutes)</label><input type="number" id="as-time" value="30" min="5">
+        </div>
+        <div class="field"><label>Linked Drive (optional)</label>
+          <select id="as-drive">
+            <option value="">None</option>
+          </select>
+        </div>
+      </div>
 
-    <div id="ai-subtopics-wrap" style="margin-bottom:16px;"></div>
-
-    <div id="ai-preview-wrap" style="display:none;">
       <div class="divider"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:13px;font-weight:700;">✨ Generated Questions Preview</div>
-        <button class="btn btn-outline btn-sm" onclick="regenerateQuiz()">🔄 Regenerate</button>
+        <div style="font-size:13px;font-weight:700;">Questions</div>
+        <button class="btn btn-outline btn-sm" onclick="addQ()">+ Add Question</button>
       </div>
-      <div id="ai-questions-preview"></div>
-    </div>
+      <div id="q-container"></div>
 
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeOverlay('ai-quiz-overlay')">Cancel</button>
-      <button class="btn btn-purple" id="ai-gen-btn" onclick="generateAIQuiz()">🤖 Generate Questions</button>
-      <button class="btn btn-primary" id="ai-save-btn" style="display:none;" onclick="saveAIAssessment()">💾 Save Assessment</button>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeOverlay('add-assessment-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="createAssessment()">Create Assessment</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-// ═══════════ API HELPER ═══════════
-const api = async (method, url, body) => {
-  const opts = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) opts.body = JSON.stringify(body);
-  try {
-    const res = await fetch(url, opts);
-    return res.json();
-  } catch(e) {
-    return { error: e.message };
-  }
-};
+  <!-- AI Quiz Generator -->
+  <div class="overlay" id="ai-quiz-overlay">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <div class="modal-title">🤖 AI Quiz Generator</div>
+        <button class="modal-close" onclick="closeOverlay('ai-quiz-overlay')">✕</button>
+      </div>
 
-// ═══════════ TOAST ═══════════
-function toast(title, msg, type = '') {
-  const w = document.getElementById('toasts');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = `<div class="toast-t">${title}</div>${msg ? `<div class="toast-m">${msg}</div>` : ''}`;
-  w.appendChild(t);
-  setTimeout(() => { t.style.cssText = 'opacity:0;transform:translateX(110%);transition:.3s'; setTimeout(() => t.remove(), 300); }, 4000);
-}
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field"><label>Assessment Title *</label><input type="text" id="ai-title"
+            placeholder="e.g. TCS Technical Round 1"></div>
+        <div class="field"><label>Time Limit (minutes)</label><input type="number" id="ai-time" value="30" min="5">
+        </div>
+        <div class="field"><label>Number of Questions</label>
+          <select id="ai-qcount">
+            <option value="5">5 Questions</option>
+            <option value="10" selected>10 Questions</option>
+            <option value="15">15 Questions</option>
+            <option value="20">20 Questions</option>
+            <option value="25">25 Questions</option>
+          </select>
+        </div>
+        <div class="field"><label>Difficulty Level</label>
+          <select id="ai-difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="mixed">Mixed (Recommended)</option>
+          </select>
+        </div>
+        <div class="field"><label>Linked Drive (optional)</label>
+          <select id="ai-drive">
+            <option value="">None</option>
+          </select>
+        </div>
+      </div>
 
-// ═══════════ NAV ═══════════
-const pageMeta = {
-  overview:            { title: 'Overview',             sub: 'Campus placement summary' },
-  students:            { title: 'Student Database',     sub: 'Manage all student records' },
-  drives:              { title: 'Placement Drives',     sub: 'Create and manage recruitment drives' },
-  assessments:         { title: 'Assessments',          sub: 'Create and manage online tests with AI' },
-  'assignment-monitor':{ title: 'Assignment Monitor',   sub: 'Live student assignment status & malpractice detection' },
-  shortlist:           { title: 'Ranking & Shortlisting', sub: 'Rank and classify students per drive' }
-};
+      <div class="divider"></div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📚 Select Categories</div>
+      <div class="checkbox-group" id="ai-categories" style="margin-bottom:16px;">
+        <label class="check-chip"><input type="checkbox" name="cat" value="Aptitude"> 🧮 Aptitude</label>
+        <label class="check-chip"><input type="checkbox" name="cat" value="Logical Reasoning"> 🧠 Logical
+          Reasoning</label>
+        <label class="check-chip"><input type="checkbox" name="cat" value="Verbal Ability"> 📖 Verbal Ability</label>
+        <label class="check-chip"><input type="checkbox" name="cat" value="Technical"> 💻 Technical</label>
+        <label class="check-chip"><input type="checkbox" name="cat" value="Managerial"> 👔 Managerial</label>
+        <label class="check-chip"><input type="checkbox" name="cat" value="HR Interview"> 🎤 HR Interview</label>
+      </div>
 
-let currentPage = 'overview';
+      <div id="ai-subtopics-wrap" style="margin-bottom:16px;"></div>
 
-function go(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`page-${id}`)?.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => { if (n.getAttribute('onclick')?.includes(`'${id}'`)) n.classList.add('active'); });
-  const m = pageMeta[id] || {};
-  document.getElementById('page-title').textContent = m.title || id;
-  document.getElementById('page-sub').textContent = m.sub || '';
-  currentPage = id;
-  loadPage(id);
-}
+      <div id="ai-preview-wrap" style="display:none;">
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;">✨ Generated Questions Preview</div>
+          <button class="btn btn-outline btn-sm" onclick="regenerateQuiz()">🔄 Regenerate</button>
+        </div>
+        <div id="ai-questions-preview"></div>
+      </div>
 
-function refreshCurrent() { loadPage(currentPage); }
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeOverlay('ai-quiz-overlay')">Cancel</button>
+        <button class="btn btn-purple" id="ai-gen-btn" onclick="generateAIQuiz()">🤖 Generate Questions</button>
+        <button class="btn btn-primary" id="ai-save-btn" style="display:none;" onclick="saveAIAssessment()">💾 Save
+          Assessment</button>
+      </div>
+    </div>
+  </div>
 
-function loadPage(id) {
-  if (id === 'overview')    loadOverview();
-  if (id === 'students')    loadStudents();
-  if (id === 'drives')      loadDrives();
-  if (id === 'assessments') loadAssessments();
-  if (id === 'assignment-monitor') loadMonitor();
-  if (id === 'shortlist')   loadShortlistPage();
-}
+  <script>
+    // ═══════════ API HELPER ═══════════
+    const api = async (method, url, body) => {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      try {
+        const res = await fetch(url, opts);
+        return res.json();
+      } catch (e) {
+        return { error: e.message };
+      }
+    };
 
-// ═══════════ OVERLAY ═══════════
-function showOverlay(id) {
-  document.getElementById(id).classList.add('show');
-  if (id === 'add-assessment-overlay') {
-    api('GET', '/api/drives').then(drives => {
-      const sel = document.getElementById('as-drive');
-      sel.innerHTML = '<option value="">None</option>' + (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName}</option>`).join('') : '');
-    });
-  }
-  if (id === 'ai-quiz-overlay') {
-    api('GET', '/api/drives').then(drives => {
-      const sel = document.getElementById('ai-drive');
-      sel.innerHTML = '<option value="">None</option>' + (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName}</option>`).join('') : '');
-    });
-    generatedQuestions = [];
-    document.getElementById('ai-preview-wrap').style.display = 'none';
-    document.getElementById('ai-save-btn').style.display = 'none';
-    document.getElementById('ai-subtopics-wrap').innerHTML = '';
-    document.querySelectorAll('#ai-categories input').forEach(i => { i.checked = false; i.closest('.check-chip').classList.remove('on'); });
-  }
-}
-function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
-document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); }));
-document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); }));
+    // ═══════════ TOAST ═══════════
+    function toast(title, msg, type = '') {
+      const w = document.getElementById('toasts');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<div class="toast-t">${title}</div>${msg ? `<div class="toast-m">${msg}</div>` : ''}`;
+      w.appendChild(t);
+      setTimeout(() => { t.style.cssText = 'opacity:0;transform:translateX(110%);transition:.3s'; setTimeout(() => t.remove(), 300); }, 4000);
+    }
 
-// ═══════════ LOGOUT ═══════════
-async function logout() {
-  await api('POST', '/api/auth/logout');
-  window.location.href = '/';
-}
+    // ═══════════ NAV ═══════════
+    const pageMeta = {
+      overview: { title: 'Overview', sub: 'Campus placement summary' },
+      students: { title: 'Student Database', sub: 'Manage all student records' },
+      drives: { title: 'Placement Drives', sub: 'Create and manage recruitment drives' },
+      assessments: { title: 'Assessments', sub: 'Create and manage online tests with AI' },
+      'assignment-monitor': { title: 'Assignment Monitor', sub: 'Live student assignment status & malpractice detection' },
+      shortlist: { title: 'Ranking & Shortlisting', sub: 'Rank and classify students per drive' },
+      'alumni-groups': { title: 'Alumni Groups', sub: 'Manage alumni connect groups' }
+    };
 
-// ═══════════ OVERVIEW ═══════════
-async function loadOverview() {
-  const d = await api('GET', '/api/dashboard/stats');
-  if (d.error) { toast('Error', d.error, 'e'); return; }
+    let currentPage = 'overview';
 
-  document.getElementById('st-students').textContent   = d.totalStudents ?? 0;
-  document.getElementById('st-drives').textContent     = d.totalDrives ?? 0;
-  document.getElementById('st-shortlisted').textContent= d.placedStudents ?? 0;
-  document.getElementById('st-assessments').textContent= d.totalAssessments ?? 0;
-  document.getElementById('st-students-sub').textContent = `${d.branchStats?.length ?? 0} branches`;
-  document.getElementById('st-drives-sub').textContent   = `${d.activeDrives ?? 0} active`;
-  document.getElementById('st-assessments-sub').textContent = 'total created';
+    function go(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(`page-${id}`)?.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => { if (n.getAttribute('onclick')?.includes(`'${id}'`)) n.classList.add('active'); });
+      const m = pageMeta[id] || {};
+      document.getElementById('page-title').textContent = m.title || id;
+      document.getElementById('page-sub').textContent = m.sub || '';
+      currentPage = id;
+      loadPage(id);
+    }
 
-  // Branch chart
-  const bc = document.getElementById('branch-chart');
-  if (d.branchStats?.length) {
-    const max = Math.max(...d.branchStats.map(b => b.count));
-    bc.innerHTML = d.branchStats.slice(0, 7).map(b => `
+    function refreshCurrent() { loadPage(currentPage); }
+
+    function loadPage(id) {
+      if (id === 'overview') loadOverview();
+      if (id === 'students') loadStudents();
+      if (id === 'drives') loadDrives();
+      if (id === 'assessments') loadAssessments();
+      if (id === 'assignment-monitor') loadMonitor();
+      if (id === 'shortlist') loadShortlistPage();
+      if (id === 'alumni-groups') loadAlumniGroups();
+    }
+
+    // ═══════════ OVERLAY ═══════════
+    function showOverlay(id) {
+      document.getElementById(id).classList.add('show');
+      if (id === 'add-assessment-overlay') {
+        api('GET', '/api/drives').then(drives => {
+          const sel = document.getElementById('as-drive');
+          sel.innerHTML = '<option value="">None</option>' + (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName}</option>`).join('') : '');
+        });
+      }
+      if (id === 'ai-quiz-overlay') {
+        api('GET', '/api/drives').then(drives => {
+          const sel = document.getElementById('ai-drive');
+          sel.innerHTML = '<option value="">None</option>' + (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName}</option>`).join('') : '');
+        });
+        generatedQuestions = [];
+        document.getElementById('ai-preview-wrap').style.display = 'none';
+        document.getElementById('ai-save-btn').style.display = 'none';
+        document.getElementById('ai-subtopics-wrap').innerHTML = '';
+        document.querySelectorAll('#ai-categories input').forEach(i => { i.checked = false; i.closest('.check-chip').classList.remove('on'); });
+      }
+    }
+    function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+    document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); }));
+    document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); }));
+
+    // ═══════════ LOGOUT ═══════════
+    async function logout() {
+      await api('POST', '/api/auth/logout');
+      window.location.href = '/';
+    }
+
+    // ═══════════ OVERVIEW ═══════════
+    async function loadOverview() {
+      const d = await api('GET', '/api/dashboard/stats');
+      if (d.error) { toast('Error', d.error, 'e'); return; }
+
+      document.getElementById('st-students').textContent = d.totalStudents ?? 0;
+      document.getElementById('st-drives').textContent = d.totalDrives ?? 0;
+      document.getElementById('st-shortlisted').textContent = d.placedStudents ?? 0;
+      document.getElementById('st-assessments').textContent = d.totalAssessments ?? 0;
+      document.getElementById('st-students-sub').textContent = `${d.branchStats?.length ?? 0} branches`;
+      document.getElementById('st-drives-sub').textContent = `${d.activeDrives ?? 0} active`;
+      document.getElementById('st-assessments-sub').textContent = 'total created';
+
+      // Branch chart
+      const bc = document.getElementById('branch-chart');
+      if (d.branchStats?.length) {
+        const max = Math.max(...d.branchStats.map(b => b.count));
+        bc.innerHTML = d.branchStats.slice(0, 7).map(b => `
       <div class="bar-col">
         <div class="bar-num">${b.count}</div>
-        <div class="bar-fill" style="height:${Math.round((b.count/max)*90)}px;"></div>
+        <div class="bar-fill" style="height:${Math.round((b.count / max) * 90)}px;"></div>
         <div class="bar-name">${b._id}</div>
       </div>`).join('');
-  } else {
-    bc.innerHTML = `<div class="empty" style="width:100%;"><div class="e-icon">📊</div><p>No data yet</p></div>`;
-  }
+      } else {
+        bc.innerHTML = `<div class="empty" style="width:100%;"><div class="e-icon">📊</div><p>No data yet</p></div>`;
+      }
 
-  // Recent drives
-  const rd = document.getElementById('recent-drives');
-  if (d.recentDrives?.length) {
-    rd.innerHTML = d.recentDrives.map(dr => `
+      // Recent drives
+      const rd = document.getElementById('recent-drives');
+      if (d.recentDrives?.length) {
+        rd.innerHTML = d.recentDrives.map(dr => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
         <div>
           <div style="font-size:13px;font-weight:700;">${dr.companyName}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;">CGPA ≥ ${dr.minCGPA} · ${dr.eligibleBranches?.join(', ') || 'All Branches'} · ${dr.eligibleCount} eligible</div>
         </div>
-        <span class="badge ${dr.status==='active'?'b-green':dr.status==='completed'?'b-cyan':'b-blue'}">${dr.status}</span>
+        <span class="badge ${dr.status === 'active' ? 'b-green' : dr.status === 'completed' ? 'b-cyan' : 'b-blue'}">${dr.status}</span>
       </div>`).join('');
-  } else {
-    rd.innerHTML = `<div class="empty"><div class="e-icon">🏢</div><p>No drives yet</p></div>`;
-  }
+      } else {
+        rd.innerHTML = `<div class="empty"><div class="e-icon">🏢</div><p>No drives yet</p></div>`;
+      }
 
-  // CGPA distribution
-  const cgpa = document.getElementById('cgpa-dist');
-  if (d.cgpaRanges?.length) {
-    const total = d.cgpaRanges.reduce((s, r) => s + r.count, 0);
-    const labels = { 0:'< 6.0', 6:'6–7', 7:'7–8', 8:'8–9', 9:'9–10' };
-    cgpa.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">` +
-      d.cgpaRanges.map(r => {
-        const pct = total ? Math.round((r.count/total)*100) : 0;
-        return `<div>
+      // CGPA distribution
+      const cgpa = document.getElementById('cgpa-dist');
+      if (d.cgpaRanges?.length) {
+        const total = d.cgpaRanges.reduce((s, r) => s + r.count, 0);
+        const labels = { 0: '< 6.0', 6: '6–7', 7: '7–8', 8: '8–9', 9: '9–10' };
+        cgpa.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">` +
+          d.cgpaRanges.map(r => {
+            const pct = total ? Math.round((r.count / total) * 100) : 0;
+            return `<div>
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
             <span style="color:var(--text2);">${labels[r._id] || r._id}</span>
             <span style="font-weight:700;">${r.count} students (${pct}%)</span>
           </div>
           <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;"></div></div>
         </div>`;
-      }).join('') + `</div>`;
-  } else {
-    cgpa.innerHTML = `<div class="empty"><div class="e-icon">📈</div><p>No CGPA data yet</p></div>`;
-  }
-}
+          }).join('') + `</div>`;
+      } else {
+        cgpa.innerHTML = `<div class="empty"><div class="e-icon">📈</div><p>No CGPA data yet</p></div>`;
+      }
+    }
 
-// ═══════════ STUDENTS ═══════════
-let allStudents = [], filteredStudents = [];
+    // ═══════════ STUDENTS ═══════════
+    let allStudents = [], filteredStudents = [];
 
-async function loadStudents() {
-  document.getElementById('students-table').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3);">Loading <span class="loader"></span></td></tr>`;
-  allStudents = await api('GET', '/api/students');
-  filteredStudents = [...allStudents];
-  renderStudents(filteredStudents);
-}
+    async function loadStudents() {
+      document.getElementById('students-table').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text3);">Loading <span class="loader"></span></td></tr>`;
+      allStudents = await api('GET', '/api/students');
+      filteredStudents = [...allStudents];
+      renderStudents(filteredStudents);
+    }
 
-function renderStudents(list) {
-  const tb = document.getElementById('students-table');
-  if (!list.length) {
-    tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="e-icon">👥</div><p>No students found</p></div></td></tr>`;
-    return;
-  }
-  tb.innerHTML = list.map((s, i) => `
+    function renderStudents(list) {
+      const tb = document.getElementById('students-table');
+      if (!list.length) {
+        tb.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="e-icon">👥</div><p>No students found</p></div></td></tr>`;
+        return;
+      }
+      tb.innerHTML = list.map((s, i) => `
     <tr>
-      <td style="color:var(--text3);font-size:12px;">${i+1}</td>
+      <td style="color:var(--text3);font-size:12px;">${i + 1}</td>
       <td>${s.name}</td>
       <td><code style="font-size:11.5px;">${s.usn}</code></td>
       <td><span class="badge b-blue">${s.branch}</span></td>
       <td>Y${s.year}</td>
-      <td class="${s.cgpa>=8?'cgpa-high':s.cgpa>=6?'cgpa-mid':'cgpa-low'}">${s.cgpa}</td>
-      <td class="${s.backlogs===0?'zero-backlog':'has-backlog'}">${s.backlogs}</td>
-      <td style="color:var(--text3);font-size:12px;">${s.email||'—'}</td>
+      <td class="${s.cgpa >= 8 ? 'cgpa-high' : s.cgpa >= 6 ? 'cgpa-mid' : 'cgpa-low'}">${s.cgpa}</td>
+      <td class="${s.backlogs === 0 ? 'zero-backlog' : 'has-backlog'}">${s.backlogs}</td>
+      <td style="color:var(--text3);font-size:12px;">${s.email || '—'}</td>
       <td>
         <button class="btn btn-danger btn-sm btn-icon" onclick="deleteStudent('${s._id}')" title="Delete">🗑</button>
       </td>
     </tr>`).join('');
-}
+    }
 
-function filterStudents(q) {
-  const s = q.toLowerCase();
-  filteredStudents = allStudents.filter(x => x.name.toLowerCase().includes(s) || x.usn.toLowerCase().includes(s) || x.branch.toLowerCase().includes(s));
-  renderStudents(filteredStudents);
-}
+    function filterStudents(q) {
+      const s = q.toLowerCase();
+      filteredStudents = allStudents.filter(x => x.name.toLowerCase().includes(s) || x.usn.toLowerCase().includes(s) || x.branch.toLowerCase().includes(s));
+      renderStudents(filteredStudents);
+    }
 
-function filterByBranch(b) {
-  filteredStudents = b ? allStudents.filter(x => x.branch === b) : [...allStudents];
-  renderStudents(filteredStudents);
-}
+    function filterByBranch(b) {
+      filteredStudents = b ? allStudents.filter(x => x.branch === b) : [...allStudents];
+      renderStudents(filteredStudents);
+    }
 
-function filterByYear(y) {
-  filteredStudents = y ? allStudents.filter(x => x.year === parseInt(y)) : [...allStudents];
-  renderStudents(filteredStudents);
-}
+    function filterByYear(y) {
+      filteredStudents = y ? allStudents.filter(x => x.year === parseInt(y)) : [...allStudents];
+      renderStudents(filteredStudents);
+    }
 
-async function addStudent() {
-  const body = {
-    name:     document.getElementById('sn-name').value.trim(),
-    usn:      document.getElementById('sn-usn').value.trim().toUpperCase(),
-    branch:   document.getElementById('sn-branch').value,
-    year:     parseInt(document.getElementById('sn-year').value),
-    cgpa:     parseFloat(document.getElementById('sn-cgpa').value),
-    backlogs: parseInt(document.getElementById('sn-backlogs').value) || 0,
-    email:    document.getElementById('sn-email').value,
-    phone:    document.getElementById('sn-phone').value,
-    password: document.getElementById('sn-pass').value || 'student123'
-  };
-  if (!body.name || !body.usn || !body.cgpa) { toast('Missing Fields', 'Name, USN and CGPA are required', 'e'); return; }
-  const res = await api('POST', '/api/students', body);
-  if (res.success) { toast('Student Added ✓', body.name, 's'); closeOverlay('add-student-overlay'); loadStudents(); }
-  else toast('Error', res.error, 'e');
-}
+    async function addStudent() {
+      const body = {
+        name: document.getElementById('sn-name').value.trim(),
+        usn: document.getElementById('sn-usn').value.trim().toUpperCase(),
+        branch: document.getElementById('sn-branch').value,
+        year: parseInt(document.getElementById('sn-year').value),
+        cgpa: parseFloat(document.getElementById('sn-cgpa').value),
+        backlogs: parseInt(document.getElementById('sn-backlogs').value) || 0,
+        email: document.getElementById('sn-email').value,
+        phone: document.getElementById('sn-phone').value,
+        password: document.getElementById('sn-pass').value || 'student123'
+      };
+      if (!body.name || !body.usn || !body.cgpa) { toast('Missing Fields', 'Name, USN and CGPA are required', 'e'); return; }
+      const res = await api('POST', '/api/students', body);
+      if (res.success) { toast('Student Added ✓', body.name, 's'); closeOverlay('add-student-overlay'); loadStudents(); }
+      else toast('Error', res.error, 'e');
+    }
 
-async function deleteStudent(id) {
-  if (!confirm('Delete this student? This cannot be undone.')) return;
-  const res = await api('DELETE', `/api/students/${id}`);
-  if (res.success) { toast('Deleted', 'Student removed', 's'); loadStudents(); }
-  else toast('Error', res.error, 'e');
-}
+    async function deleteStudent(id) {
+      if (!confirm('Delete this student? This cannot be undone.')) return;
+      const res = await api('DELETE', `/api/students/${id}`);
+      if (res.success) { toast('Deleted', 'Student removed', 's'); loadStudents(); }
+      else toast('Error', res.error, 'e');
+    }
 
-async function importCSV(input) {
-  const file = input.files[0]; if (!file) return;
-  const fd = new FormData(); fd.append('file', file);
-  document.getElementById('import-result').innerHTML = `<div style="color:var(--text2);font-size:13px;">Importing… <span class="loader"></span></div>`;
-  const res = await fetch('/api/students/import', { method: 'POST', body: fd });
-  const d = await res.json();
-  if (d.success) {
-    document.getElementById('import-result').innerHTML = `<div class="badge b-green" style="font-size:13px;padding:8px 14px;">✓ ${d.added} imported · ${d.skipped} skipped</div>`;
-    toast('Import Complete ✓', `${d.added} students added`, 's');
-    loadStudents();
-  } else {
-    document.getElementById('import-result').innerHTML = `<div class="badge b-red">${d.error}</div>`;
-    toast('Import Failed', d.error, 'e');
-  }
-}
+    async function importCSV(input) {
+      const file = input.files[0]; if (!file) return;
+      const fd = new FormData(); fd.append('file', file);
+      document.getElementById('import-result').innerHTML = `<div style="color:var(--text2);font-size:13px;">Importing… <span class="loader"></span></div>`;
+      const res = await fetch('/api/students/import', { method: 'POST', body: fd });
+      const d = await res.json();
+      if (d.success) {
+        document.getElementById('import-result').innerHTML = `<div class="badge b-green" style="font-size:13px;padding:8px 14px;">✓ ${d.added} imported · ${d.skipped} skipped</div>`;
+        toast('Import Complete ✓', `${d.added} students added`, 's');
+        loadStudents();
+      } else {
+        document.getElementById('import-result').innerHTML = `<div class="badge b-red">${d.error}</div>`;
+        toast('Import Failed', d.error, 'e');
+      }
+    }
 
-// ═══════════ DRIVES ═══════════
-let allDrives = [];
+    // ═══════════ DRIVES ═══════════
+    let allDrives = [];
 
-async function loadDrives() {
-  document.getElementById('drives-grid').innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="e-icon">⏳</div><p>Loading drives…</p></div>`;
-  allDrives = await api('GET', '/api/drives');
-  const grid = document.getElementById('drives-grid');
-  if (!allDrives.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="e-icon">🏢</div><p>No drives yet. Create one!</p></div>`; return; }
-  grid.innerHTML = allDrives.map(d => `
+    async function loadDrives() {
+      document.getElementById('drives-grid').innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="e-icon">⏳</div><p>Loading drives…</p></div>`;
+      allDrives = await api('GET', '/api/drives');
+      const grid = document.getElementById('drives-grid');
+      if (!allDrives.length) { grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="e-icon">🏢</div><p>No drives yet. Create one!</p></div>`; return; }
+      grid.innerHTML = allDrives.map(d => `
     <div class="drive-card">
       <div class="company">🏢 ${d.companyName}
-        <span class="badge ${d.status==='active'?'b-green':d.status==='completed'?'b-cyan':'b-blue'}" style="margin-left:auto;font-size:11px;">${d.status}</span>
+        <span class="badge ${d.status === 'active' ? 'b-green' : d.status === 'completed' ? 'b-cyan' : 'b-blue'}" style="margin-left:auto;font-size:11px;">${d.status}</span>
       </div>
       <div class="chips">
         <div class="chip">CGPA ≥ <strong>${d.minCGPA}</strong></div>
@@ -1135,89 +1963,89 @@ async function loadDrives() {
         <button class="btn btn-primary btn-sm" onclick="notifyDrive('${d._id}','${d.companyName}')">🔔 Notify</button>
         <button class="btn btn-success btn-sm" onclick="quickShortlist('${d._id}','${d.companyName}')">⭐ Shortlist</button>
         <button class="btn btn-outline btn-sm" onclick="toggleDrive('${d._id}','${d.status}')">
-          ${d.status==='upcoming'?'▶ Activate':d.status==='active'?'⏹ Complete':'✓ Done'}
+          ${d.status === 'upcoming' ? '▶ Activate' : d.status === 'active' ? '⏹ Complete' : '✓ Done'}
         </button>
         <button class="btn btn-danger btn-sm btn-icon" onclick="deleteDrive('${d._id}')" title="Delete">🗑</button>
       </div>
     </div>`).join('');
-}
+    }
 
-async function previewEligible() {
-  const branches = [...document.querySelectorAll('#dr-branches input:checked')].map(c => c.value);
-  const years    = [...document.querySelectorAll('#add-drive-overlay input[type=checkbox][value]')].filter(c => c.checked && ['1','2','3','4'].includes(c.value) && !c.closest('#dr-branches')).map(c => parseInt(c.value));
-  const res = await api('POST', '/api/students/eligible', {
-    minCGPA: parseFloat(document.getElementById('dr-cgpa').value) || 0,
-    maxBacklogs: parseInt(document.getElementById('dr-backlogs').value) || 0,
-    eligibleBranches: branches, eligibleYear: years
-  });
-  document.getElementById('eligible-num').textContent = res.count ?? 0;
-  document.getElementById('eligible-preview-box').style.display = 'block';
-}
+    async function previewEligible() {
+      const branches = [...document.querySelectorAll('#dr-branches input:checked')].map(c => c.value);
+      const years = [...document.querySelectorAll('#add-drive-overlay input[type=checkbox][value]')].filter(c => c.checked && ['1', '2', '3', '4'].includes(c.value) && !c.closest('#dr-branches')).map(c => parseInt(c.value));
+      const res = await api('POST', '/api/students/eligible', {
+        minCGPA: parseFloat(document.getElementById('dr-cgpa').value) || 0,
+        maxBacklogs: parseInt(document.getElementById('dr-backlogs').value) || 0,
+        eligibleBranches: branches, eligibleYear: years
+      });
+      document.getElementById('eligible-num').textContent = res.count ?? 0;
+      document.getElementById('eligible-preview-box').style.display = 'block';
+    }
 
-async function createDrive() {
-  const branches = [...document.querySelectorAll('#dr-branches input:checked')].map(c => c.value);
-  const years    = [...document.querySelectorAll('#add-drive-overlay input[type=checkbox][value]')].filter(c => c.checked && ['1','2','3','4'].includes(c.value) && !c.closest('#dr-branches')).map(c => parseInt(c.value));
-  const body = {
-    companyName: document.getElementById('dr-company').value.trim(),
-    package:     document.getElementById('dr-package').value,
-    minCGPA:     parseFloat(document.getElementById('dr-cgpa').value),
-    maxBacklogs: parseInt(document.getElementById('dr-backlogs').value) || 0,
-    eligibleBranches: branches, eligibleYear: years,
-    driveDate:   document.getElementById('dr-date').value,
-    location:    document.getElementById('dr-location').value,
-    description: document.getElementById('dr-desc').value
-  };
-  if (!body.companyName || !body.minCGPA) { toast('Missing Fields', 'Company name and CGPA required', 'e'); return; }
-  const res = await api('POST', '/api/drives', body);
-  if (res.success) {
-    toast('Drive Created ✓', `${body.companyName} — ${res.eligibleCount} eligible`, 's');
-    closeOverlay('add-drive-overlay');
-    loadDrives();
-  } else toast('Error', res.error, 'e');
-}
+    async function createDrive() {
+      const branches = [...document.querySelectorAll('#dr-branches input:checked')].map(c => c.value);
+      const years = [...document.querySelectorAll('#add-drive-overlay input[type=checkbox][value]')].filter(c => c.checked && ['1', '2', '3', '4'].includes(c.value) && !c.closest('#dr-branches')).map(c => parseInt(c.value));
+      const body = {
+        companyName: document.getElementById('dr-company').value.trim(),
+        package: document.getElementById('dr-package').value,
+        minCGPA: parseFloat(document.getElementById('dr-cgpa').value),
+        maxBacklogs: parseInt(document.getElementById('dr-backlogs').value) || 0,
+        eligibleBranches: branches, eligibleYear: years,
+        driveDate: document.getElementById('dr-date').value,
+        location: document.getElementById('dr-location').value,
+        description: document.getElementById('dr-desc').value
+      };
+      if (!body.companyName || !body.minCGPA) { toast('Missing Fields', 'Company name and CGPA required', 'e'); return; }
+      const res = await api('POST', '/api/drives', body);
+      if (res.success) {
+        toast('Drive Created ✓', `${body.companyName} — ${res.eligibleCount} eligible`, 's');
+        closeOverlay('add-drive-overlay');
+        loadDrives();
+      } else toast('Error', res.error, 'e');
+    }
 
-async function notifyDrive(id, name) {
-  const res = await api('POST', `/api/drives/${id}/notify`);
-  if (res.success) toast('Notifications Sent ✓', `${res.notified} students notified for ${name}`, 's');
-  else toast('Error', res.error, 'e');
-}
+    async function notifyDrive(id, name) {
+      const res = await api('POST', `/api/drives/${id}/notify`);
+      if (res.success) toast('Notifications Sent ✓', `${res.notified} students notified for ${name}`, 's');
+      else toast('Error', res.error, 'e');
+    }
 
-async function quickShortlist(id, name) {
-  const res = await api('POST', `/api/drives/${id}/shortlist`);
-  if (res.success) toast('Shortlisted ✓', `${res.shortlisted} students ranked for ${name}`, 's');
-  else toast('Error', res.error, 'e');
-}
+    async function quickShortlist(id, name) {
+      const res = await api('POST', `/api/drives/${id}/shortlist`);
+      if (res.success) toast('Shortlisted ✓', `${res.shortlisted} students ranked for ${name}`, 's');
+      else toast('Error', res.error, 'e');
+    }
 
-async function deleteDrive(id) {
-  if (!confirm('Delete this drive?')) return;
-  await api('DELETE', `/api/drives/${id}`);
-  toast('Deleted', 'Drive removed', 's');
-  loadDrives();
-}
+    async function deleteDrive(id) {
+      if (!confirm('Delete this drive?')) return;
+      await api('DELETE', `/api/drives/${id}`);
+      toast('Deleted', 'Drive removed', 's');
+      loadDrives();
+    }
 
-async function toggleDrive(id, status) {
-  if (status === 'completed') return;
-  const next = status === 'upcoming' ? 'active' : 'completed';
-  await api('PUT', `/api/drives/${id}`, { status: next });
-  loadDrives();
-}
+    async function toggleDrive(id, status) {
+      if (status === 'completed') return;
+      const next = status === 'upcoming' ? 'active' : 'completed';
+      await api('PUT', `/api/drives/${id}`, { status: next });
+      loadDrives();
+    }
 
-// ═══════════ ASSESSMENTS ═══════════
-let qIdx = 0;
+    // ═══════════ ASSESSMENTS ═══════════
+    let qIdx = 0;
 
-function openAssessmentModal() {
-  document.getElementById('q-container').innerHTML = '';
-  qIdx = 0;
-  showOverlay('add-assessment-overlay');
-}
+    function openAssessmentModal() {
+      document.getElementById('q-container').innerHTML = '';
+      qIdx = 0;
+      showOverlay('add-assessment-overlay');
+    }
 
-function addQ() {
-  const i = qIdx++;
-  const div = document.createElement('div');
-  div.className = 'q-builder'; div.id = `q-${i}`;
-  div.innerHTML = `
+    function addQ() {
+      const i = qIdx++;
+      const div = document.createElement('div');
+      div.className = 'q-builder'; div.id = `q-${i}`;
+      div.innerHTML = `
     <div class="q-head">
-      Question ${i+1}
+      Question ${i + 1}
       <button class="btn btn-danger btn-sm" onclick="document.getElementById('q-${i}').remove()">Remove</button>
     </div>
     <div class="form-grid">
@@ -1229,109 +2057,109 @@ function addQ() {
       <div class="field"><label>Correct Answer (0=A 1=B 2=C 3=D)</label><input type="number" id="q-ans-${i}" min="0" max="3" value="0"></div>
       <div class="field"><label>Marks</label><input type="number" id="q-mrk-${i}" value="1" min="1"></div>
     </div>`;
-  document.getElementById('q-container').appendChild(div);
-}
+      document.getElementById('q-container').appendChild(div);
+    }
 
-async function loadAssessments() {
-  const el = document.getElementById('assessments-list');
-  el.innerHTML = `<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>`;
-  const data = await api('GET', '/api/assessments');
-  if (!data.length) { el.innerHTML = `<div class="empty"><div class="e-icon">📝</div><p>No assessments yet</p></div>`; return; }
-  el.innerHTML = data.map(a => `
+    async function loadAssessments() {
+      const el = document.getElementById('assessments-list');
+      el.innerHTML = `<div class="empty"><div class="e-icon">⏳</div><p>Loading…</p></div>`;
+      const data = await api('GET', '/api/assessments');
+      if (!data.length) { el.innerHTML = `<div class="empty"><div class="e-icon">📝</div><p>No assessments yet</p></div>`; return; }
+      el.innerHTML = data.map(a => `
     <div class="card" style="margin-bottom:12px;">
       <div class="card-header">
         <div>
           <div class="card-title">${a.title}</div>
           <div class="card-sub" style="display:flex;gap:8px;margin-top:6px;">
             <span class="badge b-purple">${a.type}</span>
-            <span class="badge b-blue">${a.questions?.length||0} questions</span>
+            <span class="badge b-blue">${a.questions?.length || 0} questions</span>
             <span class="badge b-cyan">${a.timeLimit} min</span>
             <span class="badge b-yellow">${a.totalMarks} marks</span>
           </div>
         </div>
         <div class="card-actions">
-          <button class="btn ${a.isActive?'btn-success':'btn-outline'} btn-sm" onclick="toggleAssessment('${a._id}')">
-            ${a.isActive?'🟢 Active':'⭘ Inactive'}
+          <button class="btn ${a.isActive ? 'btn-success' : 'btn-outline'} btn-sm" onclick="toggleAssessment('${a._id}')">
+            ${a.isActive ? '🟢 Active' : '⭘ Inactive'}
           </button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAssessment('${a._id}')" title="Delete">🗑</button>
         </div>
       </div>
     </div>`).join('');
-}
+    }
 
-async function createAssessment() {
-  const questions = [];
-  document.querySelectorAll('#q-container .q-builder').forEach(el => {
-    const i = el.id.replace('q-', '');
-    questions.push({
-      question: document.getElementById(`q-txt-${i}`)?.value,
-      options:  [0,1,2,3].map(j => document.getElementById(`q-o-${i}-${j}`)?.value || ''),
-      correctAnswer: parseInt(document.getElementById(`q-ans-${i}`)?.value),
-      marks: parseInt(document.getElementById(`q-mrk-${i}`)?.value) || 1
-    });
-  });
-  if (!questions.length) { toast('Add Questions', 'Add at least one question', 'e'); return; }
-  const body = {
-    title:     document.getElementById('as-title').value,
-    type:      document.getElementById('as-type').value,
-    timeLimit: parseInt(document.getElementById('as-time').value),
-    driveId:   document.getElementById('as-drive').value || null,
-    questions
-  };
-  if (!body.title) { toast('Missing Title', '', 'e'); return; }
-  const res = await api('POST', '/api/assessments', body);
-  if (res.success) { toast('Assessment Created ✓', body.title, 's'); closeOverlay('add-assessment-overlay'); loadAssessments(); }
-  else toast('Error', res.error, 'e');
-}
+    async function createAssessment() {
+      const questions = [];
+      document.querySelectorAll('#q-container .q-builder').forEach(el => {
+        const i = el.id.replace('q-', '');
+        questions.push({
+          question: document.getElementById(`q-txt-${i}`)?.value,
+          options: [0, 1, 2, 3].map(j => document.getElementById(`q-o-${i}-${j}`)?.value || ''),
+          correctAnswer: parseInt(document.getElementById(`q-ans-${i}`)?.value),
+          marks: parseInt(document.getElementById(`q-mrk-${i}`)?.value) || 1
+        });
+      });
+      if (!questions.length) { toast('Add Questions', 'Add at least one question', 'e'); return; }
+      const body = {
+        title: document.getElementById('as-title').value,
+        type: document.getElementById('as-type').value,
+        timeLimit: parseInt(document.getElementById('as-time').value),
+        driveId: document.getElementById('as-drive').value || null,
+        questions
+      };
+      if (!body.title) { toast('Missing Title', '', 'e'); return; }
+      const res = await api('POST', '/api/assessments', body);
+      if (res.success) { toast('Assessment Created ✓', body.title, 's'); closeOverlay('add-assessment-overlay'); loadAssessments(); }
+      else toast('Error', res.error, 'e');
+    }
 
-async function toggleAssessment(id) {
-  const res = await api('PUT', `/api/assessments/${id}/toggle`);
-  toast(res.isActive ? 'Activated' : 'Deactivated', 'Assessment updated', 's');
-  loadAssessments();
-}
+    async function toggleAssessment(id) {
+      const res = await api('PUT', `/api/assessments/${id}/toggle`);
+      toast(res.isActive ? 'Activated' : 'Deactivated', 'Assessment updated', 's');
+      loadAssessments();
+    }
 
-async function deleteAssessment(id) {
-  if (!confirm('Delete this assessment?')) return;
-  await api('DELETE', `/api/assessments/${id}`);
-  toast('Deleted', '', 's');
-  loadAssessments();
-}
+    async function deleteAssessment(id) {
+      if (!confirm('Delete this assessment?')) return;
+      await api('DELETE', `/api/assessments/${id}`);
+      toast('Deleted', '', 's');
+      loadAssessments();
+    }
 
-// ═══════════ SHORTLIST ═══════════
-let shortlistDriveId = null;
+    // ═══════════ SHORTLIST ═══════════
+    let shortlistDriveId = null;
 
-async function loadShortlistPage() {
-  const drives = await api('GET', '/api/drives');
-  const sel = document.getElementById('shortlist-select');
-  sel.innerHTML = '<option value="">— Choose a drive —</option>' +
-    (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName} (CGPA ≥ ${d.minCGPA})</option>`).join('') : '');
-  document.getElementById('shortlist-table').innerHTML = '';
-  document.getElementById('confirm-btn').style.display = 'none';
-}
+    async function loadShortlistPage() {
+      const drives = await api('GET', '/api/drives');
+      const sel = document.getElementById('shortlist-select');
+      sel.innerHTML = '<option value="">— Choose a drive —</option>' +
+        (drives.map ? drives.map(d => `<option value="${d._id}">${d.companyName} (CGPA ≥ ${d.minCGPA})</option>`).join('') : '');
+      document.getElementById('shortlist-table').innerHTML = '';
+      document.getElementById('confirm-btn').style.display = 'none';
+    }
 
-async function previewShortlist() {
-  const id = document.getElementById('shortlist-select').value;
-  if (!id) { document.getElementById('shortlist-table').innerHTML = ''; document.getElementById('confirm-btn').style.display = 'none'; return; }
-  shortlistDriveId = id;
+    async function previewShortlist() {
+      const id = document.getElementById('shortlist-select').value;
+      if (!id) { document.getElementById('shortlist-table').innerHTML = ''; document.getElementById('confirm-btn').style.display = 'none'; return; }
+      shortlistDriveId = id;
 
-  const drives = allDrives.length ? allDrives : await api('GET', '/api/drives');
-  const drive  = drives.find(d => d._id === id);
-  if (!drive) return;
+      const drives = allDrives.length ? allDrives : await api('GET', '/api/drives');
+      const drive = drives.find(d => d._id === id);
+      if (!drive) return;
 
-  const res = await api('POST', '/api/students/eligible', {
-    minCGPA: drive.minCGPA, maxBacklogs: drive.maxBacklogs,
-    eligibleBranches: drive.eligibleBranches, eligibleYear: drive.eligibleYear
-  });
+      const res = await api('POST', '/api/students/eligible', {
+        minCGPA: drive.minCGPA, maxBacklogs: drive.maxBacklogs,
+        eligibleBranches: drive.eligibleBranches, eligibleYear: drive.eligibleYear
+      });
 
-  const ranked = (res.students || []).map(s => {
-    let score = s.cgpa * 10;
-    const as = s.assessmentScores?.[0];
-    if (as?.maxScore > 0) score += (as.score / as.maxScore) * 30;
-    return { ...s, _score: Math.round(score*10)/10, _rank: score >= 90 ? 'Best' : score >= 70 ? 'Better' : 'Average' };
-  }).sort((a, b) => b._score - a._score);
+      const ranked = (res.students || []).map(s => {
+        let score = s.cgpa * 10;
+        const as = s.assessmentScores?.[0];
+        if (as?.maxScore > 0) score += (as.score / as.maxScore) * 30;
+        return { ...s, _score: Math.round(score * 10) / 10, _rank: score >= 90 ? 'Best' : score >= 70 ? 'Better' : 'Average' };
+      }).sort((a, b) => b._score - a._score);
 
-  document.getElementById('confirm-btn').style.display = '';
-  document.getElementById('shortlist-table').innerHTML = `
+      document.getElementById('confirm-btn').style.display = '';
+      document.getElementById('shortlist-table').innerHTML = `
     <div class="card">
       <div class="card-header">
         <div>
@@ -1347,12 +2175,12 @@ async function previewShortlist() {
           <tbody>
             ${ranked.map((s, i) => `
               <tr>
-                <td style="color:var(--text3);font-weight:700;">#${i+1}</td>
+                <td style="color:var(--text3);font-weight:700;">#${i + 1}</td>
                 <td>${s.name}</td>
                 <td><code style="font-size:11.5px;">${s.usn}</code></td>
                 <td><span class="badge b-blue">${s.branch}</span></td>
                 <td>Y${s.year}</td>
-                <td class="${s.cgpa>=8?'cgpa-high':s.cgpa>=6?'cgpa-mid':'cgpa-low'}">${s.cgpa}</td>
+                <td class="${s.cgpa >= 8 ? 'cgpa-high' : s.cgpa >= 6 ? 'cgpa-mid' : 'cgpa-low'}">${s.cgpa}</td>
                 <td style="font-weight:700;">${s._score}</td>
                 <td><span class="rank rank-${s._rank.toLowerCase()}">${s._rank}</span></td>
               </tr>`).join('')}
@@ -1360,33 +2188,33 @@ async function previewShortlist() {
         </table>
       </div>
     </div>`;
-}
+    }
 
-async function confirmShortlist() {
-  if (!shortlistDriveId) return;
-  const res = await api('POST', `/api/drives/${shortlistDriveId}/shortlist`);
-  if (res.success) toast('Shortlisted & Notified ✓', `${res.shortlisted} students ranked and notified`, 's');
-  else toast('Error', res.error, 'e');
-}
+    async function confirmShortlist() {
+      if (!shortlistDriveId) return;
+      const res = await api('POST', `/api/drives/${shortlistDriveId}/shortlist`);
+      if (res.success) toast('Shortlisted & Notified ✓', `${res.shortlisted} students ranked and notified`, 's');
+      else toast('Error', res.error, 'e');
+    }
 
-// ═══════════ AI QUIZ GENERATOR ═══════════
-const AI_SUBTOPICS = {
-  'Aptitude': ['Quantitative Aptitude','Number Series','Percentages','Profit & Loss','Time & Work','Speed & Distance','Averages','Ratios','Permutation & Combination','Probability'],
-  'Logical Reasoning': ['Blood Relations','Seating Arrangement','Syllogism','Coding-Decoding','Directions','Analogies','Data Interpretation','Puzzles'],
-  'Verbal Ability': ['Reading Comprehension','Sentence Correction','Synonyms & Antonyms','Para Jumbles','Fill in the Blanks','Idioms & Phrases'],
-  'Technical': ['C Programming','C++ OOP','Java','Python','Data Structures','Algorithms','DBMS & SQL','Operating Systems','Computer Networks','Web Development','JavaScript','System Design'],
-  'Managerial': ['Leadership','Decision Making','Team Management','Project Management','Business Communication','Critical Thinking','Problem Solving','Conflict Resolution'],
-  'HR Interview': ['Tell me about yourself','Strengths & Weaknesses','Situational Questions','Company Knowledge','Career Goals','Work Ethic','Salary Negotiation','Behavioral Questions']
-};
+    // ═══════════ AI QUIZ GENERATOR ═══════════
+    const AI_SUBTOPICS = {
+      'Aptitude': ['Quantitative Aptitude', 'Number Series', 'Percentages', 'Profit & Loss', 'Time & Work', 'Speed & Distance', 'Averages', 'Ratios', 'Permutation & Combination', 'Probability'],
+      'Logical Reasoning': ['Blood Relations', 'Seating Arrangement', 'Syllogism', 'Coding-Decoding', 'Directions', 'Analogies', 'Data Interpretation', 'Puzzles'],
+      'Verbal Ability': ['Reading Comprehension', 'Sentence Correction', 'Synonyms & Antonyms', 'Para Jumbles', 'Fill in the Blanks', 'Idioms & Phrases'],
+      'Technical': ['C Programming', 'C++ OOP', 'Java', 'Python', 'Data Structures', 'Algorithms', 'DBMS & SQL', 'Operating Systems', 'Computer Networks', 'Web Development', 'JavaScript', 'System Design'],
+      'Managerial': ['Leadership', 'Decision Making', 'Team Management', 'Project Management', 'Business Communication', 'Critical Thinking', 'Problem Solving', 'Conflict Resolution'],
+      'HR Interview': ['Tell me about yourself', 'Strengths & Weaknesses', 'Situational Questions', 'Company Knowledge', 'Career Goals', 'Work Ethic', 'Salary Negotiation', 'Behavioral Questions']
+    };
 
-let generatedQuestions = [];
+    let generatedQuestions = [];
 
-function updateSubtopics() {
-  const checked = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
-  const wrap = document.getElementById('ai-subtopics-wrap');
-  if (!checked.length) { wrap.innerHTML = ''; return; }
-  wrap.innerHTML = `<div style="font-size:13px;font-weight:700;margin-bottom:10px;">🎯 Select Sub-topics (optional)</div>` +
-    checked.map(cat => `
+    function updateSubtopics() {
+      const checked = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
+      const wrap = document.getElementById('ai-subtopics-wrap');
+      if (!checked.length) { wrap.innerHTML = ''; return; }
+      wrap.innerHTML = `<div style="font-size:13px;font-weight:700;margin-bottom:10px;">🎯 Select Sub-topics (optional)</div>` +
+        checked.map(cat => `
       <div style="margin-bottom:12px;">
         <div style="font-size:11.5px;color:var(--text2);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">${cat}</div>
         <div class="checkbox-group">
@@ -1395,409 +2223,443 @@ function updateSubtopics() {
           `).join('')}
         </div>
       </div>`).join('');
-  // Re-attach chip styling
-  document.querySelectorAll('.check-chip input').forEach(inp => {
-    inp.addEventListener('change', () => inp.closest('.check-chip').classList.toggle('on', inp.checked));
-  });
-}
-
-// Watch category checkboxes
-document.addEventListener('change', e => {
-  if (e.target.closest('#ai-categories')) {
-    e.target.closest('.check-chip').classList.toggle('on', e.target.checked);
-    updateSubtopics();
-  }
-});
-
-// ── Built-in question bank (fallback when API unavailable) ─────────────────
-const QUESTION_BANK = {
-  'Aptitude': [
-    {question:"If a train travels 360 km in 4 hours, what is its speed in m/s?",options:["25 m/s","30 m/s","20 m/s","15 m/s"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"A shopkeeper sells an item for ₹480 at 20% profit. What is the cost price?",options:["₹400","₹380","₹420","₹360"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"What is 15% of 240?",options:["36","34","38","32"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"If 6 men complete a work in 12 days, how many days do 9 men take?",options:["8 days","6 days","10 days","9 days"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"A and B together can do a work in 6 days. A alone in 10 days. How many days for B alone?",options:["15 days","12 days","18 days","20 days"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"The ratio of ages of A and B is 3:5. After 6 years ratio becomes 2:3. Find A's current age.",options:["18","15","12","24"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"Simple interest on ₹5000 at 8% per year for 3 years?",options:["₹1200","₹1000","₹1400","₹1600"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"Two pipes fill a tank in 12 and 18 minutes. Both open together — time to fill?",options:["7.2 min","8 min","6 min","9 min"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"Profit percentage when CP=₹250, SP=₹300?",options:["20%","25%","15%","10%"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"Find the next number: 1, 4, 9, 16, 25, ?",options:["36","30","49","40"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"A man walks 3 km north then 4 km east. Distance from start?",options:["5 km","7 km","6 km","4 km"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"If 20% of x is 80, then x is?",options:["400","320","160","500"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"A number is increased by 25% then decreased by 25%. Net change?",options:["-6.25%","0%","+6.25%","-25%"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"HCF of 36 and 48?",options:["12","6","18","24"],correctAnswer:0,topic:"Aptitude",marks:1},
-    {question:"LCM of 4, 6, 8?",options:["24","12","48","36"],correctAnswer:0,topic:"Aptitude",marks:1},
-  ],
-  'Logical Reasoning': [
-    {question:"If all Bloops are Razzies and all Razzies are Lazzies, then all Bloops are definitely:",options:["Lazzies","Not Lazzies","Sometimes Lazzies","None"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"A is B's sister. C is B's mother. D is C's father. How is A related to D?",options:["Granddaughter","Daughter","Sister","Niece"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"In a row of 40 students, Ravi is 11th from left. Position from right?",options:["30","29","31","28"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Find next: 3, 6, 11, 18, 27, ?",options:["38","36","40","42"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"A walks 5km north, turns right 3km, turns right 5km. Distance from start?",options:["3 km","5 km","8 km","0 km"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Statements: All cats are dogs. All dogs are birds. Conclusion: All cats are birds?",options:["True","False","Uncertain","Partially True"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Find the odd one out: 121, 144, 169, 196, 225, 250",options:["250","225","196","169"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"If MANGO is coded as NBOHP, then APPLE is coded as?",options:["BQQMF","BQPMF","BQPME","CQQMF"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Find next: ACE, BDF, CEG, ?",options:["DFH","EGI","CFH","DGI"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"If south-east becomes north, north-east becomes west, what does south become?",options:["North-East","North-West","South-East","East"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Rearrange to form a word: TEADMI",options:["MATED","ADTIME","MIDEAT","DAMITE"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-    {question:"Which number replaces ?: 2,4,8,16,32,?",options:["64","48","60","56"],correctAnswer:0,topic:"Logical Reasoning",marks:1},
-  ],
-  'Verbal Ability': [
-    {question:"Synonym of BENEVOLENT:",options:["Kind","Cruel","Strict","Ignorant"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Antonym of VERBOSE:",options:["Concise","Talkative","Lengthy","Wordy"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Fill in: She has been working here ___ 2010.",options:["since","for","from","by"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Correct sentence?",options:["He doesn't know anything","He don't know nothing","He doesn't knows anything","He doesn't know nothing"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Correctly spelled word?",options:["Accommodation","Accomodation","Acommodation","Acomodation"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Meaning of 'Bite the bullet':",options:["Endure pain stoically","Shoot someone","Eat fast","Argue fiercely"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Active to passive: 'The manager signed the letter.'",options:["The letter was signed by the manager","The letter is signed by manager","The manager has signed the letter","Letter was sign by manager"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Synonym of ELOQUENT:",options:["Fluent","Silent","Confused","Harsh"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Antonym of DILIGENT:",options:["Lazy","Hardworking","Careful","Sincere"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-    {question:"Meaning of idiom 'Break the ice':",options:["Start a conversation","Damage property","Be cold","Stop fighting"],correctAnswer:0,topic:"Verbal Ability",marks:1},
-  ],
-  'Technical': [
-    {question:"Time complexity of binary search?",options:["O(log n)","O(n)","O(n²)","O(1)"],correctAnswer:0,topic:"C Programming",marks:1},
-    {question:"Which data structure uses LIFO?",options:["Stack","Queue","Linked List","Tree"],correctAnswer:0,topic:"Data Structures",marks:1},
-    {question:"What does SQL SELECT DISTINCT do?",options:["Returns unique rows","Returns all rows","Deletes duplicates","Counts rows"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
-    {question:"In Python, which is immutable?",options:["Tuple","List","Dictionary","Set"],correctAnswer:0,topic:"Python",marks:1},
-    {question:"In C, function to allocate memory dynamically?",options:["malloc()","alloc()","new()","create()"],correctAnswer:0,topic:"C Programming",marks:1},
-    {question:"HTTP status 404 means?",options:["Not Found","Server Error","Unauthorized","Forbidden"],correctAnswer:0,topic:"Web Development",marks:1},
-    {question:"Sorting with worst-case O(n log n)?",options:["Merge Sort","Bubble Sort","Insertion Sort","Selection Sort"],correctAnswer:0,topic:"Algorithms",marks:1},
-    {question:"Foreign key in a database?",options:["References primary key of another table","Duplicate primary key","Indexed column","Unique constraint"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
-    {question:"'virtual' keyword in C++ enables?",options:["Runtime polymorphism","Abstract class","Dynamic memory","None"],correctAnswer:0,topic:"C++ OOP",marks:1},
-    {question:"Deadlock in OS means?",options:["Two processes wait for each other indefinitely","CPU overload","Memory overflow","Network failure"],correctAnswer:0,topic:"Operating Systems",marks:1},
-    {question:"Java keyword to prevent method overriding?",options:["final","static","private","abstract"],correctAnswer:0,topic:"Java",marks:1},
-    {question:"Purpose of index in a database?",options:["Speed up retrieval","Delete duplicates","Enforce constraints","Join tables"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
-    {question:"Which Python keyword is used to handle exceptions?",options:["try","catch","error","handle"],correctAnswer:0,topic:"Python",marks:1},
-    {question:"In Java, which method is the entry point?",options:["public static void main(String[] args)","static main()","void main()","public main()"],correctAnswer:0,topic:"Java",marks:1},
-    {question:"OSI model has how many layers?",options:["7","5","4","6"],correctAnswer:0,topic:"Computer Networks",marks:1},
-    {question:"What is a pointer in C?",options:["Variable storing memory address","Variable storing value","Function type","Loop variable"],correctAnswer:0,topic:"C Programming",marks:1},
-    {question:"Which HTTP method is used to send data to a server?",options:["POST","GET","PUT","DELETE"],correctAnswer:0,topic:"Web Development",marks:1},
-    {question:"Time complexity of inserting in a hash table (average)?",options:["O(1)","O(n)","O(log n)","O(n²)"],correctAnswer:0,topic:"Data Structures",marks:1},
-    {question:"What does OOP stand for?",options:["Object Oriented Programming","Open Operational Process","Object Overriding Protocol","None"],correctAnswer:0,topic:"C++ OOP",marks:1},
-    {question:"Which SQL command removes all rows from a table without logging?",options:["TRUNCATE","DELETE","DROP","REMOVE"],correctAnswer:0,topic:"DBMS & SQL",marks:1},
-  ],
-  'Managerial': [
-    {question:"Which leadership style involves team in decision-making?",options:["Democratic","Autocratic","Laissez-faire","Transactional"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"SMART goal stands for?",options:["Specific, Measurable, Achievable, Relevant, Time-bound","Simple, Manageable, Accurate, Realistic, Timely","Strategic, Meaningful, Attainable, Resourceful, Trackable","None"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"Maslow's Hierarchy theory is about?",options:["Employee motivation through needs","Financial planning","Production efficiency","Quality control"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"Primary purpose of a Gantt chart?",options:["Project scheduling","Financial reporting","Team evaluation","Risk assessment"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"KPI stands for?",options:["Key Performance Indicator","Key Productivity Index","Knowledge Process Integration","None"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"360-degree feedback involves evaluation by?",options:["Peers, subordinates, superiors and self","Only superiors","Only peers","Only subordinates"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"Win-win conflict resolution style?",options:["Collaboration","Competition","Avoidance","Accommodation"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"CPM stands for?",options:["Critical Path Method","Cost Planning Management","Centralized Project Monitor","None"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"Which management style gives complete freedom to employees?",options:["Laissez-faire","Autocratic","Democratic","Bureaucratic"],correctAnswer:0,topic:"Managerial",marks:1},
-    {question:"SWOT analysis evaluates?",options:["Strengths, Weaknesses, Opportunities, Threats","Strategy, Work, Operations, Targets","None of above","Skills, Work, Outcomes, Tactics"],correctAnswer:0,topic:"Managerial",marks:1},
-  ],
-  'HR Interview': [
-    {question:"Best way to answer 'Greatest weakness'?",options:["Mention real weakness + how improving","Say no weaknesses","Strength disguised as weakness","Refuse to answer"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"'Tell me about yourself' should focus on?",options:["Professional background relevant to role","Personal life","Academic history only","Future personal goals"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"Best answer to 'Where do you see yourself in 5 years'?",options:["Align goals with company growth","Want the interviewer's job","Unsure","Mention salary expectations"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"'Why should we hire you?' should focus on?",options:["Specific skills matching the JD","General qualities","Only your degree","Salary needs"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"Salary expectations — best approach?",options:["Give researched market range","Demand highest possible","Say any amount is fine","Refuse to discuss"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"STAR method stands for?",options:["Situation, Task, Action, Result","Strategy, Target, Achievement, Review","Skill, Time, Ability, Result","None"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"'Do you have any questions for us?' — best response?",options:["Ask about growth or team culture","No questions","Ask about leaves","Ask salary immediately"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"How to answer 'Why do you want to join our company'?",options:["Show company knowledge aligned to your goals","Salary is good","It's close to home","Had no other offers"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"If asked about a gap in employment, you should?",options:["Be honest and explain how you used time productively","Lie about it","Refuse to answer","Blame previous employer"],correctAnswer:0,topic:"HR Interview",marks:1},
-    {question:"Body language tip for interviews?",options:["Maintain eye contact and sit upright","Look at the floor","Cross arms","Check phone"],correctAnswer:0,topic:"HR Interview",marks:1},
-  ]
-};
-
-async function callGeminiDirect(prompt) {
-  const GEMINI_KEY = 'AIzaSyAF29JUbKPg6kfr-ZdaMxXpsnIU-1yRQ4c';
-  try {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
-      })
-    });
-    if (!resp.ok) { console.warn('Gemini HTTP error:', resp.status); return null; }
-    const data = await resp.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!content.trim()) return null;
-    let cleaned = content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
-    if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e+1);
-    const parsed = JSON.parse(cleaned);
-    if (parsed.questions?.length) return parsed.questions;
-  } catch(err) { console.warn('Gemini failed:', err.message); }
-  return null;
-}
-
-async function callOpenRouterDirect(prompt) {
-  const MODELS = [
-    'meta-llama/llama-3.1-8b-instruct:free',
-    'mistralai/mistral-7b-instruct:free',
-    'google/gemma-2-9b-it:free',
-    'qwen/qwen-2-7b-instruct:free'
-  ];
-  const API_KEY = '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';
-  for (const model of MODELS) {
-    try {
-      const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'PlacementPro'
-        },
-        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 })
+      // Re-attach chip styling
+      document.querySelectorAll('.check-chip input').forEach(inp => {
+        inp.addEventListener('change', () => inp.closest('.check-chip').classList.toggle('on', inp.checked));
       });
-      if (!resp.ok) continue;
-      const data = await resp.json();
-      if (data.error) { console.warn('OR model error', model, data.error); continue; }
-      const content = data.choices?.[0]?.message?.content || '';
-      if (!content.trim()) continue;
-      let cleaned = content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
-      if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e+1);
-      const parsed = JSON.parse(cleaned);
-      if (parsed.questions?.length) { console.log('OpenRouter success:', model); return parsed.questions; }
-    } catch(err) { console.warn('OR model failed:', model, err.message); }
-  }
-  return null;
-}
+    }
 
-function getFallbackQuestions(cats, subs, qcount) {
-  let pool = [];
-  cats.forEach(cat => { pool.push(...(QUESTION_BANK[cat] || [])); });
-  if (subs.length) {
-    const subPool = pool.filter(q => subs.some(s => q.topic === s || q.question.toLowerCase().includes(s.toLowerCase())));
-    if (subPool.length >= Math.min(qcount, 5)) pool = subPool;
-  }
-  pool = pool.sort(() => Math.random() - 0.5);
-  while (pool.length < qcount) pool = [...pool, ...pool];
-  return pool.slice(0, qcount).map(q => {
-    const correct = q.options[q.correctAnswer];
-    const opts = [...q.options].sort(() => Math.random() - 0.5);
-    return { ...q, options: opts, correctAnswer: opts.indexOf(correct) };
-  });
-}
+    // Watch category checkboxes
+    document.addEventListener('change', e => {
+      if (e.target.closest('#ai-categories')) {
+        e.target.closest('.check-chip').classList.toggle('on', e.target.checked);
+        updateSubtopics();
+      }
+    });
 
-async function generateAIQuiz() {
-  const cats = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
-  if (!cats.length) { toast('Select Categories', 'Choose at least one category', 'e'); return; }
-  const subs = [...document.querySelectorAll('[name="sub"]:checked')].map(i => i.value);
-  const qcount = parseInt(document.getElementById('ai-qcount').value) || 10;
-  const diff = document.getElementById('ai-difficulty').value;
+    // ── Built-in question bank (fallback when API unavailable) ─────────────────
+    const QUESTION_BANK = {
+      'Aptitude': [
+        { question: "If a train travels 360 km in 4 hours, what is its speed in m/s?", options: ["25 m/s", "30 m/s", "20 m/s", "15 m/s"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "A shopkeeper sells an item for ₹480 at 20% profit. What is the cost price?", options: ["₹400", "₹380", "₹420", "₹360"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "What is 15% of 240?", options: ["36", "34", "38", "32"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "If 6 men complete a work in 12 days, how many days do 9 men take?", options: ["8 days", "6 days", "10 days", "9 days"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "A and B together can do a work in 6 days. A alone in 10 days. How many days for B alone?", options: ["15 days", "12 days", "18 days", "20 days"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "The ratio of ages of A and B is 3:5. After 6 years ratio becomes 2:3. Find A's current age.", options: ["18", "15", "12", "24"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "Simple interest on ₹5000 at 8% per year for 3 years?", options: ["₹1200", "₹1000", "₹1400", "₹1600"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "Two pipes fill a tank in 12 and 18 minutes. Both open together — time to fill?", options: ["7.2 min", "8 min", "6 min", "9 min"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "Profit percentage when CP=₹250, SP=₹300?", options: ["20%", "25%", "15%", "10%"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "Find the next number: 1, 4, 9, 16, 25, ?", options: ["36", "30", "49", "40"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "A man walks 3 km north then 4 km east. Distance from start?", options: ["5 km", "7 km", "6 km", "4 km"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "If 20% of x is 80, then x is?", options: ["400", "320", "160", "500"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "A number is increased by 25% then decreased by 25%. Net change?", options: ["-6.25%", "0%", "+6.25%", "-25%"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "HCF of 36 and 48?", options: ["12", "6", "18", "24"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+        { question: "LCM of 4, 6, 8?", options: ["24", "12", "48", "36"], correctAnswer: 0, topic: "Aptitude", marks: 1 },
+      ],
+      'Logical Reasoning': [
+        { question: "If all Bloops are Razzies and all Razzies are Lazzies, then all Bloops are definitely:", options: ["Lazzies", "Not Lazzies", "Sometimes Lazzies", "None"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "A is B's sister. C is B's mother. D is C's father. How is A related to D?", options: ["Granddaughter", "Daughter", "Sister", "Niece"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "In a row of 40 students, Ravi is 11th from left. Position from right?", options: ["30", "29", "31", "28"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Find next: 3, 6, 11, 18, 27, ?", options: ["38", "36", "40", "42"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "A walks 5km north, turns right 3km, turns right 5km. Distance from start?", options: ["3 km", "5 km", "8 km", "0 km"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Statements: All cats are dogs. All dogs are birds. Conclusion: All cats are birds?", options: ["True", "False", "Uncertain", "Partially True"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Find the odd one out: 121, 144, 169, 196, 225, 250", options: ["250", "225", "196", "169"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "If MANGO is coded as NBOHP, then APPLE is coded as?", options: ["BQQMF", "BQPMF", "BQPME", "CQQMF"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Find next: ACE, BDF, CEG, ?", options: ["DFH", "EGI", "CFH", "DGI"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "If south-east becomes north, north-east becomes west, what does south become?", options: ["North-East", "North-West", "South-East", "East"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Rearrange to form a word: TEADMI", options: ["MATED", "ADTIME", "MIDEAT", "DAMITE"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+        { question: "Which number replaces ?: 2,4,8,16,32,?", options: ["64", "48", "60", "56"], correctAnswer: 0, topic: "Logical Reasoning", marks: 1 },
+      ],
+      'Verbal Ability': [
+        { question: "Synonym of BENEVOLENT:", options: ["Kind", "Cruel", "Strict", "Ignorant"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Antonym of VERBOSE:", options: ["Concise", "Talkative", "Lengthy", "Wordy"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Fill in: She has been working here ___ 2010.", options: ["since", "for", "from", "by"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Correct sentence?", options: ["He doesn't know anything", "He don't know nothing", "He doesn't knows anything", "He doesn't know nothing"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Correctly spelled word?", options: ["Accommodation", "Accomodation", "Acommodation", "Acomodation"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Meaning of 'Bite the bullet':", options: ["Endure pain stoically", "Shoot someone", "Eat fast", "Argue fiercely"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Active to passive: 'The manager signed the letter.'", options: ["The letter was signed by the manager", "The letter is signed by manager", "The manager has signed the letter", "Letter was sign by manager"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Synonym of ELOQUENT:", options: ["Fluent", "Silent", "Confused", "Harsh"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Antonym of DILIGENT:", options: ["Lazy", "Hardworking", "Careful", "Sincere"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+        { question: "Meaning of idiom 'Break the ice':", options: ["Start a conversation", "Damage property", "Be cold", "Stop fighting"], correctAnswer: 0, topic: "Verbal Ability", marks: 1 },
+      ],
+      'Technical': [
+        { question: "Time complexity of binary search?", options: ["O(log n)", "O(n)", "O(n²)", "O(1)"], correctAnswer: 0, topic: "C Programming", marks: 1 },
+        { question: "Which data structure uses LIFO?", options: ["Stack", "Queue", "Linked List", "Tree"], correctAnswer: 0, topic: "Data Structures", marks: 1 },
+        { question: "What does SQL SELECT DISTINCT do?", options: ["Returns unique rows", "Returns all rows", "Deletes duplicates", "Counts rows"], correctAnswer: 0, topic: "DBMS & SQL", marks: 1 },
+        { question: "In Python, which is immutable?", options: ["Tuple", "List", "Dictionary", "Set"], correctAnswer: 0, topic: "Python", marks: 1 },
+        { question: "In C, function to allocate memory dynamically?", options: ["malloc()", "alloc()", "new()", "create()"], correctAnswer: 0, topic: "C Programming", marks: 1 },
+        { question: "HTTP status 404 means?", options: ["Not Found", "Server Error", "Unauthorized", "Forbidden"], correctAnswer: 0, topic: "Web Development", marks: 1 },
+        { question: "Sorting with worst-case O(n log n)?", options: ["Merge Sort", "Bubble Sort", "Insertion Sort", "Selection Sort"], correctAnswer: 0, topic: "Algorithms", marks: 1 },
+        { question: "Foreign key in a database?", options: ["References primary key of another table", "Duplicate primary key", "Indexed column", "Unique constraint"], correctAnswer: 0, topic: "DBMS & SQL", marks: 1 },
+        { question: "'virtual' keyword in C++ enables?", options: ["Runtime polymorphism", "Abstract class", "Dynamic memory", "None"], correctAnswer: 0, topic: "C++ OOP", marks: 1 },
+        { question: "Deadlock in OS means?", options: ["Two processes wait for each other indefinitely", "CPU overload", "Memory overflow", "Network failure"], correctAnswer: 0, topic: "Operating Systems", marks: 1 },
+        { question: "Java keyword to prevent method overriding?", options: ["final", "static", "private", "abstract"], correctAnswer: 0, topic: "Java", marks: 1 },
+        { question: "Purpose of index in a database?", options: ["Speed up retrieval", "Delete duplicates", "Enforce constraints", "Join tables"], correctAnswer: 0, topic: "DBMS & SQL", marks: 1 },
+        { question: "Which Python keyword is used to handle exceptions?", options: ["try", "catch", "error", "handle"], correctAnswer: 0, topic: "Python", marks: 1 },
+        { question: "In Java, which method is the entry point?", options: ["public static void main(String[] args)", "static main()", "void main()", "public main()"], correctAnswer: 0, topic: "Java", marks: 1 },
+        { question: "OSI model has how many layers?", options: ["7", "5", "4", "6"], correctAnswer: 0, topic: "Computer Networks", marks: 1 },
+        { question: "What is a pointer in C?", options: ["Variable storing memory address", "Variable storing value", "Function type", "Loop variable"], correctAnswer: 0, topic: "C Programming", marks: 1 },
+        { question: "Which HTTP method is used to send data to a server?", options: ["POST", "GET", "PUT", "DELETE"], correctAnswer: 0, topic: "Web Development", marks: 1 },
+        { question: "Time complexity of inserting in a hash table (average)?", options: ["O(1)", "O(n)", "O(log n)", "O(n²)"], correctAnswer: 0, topic: "Data Structures", marks: 1 },
+        { question: "What does OOP stand for?", options: ["Object Oriented Programming", "Open Operational Process", "Object Overriding Protocol", "None"], correctAnswer: 0, topic: "C++ OOP", marks: 1 },
+        { question: "Which SQL command removes all rows from a table without logging?", options: ["TRUNCATE", "DELETE", "DROP", "REMOVE"], correctAnswer: 0, topic: "DBMS & SQL", marks: 1 },
+      ],
+      'Managerial': [
+        { question: "Which leadership style involves team in decision-making?", options: ["Democratic", "Autocratic", "Laissez-faire", "Transactional"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "SMART goal stands for?", options: ["Specific, Measurable, Achievable, Relevant, Time-bound", "Simple, Manageable, Accurate, Realistic, Timely", "Strategic, Meaningful, Attainable, Resourceful, Trackable", "None"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "Maslow's Hierarchy theory is about?", options: ["Employee motivation through needs", "Financial planning", "Production efficiency", "Quality control"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "Primary purpose of a Gantt chart?", options: ["Project scheduling", "Financial reporting", "Team evaluation", "Risk assessment"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "KPI stands for?", options: ["Key Performance Indicator", "Key Productivity Index", "Knowledge Process Integration", "None"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "360-degree feedback involves evaluation by?", options: ["Peers, subordinates, superiors and self", "Only superiors", "Only peers", "Only subordinates"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "Win-win conflict resolution style?", options: ["Collaboration", "Competition", "Avoidance", "Accommodation"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "CPM stands for?", options: ["Critical Path Method", "Cost Planning Management", "Centralized Project Monitor", "None"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "Which management style gives complete freedom to employees?", options: ["Laissez-faire", "Autocratic", "Democratic", "Bureaucratic"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+        { question: "SWOT analysis evaluates?", options: ["Strengths, Weaknesses, Opportunities, Threats", "Strategy, Work, Operations, Targets", "None of above", "Skills, Work, Outcomes, Tactics"], correctAnswer: 0, topic: "Managerial", marks: 1 },
+      ],
+      'HR Interview': [
+        { question: "Best way to answer 'Greatest weakness'?", options: ["Mention real weakness + how improving", "Say no weaknesses", "Strength disguised as weakness", "Refuse to answer"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "'Tell me about yourself' should focus on?", options: ["Professional background relevant to role", "Personal life", "Academic history only", "Future personal goals"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "Best answer to 'Where do you see yourself in 5 years'?", options: ["Align goals with company growth", "Want the interviewer's job", "Unsure", "Mention salary expectations"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "'Why should we hire you?' should focus on?", options: ["Specific skills matching the JD", "General qualities", "Only your degree", "Salary needs"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "Salary expectations — best approach?", options: ["Give researched market range", "Demand highest possible", "Say any amount is fine", "Refuse to discuss"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "STAR method stands for?", options: ["Situation, Task, Action, Result", "Strategy, Target, Achievement, Review", "Skill, Time, Ability, Result", "None"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "'Do you have any questions for us?' — best response?", options: ["Ask about growth or team culture", "No questions", "Ask about leaves", "Ask salary immediately"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "How to answer 'Why do you want to join our company'?", options: ["Show company knowledge aligned to your goals", "Salary is good", "It's close to home", "Had no other offers"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "If asked about a gap in employment, you should?", options: ["Be honest and explain how you used time productively", "Lie about it", "Refuse to answer", "Blame previous employer"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+        { question: "Body language tip for interviews?", options: ["Maintain eye contact and sit upright", "Look at the floor", "Cross arms", "Check phone"], correctAnswer: 0, topic: "HR Interview", marks: 1 },
+      ]
+    };
 
-  const btn = document.getElementById('ai-gen-btn');
-  btn.innerHTML = '<div class="loader"></div> Generating…';
-  btn.disabled = true;
+    async function callGeminiDirect(prompt) {
+      const GEMINI_KEY = 'AIzaSyAF29JUbKPg6kfr-ZdaMxXpsnIU-1yRQ4c';
+      try {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
+          })
+        });
+        if (!resp.ok) { console.warn('Gemini HTTP error:', resp.status); return null; }
+        const data = await resp.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!content.trim()) return null;
+        let cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
+        if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e + 1);
+        const parsed = JSON.parse(cleaned);
+        if (parsed.questions?.length) return parsed.questions;
+      } catch (err) { console.warn('Gemini failed:', err.message); }
+      return null;
+    }
 
-  const topicList = [...cats, ...subs].join(', ');
-  const prompt = `You are a placement exam expert for Indian engineering colleges. Generate exactly ${qcount} unique multiple-choice questions on: ${topicList}. Difficulty: ${diff}.
+    async function callOpenRouterDirect(prompt) {
+      const MODELS = [
+        'meta-llama/llama-3.1-8b-instruct:free',
+        'mistralai/mistral-7b-instruct:free',
+        'google/gemma-2-9b-it:free',
+        'qwen/qwen-2-7b-instruct:free'
+      ];
+      const API_KEY = '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';
+      for (const model of MODELS) {
+        try {
+          const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': window.location.origin,
+              'X-Title': 'PlacementPro'
+            },
+            body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 4000 })
+          });
+          if (!resp.ok) continue;
+          const data = await resp.json();
+          if (data.error) { console.warn('OR model error', model, data.error); continue; }
+          const content = data.choices?.[0]?.message?.content || '';
+          if (!content.trim()) continue;
+          let cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+          const s = cleaned.indexOf('{'), e = cleaned.lastIndexOf('}');
+          if (s !== -1 && e !== -1) cleaned = cleaned.substring(s, e + 1);
+          const parsed = JSON.parse(cleaned);
+          if (parsed.questions?.length) { console.log('OpenRouter success:', model); return parsed.questions; }
+        } catch (err) { console.warn('OR model failed:', model, err.message); }
+      }
+      return null;
+    }
+
+    function getFallbackQuestions(cats, subs, qcount) {
+      let pool = [];
+      cats.forEach(cat => { pool.push(...(QUESTION_BANK[cat] || [])); });
+      if (subs.length) {
+        const subPool = pool.filter(q => subs.some(s => q.topic === s || q.question.toLowerCase().includes(s.toLowerCase())));
+        if (subPool.length >= Math.min(qcount, 5)) pool = subPool;
+      }
+      pool = pool.sort(() => Math.random() - 0.5);
+      while (pool.length < qcount) pool = [...pool, ...pool];
+      return pool.slice(0, qcount).map(q => {
+        const correct = q.options[q.correctAnswer];
+        const opts = [...q.options].sort(() => Math.random() - 0.5);
+        return { ...q, options: opts, correctAnswer: opts.indexOf(correct) };
+      });
+    }
+
+    async function generateAIQuiz() {
+      const cats = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
+      if (!cats.length) { toast('Select Categories', 'Choose at least one category', 'e'); return; }
+      const subs = [...document.querySelectorAll('[name="sub"]:checked')].map(i => i.value);
+      const qcount = parseInt(document.getElementById('ai-qcount').value) || 10;
+      const diff = document.getElementById('ai-difficulty').value;
+
+      const btn = document.getElementById('ai-gen-btn');
+      btn.innerHTML = '<div class="loader"></div> Generating…';
+      btn.disabled = true;
+
+      const topicList = [...cats, ...subs].join(', ');
+      const prompt = `You are a placement exam expert for Indian engineering colleges. Generate exactly ${qcount} unique multiple-choice questions on: ${topicList}. Difficulty: ${diff}.
 Return ONLY valid JSON — no markdown, no explanation, no code fences:
 {"questions":[{"question":"Question text?","options":["Option A","Option B","Option C","Option D"],"correctAnswer":0,"topic":"${cats[0]}","marks":1}]}
 correctAnswer is 0-indexed (0=A,1=B,2=C,3=D). Make all ${qcount} questions unique and placement-focused.`;
 
-  let questions = null;
+      let questions = null;
 
-  // 1. Try Gemini first (most reliable)
-  questions = await callGeminiDirect(prompt);
+      // 1. Try Gemini first (most reliable)
+      questions = await callGeminiDirect(prompt);
 
-  // 2. Try OpenRouter as fallback
-  if (!questions || !questions.length) {
-    console.log('Gemini failed, trying OpenRouter...');
-    questions = await callOpenRouterDirect(prompt);
-  }
+      // 2. Try OpenRouter as fallback
+      if (!questions || !questions.length) {
+        console.log('Gemini failed, trying OpenRouter...');
+        questions = await callOpenRouterDirect(prompt);
+      }
 
-  // 3. Use built-in question bank as last resort
-  if (!questions || !questions.length) {
-    console.log('All AI failed, using question bank...');
-    questions = getFallbackQuestions(cats, subs, qcount);
-    toast('Using Question Bank', 'AI unavailable — loaded from built-in bank', 'w');
-  } else {
-    toast('AI Generated ✓', `${questions.length} questions ready`, 's');
-  }
+      // 3. Use built-in question bank as last resort
+      if (!questions || !questions.length) {
+        console.log('All AI failed, using question bank...');
+        questions = getFallbackQuestions(cats, subs, qcount);
+        toast('Using Question Bank', 'AI unavailable — loaded from built-in bank', 'w');
+      } else {
+        toast('AI Generated ✓', `${questions.length} questions ready`, 's');
+      }
 
-  btn.innerHTML = '🤖 Generate Questions';
-  btn.disabled = false;
-  generatedQuestions = questions;
-  renderGeneratedPreview();
-}
+      btn.innerHTML = '🤖 Generate Questions';
+      btn.disabled = false;
+      generatedQuestions = questions;
+      renderGeneratedPreview();
+    }
 
-function renderGeneratedPreview() {
-  const wrap = document.getElementById('ai-preview-wrap');
-  const preview = document.getElementById('ai-questions-preview');
-  wrap.style.display = '';
-  document.getElementById('ai-save-btn').style.display = '';
-  const LETTERS = ['A','B','C','D'];
-  preview.innerHTML = generatedQuestions.map((q, i) => `
+    function renderGeneratedPreview() {
+      const wrap = document.getElementById('ai-preview-wrap');
+      const preview = document.getElementById('ai-questions-preview');
+      wrap.style.display = '';
+      document.getElementById('ai-save-btn').style.display = '';
+      const LETTERS = ['A', 'B', 'C', 'D'];
+      preview.innerHTML = generatedQuestions.map((q, i) => `
     <div class="q-builder" style="margin-bottom:12px;">
-      <div class="q-head">Q${i+1} · <span style="color:var(--accent2);">${q.topic||''}</span>
+      <div class="q-head">Q${i + 1} · <span style="color:var(--accent2);">${q.topic || ''}</span>
         <button class="btn btn-danger btn-sm btn-icon" onclick="removeAIQ(${i})" title="Remove">🗑</button>
       </div>
       <div style="font-size:13px;font-weight:600;margin-bottom:8px;">${q.question}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         ${q.options.map((opt, oi) => `
-          <div style="padding:7px 10px;border-radius:8px;font-size:12px;background:${oi===q.correctAnswer?'rgba(34,197,94,0.12)':'var(--surface3)'};border:1px solid ${oi===q.correctAnswer?'rgba(34,197,94,0.3)':'var(--border)'};color:${oi===q.correctAnswer?'var(--success)':'var(--text2)'};">
-            <strong>${LETTERS[oi]}.</strong> ${opt} ${oi===q.correctAnswer?'✓':''}
+          <div style="padding:7px 10px;border-radius:8px;font-size:12px;background:${oi === q.correctAnswer ? 'rgba(34,197,94,0.12)' : 'var(--surface3)'};border:1px solid ${oi === q.correctAnswer ? 'rgba(34,197,94,0.3)' : 'var(--border)'};color:${oi === q.correctAnswer ? 'var(--success)' : 'var(--text2)'};">
+            <strong>${LETTERS[oi]}.</strong> ${opt} ${oi === q.correctAnswer ? '✓' : ''}
           </div>`).join('')}
       </div>
     </div>`).join('');
-}
+    }
 
-function removeAIQ(idx) {
-  generatedQuestions.splice(idx, 1);
-  renderGeneratedPreview();
-}
+    function removeAIQ(idx) {
+      generatedQuestions.splice(idx, 1);
+      renderGeneratedPreview();
+    }
 
-async function regenerateQuiz() {
-  generatedQuestions = [];
-  document.getElementById('ai-preview-wrap').style.display = 'none';
-  document.getElementById('ai-save-btn').style.display = 'none';
-  await generateAIQuiz();
-}
+    async function regenerateQuiz() {
+      generatedQuestions = [];
+      document.getElementById('ai-preview-wrap').style.display = 'none';
+      document.getElementById('ai-save-btn').style.display = 'none';
+      await generateAIQuiz();
+    }
 
-async function saveAIAssessment() {
-  if (!generatedQuestions.length) { toast('No questions', 'Generate questions first', 'e'); return; }
-  const title = document.getElementById('ai-title').value;
-  if (!title) { toast('Missing Title', 'Enter assessment title', 'e'); return; }
-  const cats = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
-  const totalMarks = generatedQuestions.reduce((s, q) => s + (q.marks || 1), 0);
-  const body = {
-    title, type: cats.join('+') || 'Mixed', categories: cats,
-    timeLimit: parseInt(document.getElementById('ai-time').value),
-    driveId: document.getElementById('ai-drive').value || null,
-    questions: generatedQuestions, totalMarks, aiGenerated: true
-  };
-  const btn = document.getElementById('ai-save-btn');
-  btn.innerHTML = '<div class="loader"></div> Saving…';
-  btn.disabled = true;
-  const res = await api('POST', '/api/assessments', body);
-  btn.innerHTML = '💾 Save Assessment';
-  btn.disabled = false;
-  if (res.success) {
-    toast('Assessment Saved ✓', title, 's');
-    closeOverlay('ai-quiz-overlay');
-    generatedQuestions = [];
-    document.getElementById('ai-preview-wrap').style.display = 'none';
-    document.getElementById('ai-save-btn').style.display = 'none';
-    loadAssessments();
-  } else toast('Error', res.error, 'e');
-}
+    async function saveAIAssessment() {
+      if (!generatedQuestions.length) { toast('No questions', 'Generate questions first', 'e'); return; }
+      const title = document.getElementById('ai-title').value;
+      if (!title) { toast('Missing Title', 'Enter assessment title', 'e'); return; }
+      const cats = [...document.querySelectorAll('#ai-categories input:checked')].map(i => i.value);
+      const totalMarks = generatedQuestions.reduce((s, q) => s + (q.marks || 1), 0);
+      const body = {
+        title, type: cats.join('+') || 'Mixed', categories: cats,
+        timeLimit: parseInt(document.getElementById('ai-time').value),
+        driveId: document.getElementById('ai-drive').value || null,
+        questions: generatedQuestions, totalMarks, aiGenerated: true
+      };
+      const btn = document.getElementById('ai-save-btn');
+      btn.innerHTML = '<div class="loader"></div> Saving…';
+      btn.disabled = true;
+      const res = await api('POST', '/api/assessments', body);
+      btn.innerHTML = '💾 Save Assessment';
+      btn.disabled = false;
+      if (res.success) {
+        toast('Assessment Saved ✓', title, 's');
+        closeOverlay('ai-quiz-overlay');
+        generatedQuestions = [];
+        document.getElementById('ai-preview-wrap').style.display = 'none';
+        document.getElementById('ai-save-btn').style.display = 'none';
+        loadAssessments();
+      } else toast('Error', res.error, 'e');
+    }
 
-// ═══════════ ASSIGNMENT MONITOR ═══════════
-let allAttempts = [];
-let monitorFilter = 'all';
-let monitorAssessments = {};
+    // ═══════════ ALUMNI GROUPS ═══════════
+    async function loadAlumniGroups() {
+      const tbody = document.getElementById('alumni-groups-table');
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3);">Loading…</td></tr>`;
+      const groups = await api('GET', '/api/alumni/groups');
+      if (!Array.isArray(groups) || !groups.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">🤝 No alumni groups yet</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = groups.map((g, i) => `
+        <tr>
+          <td style="color:var(--text3);">${i + 1}</td>
+          <td style="font-weight:600;color:var(--text);">${g.name || '—'}</td>
+          <td><span class="badge b-blue">${g.companyTag || '—'}</span></td>
+          <td style="font-weight:600;">${g.members?.length || 0}</td>
+          <td style="font-size:12px;color:var(--text2);">${g.creatorName || '—'} <span class="badge b-gray" style="margin-left:4px;">${g.creatorRole || '—'}</span></td>
+          <td style="font-size:11.5px;color:var(--text3);">${new Date(g.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteAlumniGroup('${g._id}', '${(g.name || '').replace(/'/g, "\\'")}')">🗑 Delete</button>
+          </td>
+        </tr>`).join('');
+    }
 
-async function loadMonitor() {
-  const tbody = document.getElementById('monitor-table');
-  tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3);">Loading…</td></tr>`;
+    async function deleteAlumniGroup(id, name) {
+      if (!confirm(`Delete group "${name}"? This will also delete all messages in this group.`)) return;
+      const res = await api('DELETE', `/api/alumni/groups/${id}`);
+      if (res.success) {
+        toast('Group Deleted', `"${name}" has been removed`, 's');
+        loadAlumniGroups();
+      } else {
+        toast('Error', res.error || 'Failed to delete group', 'e');
+      }
+    }
 
-  // Load assessments for filter
-  const assessments = await api('GET', '/api/assessments');
-  monitorAssessments = {};
-  if (Array.isArray(assessments)) {
-    assessments.forEach(a => { monitorAssessments[a._id] = a; });
-    const sel = document.getElementById('monitor-assessment-filter');
-    const current = sel.value;
-    sel.innerHTML = '<option value="">All Assessments</option>' +
-      assessments.map(a => `<option value="${a._id}" ${a._id===current?'selected':''}>${a.title}</option>`).join('');
-  }
+    // ═══════════ ASSIGNMENT MONITOR ═══════════
+    let allAttempts = [];
+    let monitorFilter = 'all';
+    let monitorAssessments = {};
 
-  const filterAssessId = document.getElementById('monitor-assessment-filter').value;
-  const url = filterAssessId ? `/api/attempts/assessment/${filterAssessId}` : '/api/attempts/all';
-  const data = await api('GET', url);
-  allAttempts = Array.isArray(data) ? data : [];
+    async function loadMonitor() {
+      const tbody = document.getElementById('monitor-table');
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3);">Loading…</td></tr>`;
 
-  updateMonitorStats();
-  renderMonitorTable();
-  renderMalpracticeAlerts();
-}
+      // Load assessments for filter
+      const assessments = await api('GET', '/api/assessments');
+      monitorAssessments = {};
+      if (Array.isArray(assessments)) {
+        assessments.forEach(a => { monitorAssessments[a._id] = a; });
+        const sel = document.getElementById('monitor-assessment-filter');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">All Assessments</option>' +
+          assessments.map(a => `<option value="${a._id}" ${a._id === current ? 'selected' : ''}>${a.title}</option>`).join('');
+      }
 
-function updateMonitorStats() {
-  const total = allAttempts.length;
-  const submitted = allAttempts.filter(a => a.status === 'submitted').length;
-  const inprog = allAttempts.filter(a => a.status === 'in-progress').length;
-  const malp = allAttempts.filter(a => a.status === 'malpractice' || a.isMalpractice).length;
-  document.getElementById('ms-total').textContent = total;
-  document.getElementById('ms-submitted').textContent = submitted;
-  document.getElementById('ms-inprogress').textContent = inprog;
-  document.getElementById('ms-malpractice').textContent = malp;
-}
+      const filterAssessId = document.getElementById('monitor-assessment-filter').value;
+      const url = filterAssessId ? `/api/attempts/assessment/${filterAssessId}` : '/api/attempts/all';
+      const data = await api('GET', url);
+      allAttempts = Array.isArray(data) ? data : [];
 
-function renderMalpracticeAlerts() {
-  const malp = allAttempts.filter(a => a.status === 'malpractice' || a.isMalpractice);
-  const el = document.getElementById('malpractice-alerts');
-  if (!malp.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `
+      updateMonitorStats();
+      renderMonitorTable();
+      renderMalpracticeAlerts();
+    }
+
+    function updateMonitorStats() {
+      const total = allAttempts.length;
+      const submitted = allAttempts.filter(a => a.status === 'submitted').length;
+      const inprog = allAttempts.filter(a => a.status === 'in-progress').length;
+      const malp = allAttempts.filter(a => a.status === 'malpractice' || a.isMalpractice).length;
+      document.getElementById('ms-total').textContent = total;
+      document.getElementById('ms-submitted').textContent = submitted;
+      document.getElementById('ms-inprogress').textContent = inprog;
+      document.getElementById('ms-malpractice').textContent = malp;
+    }
+
+    function renderMalpracticeAlerts() {
+      const malp = allAttempts.filter(a => a.status === 'malpractice' || a.isMalpractice);
+      const el = document.getElementById('malpractice-alerts');
+      if (!malp.length) { el.innerHTML = ''; return; }
+      el.innerHTML = `
     <div class="card" style="border-color:rgba(244,63,94,0.4);background:rgba(244,63,94,0.04);margin-bottom:16px;">
       <div class="card-header">
         <div>
-          <div class="card-title" style="color:var(--danger);">🚨 Malpractice Detected — ${malp.length} student${malp.length>1?'s':''}</div>
+          <div class="card-title" style="color:var(--danger);">🚨 Malpractice Detected — ${malp.length} student${malp.length > 1 ? 's' : ''}</div>
           <div class="card-sub">These students were automatically flagged for suspicious activity</div>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;">
         ${malp.map(a => {
-          const assessment = monitorAssessments[a.assessmentId] || {};
-          return `
+        const assessment = monitorAssessments[a.assessmentId] || {};
+        return `
           <div style="background:var(--surface2);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:12px 16px;min-width:200px;">
             <div style="font-size:13px;font-weight:700;color:var(--danger);">🚨 ${a.studentName || a.usn}</div>
             <div style="font-size:11px;color:var(--text3);margin-top:3px;">${a.usn} · ${assessment.title || 'Assessment'}</div>
             <div style="font-size:11px;color:var(--warning);margin-top:4px;">⚠️ ${a.tabSwitchCount || 0} tab switches · ${a.warnings || 0} warnings</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:4px;">${(a.malpracticeLog||[]).slice(-1)[0]?.event || 'Auto-submitted after 3 warnings'}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:4px;">${(a.malpracticeLog || []).slice(-1)[0]?.event || 'Auto-submitted after 3 warnings'}</div>
           </div>`;
-        }).join('')}
+      }).join('')}
       </div>
     </div>`;
-}
+    }
 
-function filterMonitor(filter) {
-  monitorFilter = filter;
-  ['all','inprog','sub','mal'].forEach(k => {
-    document.getElementById(`mf-${k}`)?.classList.remove('btn-primary','btn-danger');
-    document.getElementById(`mf-${k}`)?.classList.add('btn-outline');
-  });
-  const idMap = { all: 'mf-all', 'in-progress': 'mf-inprog', submitted: 'mf-sub', malpractice: 'mf-mal' };
-  const activeBtn = document.getElementById(idMap[filter] || 'mf-all');
-  if (activeBtn) { activeBtn.classList.remove('btn-outline'); activeBtn.classList.add(filter==='malpractice'?'btn-danger':'btn-primary'); }
-  renderMonitorTable();
-}
+    function filterMonitor(filter) {
+      monitorFilter = filter;
+      ['all', 'inprog', 'sub', 'mal'].forEach(k => {
+        document.getElementById(`mf-${k}`)?.classList.remove('btn-primary', 'btn-danger');
+        document.getElementById(`mf-${k}`)?.classList.add('btn-outline');
+      });
+      const idMap = { all: 'mf-all', 'in-progress': 'mf-inprog', submitted: 'mf-sub', malpractice: 'mf-mal' };
+      const activeBtn = document.getElementById(idMap[filter] || 'mf-all');
+      if (activeBtn) { activeBtn.classList.remove('btn-outline'); activeBtn.classList.add(filter === 'malpractice' ? 'btn-danger' : 'btn-primary'); }
+      renderMonitorTable();
+    }
 
-function renderMonitorTable() {
-  const tbody = document.getElementById('monitor-table');
-  let attempts = monitorFilter === 'all' ? allAttempts : allAttempts.filter(a => a.status === monitorFilter);
-  if (!attempts.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3);">No ${monitorFilter==='all'?'':monitorFilter} attempts found</td></tr>`;
-    return;
-  }
-  const statusColor = { 'submitted': 'var(--success)', 'in-progress': 'var(--warning)', 'malpractice': 'var(--danger)' };
-  const statusBadge = s => `<span class="badge" style="background:${statusColor[s]+'22'};color:${statusColor[s]};border:1px solid ${statusColor[s]+'44'}">${s==='in-progress'?'⏳ In Progress':s==='submitted'?'✅ Submitted':'🚨 Malpractice'}</span>`;
-  tbody.innerHTML = attempts.map((a, i) => {
-    const assessment = monitorAssessments[a.assessmentId] || {};
-    const pct = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : null;
-    const started = new Date(a.startedAt).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-    return `<tr style="${a.isMalpractice?'background:rgba(244,63,94,0.04);':a.status==='in-progress'?'background:rgba(245,158,11,0.03);':''}">
-      <td style="color:var(--text3)">${i+1}</td>
+    function renderMonitorTable() {
+      const tbody = document.getElementById('monitor-table');
+      let attempts = monitorFilter === 'all' ? allAttempts : allAttempts.filter(a => a.status === monitorFilter);
+      if (!attempts.length) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text3);">No ${monitorFilter === 'all' ? '' : monitorFilter} attempts found</td></tr>`;
+        return;
+      }
+      const statusColor = { 'submitted': 'var(--success)', 'in-progress': 'var(--warning)', 'malpractice': 'var(--danger)' };
+      const statusBadge = s => `<span class="badge" style="background:${statusColor[s] + '22'};color:${statusColor[s]};border:1px solid ${statusColor[s] + '44'}">${s === 'in-progress' ? '⏳ In Progress' : s === 'submitted' ? '✅ Submitted' : '🚨 Malpractice'}</span>`;
+      tbody.innerHTML = attempts.map((a, i) => {
+        const assessment = monitorAssessments[a.assessmentId] || {};
+        const pct = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : null;
+        const started = new Date(a.startedAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        return `<tr style="${a.isMalpractice ? 'background:rgba(244,63,94,0.04);' : a.status === 'in-progress' ? 'background:rgba(245,158,11,0.03);' : ''}">
+      <td style="color:var(--text3)">${i + 1}</td>
       <td style="color:var(--text);font-weight:600;">${a.studentName || '—'}</td>
       <td><code style="font-size:11px;">${a.usn}</code></td>
       <td style="color:var(--text2);font-size:12px;">${assessment.title || 'Unknown'}</td>
       <td>${statusBadge(a.status)}</td>
-      <td style="font-weight:700;color:${pct===null?'var(--text3)':pct>=70?'var(--success)':pct>=40?'var(--warning)':'var(--danger)'}">
+      <td style="font-weight:700;color:${pct === null ? 'var(--text3)' : pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--warning)' : 'var(--danger)'}">
         ${pct !== null ? `${a.score}/${a.maxScore} (${pct}%)` : '—'}
       </td>
       <td>
-        ${a.warnings > 0 ? `<span style="color:${a.warnings>=3?'var(--danger)':'var(--warning)'};font-weight:700;">⚠️ ${a.warnings}</span>` : '<span style="color:var(--text3)">0</span>'}
+        ${a.warnings > 0 ? `<span style="color:${a.warnings >= 3 ? 'var(--danger)' : 'var(--warning)'};font-weight:700;">⚠️ ${a.warnings}</span>` : '<span style="color:var(--text3)">0</span>'}
       </td>
       <td style="font-size:11.5px;color:var(--text3);">${started}</td>
       <td>
-        ${a.malpracticeLog?.length ? `<button class="btn btn-outline btn-sm btn-icon" onclick="viewMalpracticeLog(${JSON.stringify(a.malpracticeLog||[]).replace(/"/g,'&quot;')}, '${a.studentName||a.usn}')" title="View events">📋</button>` : '—'}
+        ${a.malpracticeLog?.length ? `<button class="btn btn-outline btn-sm btn-icon" onclick="viewMalpracticeLog(${JSON.stringify(a.malpracticeLog || []).replace(/"/g, '&quot;')}, '${a.studentName || a.usn}')" title="View events">📋</button>` : '—'}
       </td>
     </tr>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-function viewMalpracticeLog(log, name) {
-  if (typeof log === 'string') { try { log = JSON.parse(log); } catch { log = []; } }
-  const events = Array.isArray(log) ? log : [];
-  const html = events.map(e => `
+    function viewMalpracticeLog(log, name) {
+      if (typeof log === 'string') { try { log = JSON.parse(log); } catch { log = []; } }
+      const events = Array.isArray(log) ? log : [];
+      const html = events.map(e => `
     <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
       <span style="color:var(--danger);font-size:18px;">⚠️</span>
       <div>
@@ -1805,12 +2667,12 @@ function viewMalpracticeLog(log, name) {
         <div style="font-size:11px;color:var(--text3);">${new Date(e.timestamp).toLocaleString('en-IN')}</div>
       </div>
     </div>`).join('') || '<div style="color:var(--text3);padding:16px;text-align:center;">No events logged</div>';
-  
-  // Simple alert-style display
-  const modal = document.createElement('div');
-  modal.className = 'overlay show';
-  modal.style.zIndex = '9999';
-  modal.innerHTML = `
+
+      // Simple alert-style display
+      const modal = document.createElement('div');
+      modal.className = 'overlay show';
+      modal.style.zIndex = '9999';
+      modal.innerHTML = `
     <div class="modal" style="max-width:480px;">
       <div class="modal-header">
         <div class="modal-title">🚨 Malpractice Log — ${name}</div>
@@ -1819,21 +2681,22 @@ function viewMalpracticeLog(log, name) {
       <div>${html}</div>
       <div class="modal-footer"><button class="btn btn-outline" onclick="this.closest('.overlay').remove()">Close</button></div>
     </div>`;
-  document.body.appendChild(modal);
-}
+      document.body.appendChild(modal);
+    }
 
-// Auto-refresh monitor every 15 seconds when on that page
-setInterval(() => { if (currentPage === 'assignment-monitor') loadMonitor(); }, 15000);
+    // Auto-refresh monitor every 15 seconds when on that page
+    setInterval(() => { if (currentPage === 'assignment-monitor') loadMonitor(); }, 15000);
 
 
-(async () => {
-  const me = await api('GET', '/api/auth/me');
-  if (!me || me.error || me.role !== 'admin') {
-    window.location.href = '/';
-    return;
-  }
-  loadOverview();
-})();
-</script>
+    (async () => {
+      const me = await api('GET', '/api/auth/me');
+      if (!me || me.error || me.role !== 'admin') {
+        window.location.href = '/';
+        return;
+      }
+      loadOverview();
+    })();
+  </script>
 </body>
+
 </html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlacementPro – Alumni Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2236;
+  --border: #1e2d45;
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --purple: #8b5cf6;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --grad: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  --grad2: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(6,182,212,0.08) 0%, transparent 60%),
+    var(--bg);
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(139,92,246,0.2); } 50% { box-shadow: 0 0 40px rgba(139,92,246,0.4); } }
+
+.container {
+  width: 460px; max-width: 95vw;
+  animation: fadeIn 0.5s ease;
+}
+
+/* ─── LOGIN CARD ─── */
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 44px 40px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+}
+.login-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad);
+}
+
+.logo { text-align: center; margin-bottom: 32px; }
+.logo-icon {
+  width: 72px; height: 72px;
+  background: var(--grad);
+  border-radius: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 32px; margin-bottom: 16px;
+  animation: glow 3s ease-in-out infinite;
+}
+.logo h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+.logo p { color: var(--text2); font-size: 14px; margin-top: 6px; }
+.logo .alumni-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25);
+  color: var(--purple); padding: 5px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 600; margin-top: 12px;
+}
+
+/* ─── GOOGLE BTN AREA ─── */
+.google-area {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.google-area p {
+  font-size: 13px; color: var(--text3); margin-bottom: 18px;
+}
+
+/* ─── REGISTRATION FORM ─── */
+.reg-form {
+  display: none;
+  animation: slideUp 0.4s ease;
+}
+.reg-form.show { display: block; }
+
+.reg-header {
+  text-align: center; margin-bottom: 24px;
+  padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.reg-header h2 { font-size: 18px; font-weight: 700; }
+.reg-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-full { grid-column: 1 / -1; }
+.field { margin-bottom: 0; }
+.field label {
+  display: block; font-size: 11.5px; color: var(--text2);
+  margin-bottom: 6px; font-weight: 600; letter-spacing: 0.2px;
+}
+.field input, .field select {
+  width: 100%; padding: 11px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-family: inherit; font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus, .field select:focus {
+  outline: none; border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+}
+.field input[readonly] {
+  opacity: 0.7; cursor: not-allowed;
+}
+.field .hint {
+  font-size: 11px; color: var(--text3); margin-top: 4px;
+}
+.field select option { background: var(--surface2); }
+
+.btn-register {
+  width: 100%; padding: 14px;
+  background: var(--grad); border: none;
+  border-radius: 12px; color: white;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+  margin-top: 20px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-register:hover { opacity: 0.9; }
+.btn-register:active { transform: scale(0.99); }
+.btn-register:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── FOOTER LINK ─── */
+.footer-link {
+  text-align: center; margin-top: 20px;
+  font-size: 13px; color: var(--text3);
+}
+.footer-link a {
+  color: var(--accent); text-decoration: none; font-weight: 600;
+}
+.footer-link a:hover { text-decoration: underline; }
+
+/* ─── TOAST ─── */
+.toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px; padding: 13px 16px;
+  min-width: 270px; max-width: 340px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  animation: slideIn 0.3s ease; pointer-events: all;
+}
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast.s { border-left-color: var(--success); }
+.toast.e { border-left-color: var(--danger); }
+.toast-t { font-size: 13px; font-weight: 700; }
+.toast-m { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ─── LOADING ─── */
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 500px) {
+  .login-card { padding: 32px 24px; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<body>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<div class="container">
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-icon">🎓</div>
+      <h1>PlacementPro</h1>
+      <p>Alumni Connect Portal</p>
+      <div class="alumni-badge">🌟 Alumni Login</div>
+    </div>
+
+    <!-- STEP 1: Google Sign-In -->
+    <div class="google-area" id="google-area">
+      <p>Sign in with your Google account to get started</p>
+      <div id="g_id_onload"
+           data-client_id="672992454401-bh0cqp66c4lgmptfgqh07nuh5f64verq.apps.googleusercontent.com"
+           data-callback="handleGoogleSignIn">
+      </div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-size="large"
+           data-theme="filled_black"
+           data-text="signin_with"
+           data-shape="rectangular"
+           data-logo_alignment="left"
+           data-width="380">
+      </div>
+    </div>
+
+    <!-- STEP 2: Registration Form -->
+    <div class="reg-form" id="reg-form">
+      <div class="reg-header">
+        <h2>Complete Your Profile</h2>
+        <p>Tell us about yourself so students can connect with you</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="r-name" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="r-email" readonly>
+        </div>
+        <div class="field">
+          <label>Company Name *</label>
+          <input type="text" id="r-company" placeholder="e.g. Google, Infosys">
+        </div>
+        <div class="field">
+          <label>Designation / Role *</label>
+          <input type="text" id="r-designation" placeholder="e.g. Software Engineer">
+        </div>
+        <div class="field">
+          <label>LinkedIn URL</label>
+          <input type="url" id="r-linkedin" placeholder="https://linkedin.com/in/...">
+          <div class="hint">Your public LinkedIn profile</div>
+        </div>
+        <div class="field">
+          <label>GitHub URL</label>
+          <input type="url" id="r-github" placeholder="https://github.com/...">
+        </div>
+        <div class="field">
+          <label>Personal Gmail</label>
+          <input type="email" id="r-gmail" placeholder="your.email@gmail.com">
+          <div class="hint">Separate from login email, visible to students</div>
+        </div>
+        <div class="field">
+          <label>Branch</label>
+          <select id="r-branch">
+            <option value="">Select Branch</option>
+            <option>CSE</option><option>ECE</option><option>ME</option>
+            <option>CE</option><option>EEE</option><option>ISE</option>
+          </select>
+        </div>
+        <div class="field form-full">
+          <label>Graduation Year</label>
+          <input type="number" id="r-gradyear" placeholder="e.g. 2023" min="1980" max="2030">
+        </div>
+      </div>
+
+      <button class="btn-register" id="btn-register" onclick="submitRegistration()">
+        🚀 Complete Registration & Enter Dashboard
+      </button>
+    </div>
+
+    <div class="footer-link">
+      <a href="/">← Back to Student / Admin Login</a>
+    </div>
+  </div>
+</div>
+
+<script>
+let googleCredential = null;
+
+function toast(title, msg, type='') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<div class="toast-t">${title}</div><div class="toast-m">${msg}</div>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='0.3s'; setTimeout(()=>t.remove(),300); }, 4000);
+}
+
+async function handleGoogleSignIn(response) {
+  googleCredential = response.credential;
+  // Decode JWT to get name/email
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  const email = payload.email;
+  const name = payload.name || '';
+
+  // First check if returning alumni
+  try {
+    const res = await fetch('/api/auth/google-alumni', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: googleCredential })
+    });
+    const data = await res.json();
+
+    if (data.success && data.returning) {
+      toast('Welcome back!', `Logged in as ${data.name}`, 's');
+      setTimeout(() => window.location.href = '/alumni', 1000);
+      return;
+    }
+  } catch(e) {}
+
+  // New alumni — show registration form
+  document.getElementById('google-area').style.display = 'none';
+  document.getElementById('reg-form').classList.add('show');
+  document.getElementById('r-name').value = name;
+  document.getElementById('r-email').value = email;
+  document.getElementById('r-gmail').value = email;
+  toast('Google Sign-In Success', 'Please complete your profile', 's');
+}
+
+async function submitRegistration() {
+  const company = document.getElementById('r-company').value.trim();
+  const designation = document.getElementById('r-designation').value.trim();
+  if (!company || !designation) {
+    toast('Required Fields', 'Please fill Company Name and Designation', 'e');
+    return;
+  }
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Registering...';
+
+  try {
+    const res = await fetch('/api/auth/google-alumni', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        credential: googleCredential,
+        name: document.getElementById('r-name').value.trim(),
+        company,
+        designation,
+        linkedin: document.getElementById('r-linkedin').value.trim(),
+        github: document.getElementById('r-github').value.trim(),
+        gmail: document.getElementById('r-gmail').value.trim(),
+        branch: document.getElementById('r-branch').value,
+        gradYear: document.getElementById('r-gradyear').value
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('Registration Complete!', `Welcome ${data.name}`, 's');
+      setTimeout(() => window.location.href = '/alumni', 1200);
+    } else {
+      toast('Error', data.error || 'Registration failed', 'e');
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Complete Registration & Enter Dashboard';
+    }
+  } catch(e) {
+    toast('Error', 'Network error, please try again', 'e');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Complete Registration & Enter Dashboard';
+  }
+}
+</script>
+</body>
+</html>

@@ -187,6 +187,59 @@ const Notification = mongoose.model('Notification', new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 }));
 
+// ─── ALUMNI MODELS ───────────────────────────────────────────────────────────
+const Alumni = mongoose.model('Alumni', new mongoose.Schema({
+  name:        { type: String, required: true },
+  email:       { type: String, required: true, unique: true },
+  company:     { type: String, default: '' },
+  designation: { type: String, default: '' },
+  linkedin:    { type: String, default: '' },
+  github:      { type: String, default: '' },
+  gmail:       { type: String, default: '' },
+  branch:      { type: String, default: '' },
+  gradYear:    { type: Number, default: 0 },
+  profileComplete: { type: Boolean, default: false },
+  createdAt:   { type: Date, default: Date.now }
+}));
+
+const AlumniGroup = mongoose.model('AlumniGroup', new mongoose.Schema({
+  name:        { type: String, required: true },
+  companyTag:  { type: String, required: true },
+  createdBy:   { type: String, required: true },
+  creatorName: { type: String, required: true },
+  creatorRole: { type: String, default: 'student' },
+  members:     [{
+    userId:   String,
+    name:     String,
+    role:     { type: String, enum: ['student','alumni','admin'], default: 'student' },
+    joinedAt: { type: Date, default: Date.now }
+  }],
+  createdAt:   { type: Date, default: Date.now }
+}));
+
+const GroupMessage = mongoose.model('GroupMessage', new mongoose.Schema({
+  groupId:    { type: mongoose.Schema.Types.ObjectId, required: true },
+  section:    { type: String, enum: ['general','resource'], default: 'general' },
+  senderId:   { type: String, required: true },
+  senderName: { type: String, required: true },
+  senderRole: { type: String, enum: ['student','alumni','admin'], default: 'student' },
+  content:    { type: String, default: '' },
+  fileName:   { type: String, default: '' },
+  fileUrl:    { type: String, default: '' },
+  createdAt:  { type: Date, default: Date.now }
+}));
+
+const PrivateMessage = mongoose.model('PrivateMessage', new mongoose.Schema({
+  groupId:    { type: mongoose.Schema.Types.ObjectId, required: true },
+  studentId:  { type: String, required: true },
+  alumniId:   { type: String, required: true },
+  senderId:   { type: String, required: true },
+  senderRole: { type: String, enum: ['student','alumni'], required: true },
+  senderName: { type: String, required: true },
+  content:    { type: String, required: true },
+  createdAt:  { type: Date, default: Date.now }
+}));
+
 // ─── MIDDLEWARE ──────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
@@ -887,10 +940,173 @@ app.get('/api/form-submit', (req, res) => {
   res.json({ status: 'ok', message: 'PlacementPro form endpoint is live ✅', endpoint: 'POST /api/form-submit' });
 });
 
+// ─── ALUMNI AUTH ──────────────────────────────────────────────────────────────
+app.post('/api/auth/google-alumni', async (req, res) => {
+  try {
+    const { credential, name, company, designation, linkedin, github, gmail, branch, gradYear } = req.body;
+    const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: process.env.GOOGLE_CLIENT_ID });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const displayName = (name || payload.name || '').trim();
+
+    let alumni = await Alumni.findOne({ email });
+    if (alumni && alumni.profileComplete) {
+      // Returning alumni — just login
+      req.session.user = { role: 'alumni', id: alumni._id, email, name: alumni.name };
+      return res.json({ success: true, returning: true, name: alumni.name });
+    }
+    // New alumni or incomplete profile — save details
+    const data = {
+      name: displayName, email,
+      company: company || '', designation: designation || '',
+      linkedin: linkedin || '', github: github || '', gmail: gmail || email,
+      branch: branch || '', gradYear: parseInt(gradYear) || 0,
+      profileComplete: !!(company && designation)
+    };
+    if (alumni) {
+      Object.assign(alumni, data);
+      await alumni.save();
+    } else {
+      alumni = await new Alumni(data).save();
+    }
+    req.session.user = { role: 'alumni', id: alumni._id, email, name: alumni.name };
+    res.json({ success: true, returning: false, name: alumni.name, needsProfile: !alumni.profileComplete });
+  } catch (err) {
+    console.error('Alumni Google auth error:', err);
+    res.json({ success: false, error: 'Alumni login failed' });
+  }
+});
+
+// ─── ALUMNI PROFILE ───────────────────────────────────────────────────────────
+app.get('/api/alumni/me', async (req, res) => {
+  try {
+    if (!req.session.user || req.session.user.role !== 'alumni') return res.status(401).json({ error: 'Not authenticated' });
+    const alumni = await Alumni.findById(req.session.user.id);
+    if (!alumni) return res.status(404).json({ error: 'Alumni not found' });
+    res.json(alumni);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/alumni/me', async (req, res) => {
+  try {
+    if (!req.session.user || req.session.user.role !== 'alumni') return res.status(401).json({ error: 'Not authenticated' });
+    const updated = await Alumni.findByIdAndUpdate(req.session.user.id, { $set: { ...req.body, profileComplete: true } }, { new: true });
+    res.json({ success: true, alumni: updated });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ─── ALUMNI GROUP ROUTES ──────────────────────────────────────────────────────
+app.get('/api/alumni/groups', async (req, res) => {
+  try { res.json(await AlumniGroup.find().sort({ createdAt: -1 })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/alumni/groups', async (req, res) => {
+  try {
+    const { companyTag, createdBy, creatorName, creatorRole } = req.body;
+    if (!companyTag) return res.status(400).json({ error: 'Company name is required' });
+    const name = companyTag.trim() + ' Family';
+    const group = await new AlumniGroup({
+      name, companyTag: companyTag.trim(), createdBy, creatorName, creatorRole: creatorRole || 'student',
+      members: [{ userId: createdBy, name: creatorName, role: creatorRole || 'student' }]
+    }).save();
+    res.json({ success: true, group });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.post('/api/alumni/groups/:id/join', async (req, res) => {
+  try {
+    const { userId, name, role } = req.body;
+    const group = await AlumniGroup.findById(req.params.id);
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+    if (group.members.find(m => m.userId === userId)) return res.json({ success: true, message: 'Already a member' });
+    group.members.push({ userId, name, role: role || 'student' });
+    await group.save();
+    res.json({ success: true, group });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.delete('/api/alumni/groups/:id', async (req, res) => {
+  try {
+    await AlumniGroup.findByIdAndDelete(req.params.id);
+    await GroupMessage.deleteMany({ groupId: req.params.id });
+    await PrivateMessage.deleteMany({ groupId: req.params.id });
+    res.json({ success: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.get('/api/alumni/groups/:id/members', async (req, res) => {
+  try {
+    const group = await AlumniGroup.findById(req.params.id);
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+    // Get full alumni profiles for alumni members
+    const alumniMembers = group.members.filter(m => m.role === 'alumni');
+    const alumniProfiles = await Alumni.find({ _id: { $in: alumniMembers.map(m => m.userId) } });
+    res.json({ members: group.members, alumniProfiles });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── GROUP MESSAGES ───────────────────────────────────────────────────────────
+app.get('/api/alumni/groups/:id/messages/:section', async (req, res) => {
+  try {
+    const messages = await GroupMessage.find({ groupId: req.params.id, section: req.params.section }).sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/alumni/groups/:id/messages', upload.single('file'), async (req, res) => {
+  try {
+    const { section, senderId, senderName, senderRole, content } = req.body;
+    const msg = { groupId: req.params.id, section: section || 'general', senderId, senderName, senderRole: senderRole || 'student', content: content || '' };
+    if (req.file) {
+      msg.fileName = req.file.originalname;
+      msg.fileUrl = '/uploads/' + req.file.filename;
+    }
+    const saved = await new GroupMessage(msg).save();
+    res.json({ success: true, message: saved });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ─── PRIVATE MESSAGES (Student ↔ Alumni) ──────────────────────────────────────
+app.get('/api/alumni/private/:groupId/:alumniId', async (req, res) => {
+  try {
+    if (!req.session.user) return res.status(401).json({ error: 'Not authenticated' });
+    const userId = req.session.user.id || req.session.user.username;
+    const { groupId, alumniId } = req.params;
+    const messages = await PrivateMessage.find({
+      groupId,
+      $or: [
+        { studentId: userId, alumniId },
+        { studentId: alumniId, alumniId: userId }
+      ]
+    }).sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/alumni/private', async (req, res) => {
+  try {
+    const { groupId, studentId, alumniId, senderId, senderRole, senderName, content } = req.body;
+    const msg = await new PrivateMessage({ groupId, studentId, alumniId, senderId, senderRole, senderName, content }).save();
+    res.json({ success: true, message: msg });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Get alumni list for alumni connect
+app.get('/api/alumni/list', async (req, res) => {
+  try { res.json(await Alumni.find({ profileComplete: true }).select('-__v')); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── SERVE FRONTEND ───────────────────────────────────────────────────────────
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
 app.get('/student', (req, res) => res.sendFile(path.join(__dirname, 'dashboard1.html')));
 app.get('/dashboard1', (req, res) => res.sendFile(path.join(__dirname, 'dashboard1.html')));
+app.get('/alumni-login', (req, res) => res.sendFile(path.join(__dirname, 'index1.html')));
+app.get('/alumni', (req, res) => res.sendFile(path.join(__dirname, 'dashboard-alumni.html')));
+app.get('/alumni-connect', (req, res) => res.sendFile(path.join(__dirname, 'alumni-connect.html')));
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.listen(PORT, () => console.log(`🚀 PlacementPro running on http://localhost:${PORT}`));
